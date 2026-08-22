@@ -1,0 +1,56 @@
+[x-cloak] { display: none !important; }
+
+body { background: #fafafa; }
+nav .brand-logo { font-family: 'Roboto Mono', monospace; font-weight: 500; padding-left: 12px; }
+
+.app-body { padding: 12px 24px 48px; }
+.no-margin { margin: 0; }
+
+/* Sidebar */
+.sidebar {
+  padding: 12px 16px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  position: sticky;
+  top: 76px;
+}
+.filter-group { margin-bottom: 18px; }
+.filter-group h6 { font-size: 13px; font-weight: 500; color: #616161; margin: 4px 0 8px; text-transform: uppercase; letter-spacing: .5px; }
+.chip-list { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px; }
+.chip-list .chip { margin: 0; font-size: 12px; height: 28px; line-height: 28px; padding: 0 12px; cursor: pointer; }
+
+/* Main */
+.main { padding: 12px 16px; }
+
+.sort-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  padding: 8px 12px; margin-bottom: 12px;
+  background: #fff; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,.08);
+}
+.sort-bar > span { font-size: 13px; }
+.sort-chip-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; flex: 1 1 auto; min-height: 32px; }
+.sort-chip-list .chip { display: inline-flex; align-items: center; gap: 4px; cursor: default; margin: 0; }
+.sort-chip-list .chip .drag-handle { font-size: 18px; cursor: grab; color: #616161; }
+.sort-chip-list .chip a { display: inline-flex; align-items: center; color: inherit; }
+.sort-chip-list .chip a .material-icons { font-size: 16px; }
+.sort-chip-list .chip .close { cursor: pointer; }
+.add-sort select { display: block; margin: 0; height: 32px; padding: 0 8px; border: 1px solid #ccc; border-radius: 3px; background: #fff; font-size: 13px; }
+
+.table-scroll { max-height: calc(100vh - 260px); overflow: auto; background: #fff; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.compact-table { margin: 0; font-size: 13px; }
+.compact-table th, .compact-table td { padding: 6px 10px; white-space: nowrap; }
+.compact-table thead th { position: sticky; top: 0; background: #eceff1; z-index: 1; }
+.compact-table .mono { font-family: 'Roboto Mono', ui-monospace, Menlo, monospace; }
+.compact-table td a { color: #00695c; }
+.null { color: #b0bec5; }
+
+.row-count { padding: 8px 0; font-size: 13px; }
+.padded { padding: 32px 16px; }
+
+@media (max-width: 992px) {
+  .sidebar { position: static; max-height: none; }
+  .table-scroll { max-height: none; }
+}

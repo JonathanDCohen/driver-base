@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Driver Base</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body x-data="app()" x-init="init()" x-cloak>
+
+  <nav class="teal darken-2">
+    <div class="nav-wrapper container">
+      <a class="brand-logo" href="#">driver-base</a>
+      <ul class="right hide-on-med-and-down">
+        <li><a><span x-text="statusLabel"></span></a></li>
+        <li><a x-text="`schema ${schemaVersion}`"></a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container-fluid app-body">
+    <div class="row no-margin">
+
+      <!-- Filter sidebar -->
+      <aside class="col s12 m4 l3 sidebar">
+        <div class="input-field">
+          <i class="material-icons prefix">search</i>
+          <input id="q" type="text" x-model="filters.q" @input.debounce.150="onFilterChange" />
+          <label for="q">Model or manufacturer</label>
+        </div>
+
+        <template x-for="group in filterGroups" :key="group.key">
+          <div class="filter-group">
+            <h6 x-text="group.label"></h6>
+            <ul class="chip-list">
+              <template x-for="opt in group.options" :key="opt.value">
+                <li>
+                  <a href="#" class="chip"
+                     :class="filters[group.key].includes(opt.value) ? 'teal white-text' : ''"
+                     @click.prevent="toggleFilter(group.key, opt.value)"
+                     x-text="`${opt.label} (${opt.count})`"></a>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </template>
+
+        <button class="btn-flat waves-effect grey-text" @click="clearFilters" x-show="hasFilters">
+          <i class="material-icons left">clear_all</i> Clear filters
+        </button>
+      </aside>
+
+      <!-- Main -->
+      <section class="col s12 m8 l9 main">
+        <div class="sort-bar">
+          <span class="grey-text">Sort priority:</span>
+          <ul id="sort-chips" class="sort-chip-list" x-ref="sortChips">
+            <template x-for="(s, i) in sorts" :key="s.field">
+              <li class="chip teal lighten-4" :data-idx="i">
+                <span class="drag-handle material-icons">drag_indicator</span>
+                <span x-text="fieldLabel(s.field)"></span>
+                <a href="#" @click.prevent="toggleSortDir(i)" :title="s.dir === 'asc' ? 'ascending' : 'descending'">
+                  <i class="material-icons" x-text="s.dir === 'asc' ? 'arrow_upward' : 'arrow_downward'"></i>
+                </a>
+                <i class="close material-icons" @click="removeSort(i)">close</i>
+              </li>
+            </template>
+          </ul>
+
+          <div class="add-sort">
+            <select @change="onAddSort($event)">
+              <option value="" disabled selected>+ add sort</option>
+              <template x-for="f in unusedSortableFields" :key="f.key">
+                <option :value="f.key" x-text="f.label"></option>
+              </template>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="striped highlight compact-table">
+            <thead>
+              <tr>
+                <template x-for="col in visibleColumns" :key="col.key">
+                  <th x-text="col.label" :class="col.numeric ? 'right-align' : ''"></th>
+                </template>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="d in visibleRows" :key="d.canonical_id">
+                <tr>
+                  <template x-for="col in visibleColumns" :key="col.key">
+                    <td :class="col.numeric ? 'right-align mono' : ''" x-html="formatCell(d, col)"></td>
+                  </template>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+          <div x-show="visibleRows.length === 0" class="grey-text center-align padded">
+            No drivers match the current filters.
+          </div>
+        </div>
+
+        <div class="row-count grey-text center-align">
+          <span x-text="`${visibleRows.length} / ${drivers.length} drivers`"></span>
+          <span x-show="paginated" x-text="` (showing first ${pageSize})`"></span>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <script src="app.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+</body>
+</html>
