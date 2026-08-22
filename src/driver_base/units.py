@@ -214,14 +214,14 @@ def parse_liters(s: Optional[str]) -> Optional[float]:
     if not s:
         return None
     metric_m = re.search(
-        r"(-?\d+(?:[.,]\d+)?)\s*(?:dm\^?[³3]|l\b|liters?|litres?)",
+        r"(-?\d+(?:[.,]\d+)?)\s*(?:dm\s*\^?\s*[³3]|l\b|liters?|litres?)",
         s,
         re.IGNORECASE,
     )
     if metric_m:
         return float(metric_m.group(1).replace(",", "."))
     ft3_m = re.search(
-        r"(-?\d+(?:[.,]\d+)?)\s*(?:ft\^?[³3]|cu\.?\s*ft\.?)", s, re.IGNORECASE
+        r"(-?\d+(?:[.,]\d+)?)\s*(?:ft\s*\^?\s*[³3]|cu\.?\s*ft\.?)", s, re.IGNORECASE
     )
     if ft3_m:
         return float(ft3_m.group(1).replace(",", ".")) * 28.3168
@@ -236,15 +236,15 @@ def parse_sd_cm2(s: Optional[str]) -> Optional[float]:
     if not s:
         return None
     cm2_m = re.search(
-        r"(-?\d+(?:[.,]\d+)?)\s*(?:cm\^?[²2]|sq\.?\s*cm)", s, re.IGNORECASE
+        r"(-?\d+(?:[.,]\d+)?)\s*(?:cm\s*\^?\s*[²2]|sq\.?\s*cm)", s, re.IGNORECASE
     )
     if cm2_m:
         return float(cm2_m.group(1).replace(",", "."))
-    m2_m = re.search(r"(-?\d+(?:[.,]\d+)?)\s*m\^?[²2]\b", s, re.IGNORECASE)
+    m2_m = re.search(r"(-?\d+(?:[.,]\d+)?)\s*m\s*\^?\s*[²2]\b", s, re.IGNORECASE)
     if m2_m:
         return float(m2_m.group(1).replace(",", ".")) * 10000.0
     in2_m = re.search(
-        r"(-?\d+(?:[.,]\d+)?)\s*(?:in\^?[²2]|sq\.?\s*in)", s, re.IGNORECASE
+        r"(-?\d+(?:[.,]\d+)?)\s*(?:in\s*\^?\s*[²2]|sq\.?\s*in)", s, re.IGNORECASE
     )
     if in2_m:
         return float(in2_m.group(1).replace(",", ".")) * 6.4516

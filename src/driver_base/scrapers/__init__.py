@@ -24,6 +24,7 @@ def instantiate_all() -> list[Scraper]:
     """Import concrete scraper modules and return instances of each registered class."""
     from driver_base.scrapers import bcspeakers  # noqa: F401
     from driver_base.scrapers import beyma  # noqa: F401
+    from driver_base.scrapers import celestion  # noqa: F401
     from driver_base.scrapers import dayton  # noqa: F401
     from driver_base.scrapers import eighteensound  # noqa: F401
     from driver_base.scrapers import eminence  # noqa: F401
