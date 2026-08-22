@@ -481,18 +481,28 @@ def _preserve_result(
 def _rehydrate_drivers(
     prior_records: list[dict[str, Any]], *, now_iso: str
 ) -> list[Driver]:
-    """Turn prior JSON records back into Driver dataclasses so we can re-emit
-    them unchanged (but with a bumped last_scraped_at)."""
-    from dataclasses import fields as dc_fields
+    """Preserve-on-failure path: rehydrate prior records with `last_scraped_at`
+    bumped to `now_iso` (scraped_at stays)."""
+    return rehydrate_drivers(prior_records, now_iso=now_iso)
 
-    from driver_base.model import DriverStatus, MagnetType, SpecSource
+
+def rehydrate_drivers(
+    prior_records: list[dict[str, Any]], *, now_iso: Optional[str] = None
+) -> list[Driver]:
+    """Turn prior drivers.json records back into Driver dataclasses.
+
+    Passing `now_iso=None` keeps each record's own `last_scraped_at` — used by
+    the CLI's per-scraper regen path where an unrun scraper's records must
+    pass through untouched. Passing an ISO timestamp bumps `last_scraped_at`
+    (used by the preserve-on-failure branch)."""
+    from dataclasses import fields as dc_fields
 
     driver_fields = {f.name: f for f in dc_fields(Driver)}
     out: list[Driver] = []
     for rec in prior_records:
         kwargs: dict[str, Any] = {}
         for name in driver_fields:
-            if name == "last_scraped_at":
+            if name == "last_scraped_at" and now_iso is not None:
                 kwargs[name] = now_iso
                 continue
             v = rec.get(name)
@@ -500,7 +510,6 @@ def _rehydrate_drivers(
         try:
             out.append(Driver(**kwargs))
         except TypeError:
-            # tolerate stale schemas — skip records that can't be rehydrated
             continue
     return out
 

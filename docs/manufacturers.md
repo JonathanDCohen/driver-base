@@ -19,6 +19,7 @@ The selectors below are the ones the validator's script actually used. Substitut
 | HOQS | hoqs.org | `/products.json?limit=250` (Shopify) | static HTML | `var speakerData = ({...});` (inline JS object) | 13 | **Sensitivity is `2.83V/1m`, not `1W/1m`** |
 | RCF | rcf.it | 6 category pages via `?serieId=` | static HTML | `div.specifications div.row > div.col-md-6:first-child + div.col-md-6.font-family-semibold` (div pairs) | 137 (103 excl. Custom Designs) | No usable sitemap; Liferay OAuth endpoints 403 without token |
 | Beyma | beyma.com | 12 English category pages (10 kept, 2 dropped) | static HTML | `div.block-product-features div.items div.item` (div pairs) | ~194 active | `passive-filter` + `accesories` slugs dropped at enumeration |
+| Jensen | jensentone.com | `sitemap.xml` (63 product URLs across 7 categories) | static HTML | `div.jensentone-ohm-specs` (4 captioned `<table>`s) | ~120 (multi-impedance expansion from 63 URLs) | Every product is guitar/bass; many pages carry both 8Ω and 16Ω specs — one `DriverFragment` emitted per impedance column |
 
 **Deferred:** La Voce (site unreachable — see `memory/la-voce-parked.md` and the "Deferred" section below).
 
@@ -529,6 +530,56 @@ shaker                    → SHAKER
 - Shaker driver bandwidth is legitimately narrow (e.g. 20-60 Hz); `SHAKER` DriverKind gets a relaxed `freq_high >= freq_low + min_bw` gate.
 
 **Recon count:** 194 active + 112 discontinued. v1 scrapes active only: `expected_min_records = 160`.
+
+---
+
+---
+
+## Jensen (`jensen`)
+
+**Homepage:** https://www.jensentone.com (Drupal site). `robots.txt` allows product pages; no `Crawl-delay` for the default UA. Sitemap at `/sitemap.xml`.
+
+**Enumeration.** Parse `sitemap.xml`, filter to URLs that match one of the 7 known category slugs:
+```
+vintage-alnico   vintage-ceramic   vintage-neo
+jet-series       mod-series        d-series
+bass-speakers
+```
+Regex `^https?://www\.jensentone\.com/{cat}/[a-z0-9-]+/?$`. Yields 63 product URLs (2026-08-22). Every product maps to `DriverKind.GUITAR_BASS` — Jensen is exclusively guitar/bass amp speakers, kin to Celestion's guitar catalog. The GUITAR_BASS kind is exempt from the T/S-required consistency check, which matters because Jensen guitar drivers legitimately omit some parameters.
+
+**Sample product page:** https://www.jensentone.com/vintage-alnico/p12n
+
+**Extraction.** Specs live inside `div.jensentone-ohm-specs`, which contains **four `<table>`s** each with a `<caption>` naming its section:
+
+| Caption | Row layout | How the parser reads it |
+|---|---|---|
+| `General Characteristics` | `label \| metric \| imperial` | `cell[1]` (metric) |
+| `Thiele-Small Parameters` | `label \| symbol \| value_imp0 [\| value_imp1…]` | Impedance-indexed cell (see below) |
+| `Constructive Characteristics` | `label \| empty \| value` | Last non-empty cell |
+| `Electrical Characteristics` | `label \| empty \| value_imp0 [\| value_imp1…]` | Impedance-indexed cell |
+
+**Multi-impedance emission.** Some products (e.g. P12N) ship in both 8Ω and 16Ω from a single URL. The scraper reads the first `Nominal Impedance` header row it finds, treats each non-empty value cell as an impedance column, and **emits one `DriverFragment` per impedance**. Canonical IDs then differ (`jensen__p12n__8ohm` vs `jensen__p12n__16ohm`). Rows with only one value column (e.g. `Electrical Q Factor | Q ES | 0.98`) apply that single value to every fragment.
+
+**Sample data (P12N, 8Ω / 16Ω):**
+- 8Ω: Fs 90 Hz, Qts 0.77, Qms 4.36, Vas 34.6 L, Re 6.03 Ω, Bl 10.62 T·m, Le 0.87 mH, Sensitivity 97.5 dB
+- 16Ω: Fs 91 Hz, Qts 0.84, Qms 5.77, Vas 42.2 L, Re 12 Ω, Bl 13.71 T·m, Le 1.05 mH, Sensitivity 97.8 dB
+- Shared: Qes 0.98 (single-value row), Xmax 1 mm, Mms 30.9/27 g, magnet ALNICO, 12″ / 307 mm, 3.1 kg, Rated 50 W, Musical 100 W
+
+**Field mapping (Jensen):**
+- `Rated Power` → `power_aes_watts`
+- `Musical Power` → `power_peak_watts`
+- `Sensitivity@1W,1m` → `sensitivity_db_1w_1m`
+- `Force Factor` → `bl_tm` (value like `10.62 Wb/m` — Wb/m ≡ T·m)
+- `Mechanical Compliance` → `cms_mm_per_n` (values in µm/N converted to mm/N)
+- `Voice Coil Inductance @ 1kHz` → `le_mh`
+- `Nominal Overall Diameter` → `nominal_size_mm`; `Overall Weight` → `net_weight_kg`; `Magnet` (Alnico/Ceramic/Neo) → `magnet_type` enum
+
+**Quirks:**
+- H1 text is the model name (`P12N`, `Vintage 30`-style is Celestion's; Jensen uses codes).
+- Cells in the T/S table use spaced-out symbol notation (`R E`, `Q MS`, `M MS`) — `normalize_label` isn't involved for symbols; symbols live in `cell[1]` and are skipped.
+- `Xmax` values include the `±` sign (`± 1 mm`) — `parse_length_mm` strips it.
+
+**Recon count:** 63 product URLs. Multi-impedance expansion yields **120 driver records**. Set `expected_min_records = 55` (below 63 to allow parse-fail attrition).
 
 ---
 

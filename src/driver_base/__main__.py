@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 from driver_base import __version__
-from driver_base.orchestrator import run_all
+from driver_base.orchestrator import rehydrate_drivers, run_all
 from driver_base.schema import read_prior_drivers_json, write_drivers_json
 from driver_base.scrapers import SCRAPERS, instantiate_all
 
@@ -39,15 +39,17 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 
 
 async def _amain(args: argparse.Namespace) -> int:
-    scrapers = instantiate_all()
+    all_scrapers = instantiate_all()
     if args.scraper:
         wanted = set(args.scraper)
-        scrapers = [s for s in scrapers if s.name in wanted]
-        missing = wanted - {s.name for s in scrapers}
+        run_scrapers = [s for s in all_scrapers if s.name in wanted]
+        missing = wanted - {s.name for s in run_scrapers}
         if missing:
             print(f"error: unknown scraper(s): {sorted(missing)}", file=sys.stderr)
             return 2
-    if not scrapers:
+    else:
+        run_scrapers = all_scrapers
+    if not run_scrapers:
         print("error: no scrapers registered / selected", file=sys.stderr)
         return 2
 
@@ -55,13 +57,32 @@ async def _amain(args: argparse.Namespace) -> int:
     aliases_path = args.aliases if args.aliases.exists() else None
 
     drivers, per_status = await run_all(
-        scrapers,
+        run_scrapers,
         prior=prior,
         cache_root=args.cache_root,
         aliases_path=aliases_path,
         rejections_dir=args.rejections_dir,
         force_refresh=args.refetch,
     )
+
+    # Per-manufacturer regen: preserve records + per_scraper_status for any
+    # scraper NOT in this run, so a `--scraper jensen` invocation doesn't
+    # nuke the other 9 manufacturers' data.
+    if prior:
+        run_names = {s.name for s in run_scrapers}
+        prior_status = prior.get("per_scraper_status") or {}
+        prior_records = prior.get("drivers") or []
+        for s in all_scrapers:
+            if s.name in run_names:
+                continue
+            if s.name in prior_status:
+                per_status[s.name] = prior_status[s.name]
+            belonging = [
+                r for r in prior_records
+                if r.get("manufacturer") == s.manufacturer_display
+            ]
+            if belonging:
+                drivers.extend(rehydrate_drivers(belonging, now_iso=None))
 
     write_drivers_json(
         path=args.output,
