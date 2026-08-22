@@ -17,6 +17,9 @@ from driver_base.labels import normalize_label
     ("Xmax (4)", "xmax"),
     ("Xdamage (5)", "xdamage"),
     ("Cone Surround (3)", "cone surround"),
+    # (Xmax) parenthetical must NOT trigger the "max" measurement-context token
+    ("Maximum Linear Excursion (Xmax)", "maximum linear excursion"),
+    ("Total Q (Qts)", "total q"),
     # measurement-context parenthetical → preserved
     ("Power Handling (RMS)", "power handling (rms)"),
     ("Power Handling (max)", "power handling (max)"),

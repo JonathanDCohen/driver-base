@@ -85,8 +85,11 @@ def parse_frequency(s: Optional[str]) -> Optional[float]:
 def parse_range(s: Optional[str]) -> Optional[tuple[float, float]]:
     """Return (low_hz, high_hz). Accepts '-', '–', '÷', 'to' separators.
 
-    Interior '-' inside `40-3000Hz` is a separator, not a sign. Extraction
-    takes the absolute value of both endpoints.
+    Interior '-' inside `40-3000Hz` is a separator, not a sign — endpoints
+    are taken as absolute values.
+
+    Mixed units per endpoint are respected: `"33 Hz - 0.3 kHz"` → (33, 300),
+    not (33000, 300).
     """
     if s is None:
         return None
@@ -95,13 +98,27 @@ def parse_range(s: Optional[str]) -> Optional[tuple[float, float]]:
         return None
     # Strip thousands commas so 4,000 doesn't fragment into two numbers.
     stripped = re.sub(r"(?<=\d),(?=\d{3}\b)", "", s)
-    nums = [abs(n) for n in _all_floats(stripped, comma_is_decimal=True)]
-    if len(nums) < 2:
-        return None
-    low, high = nums[0], nums[1]
-    if re.search(r"\bkhz\b", s, re.IGNORECASE):
-        low *= 1000.0
-        high *= 1000.0
+
+    # First-pass: look for explicitly unit-tagged endpoints so mixed
+    # `33 Hz - 0.3 kHz` handles correctly.
+    tagged = re.findall(
+        r"(-?\d+(?:[.,]\d+)?)\s*(khz|hz)\b",
+        stripped,
+        re.IGNORECASE,
+    )
+    if len(tagged) >= 2:
+        (a_s, a_u), (b_s, b_u) = tagged[0], tagged[1]
+        low = abs(float(a_s.replace(",", "."))) * (1000.0 if a_u.lower() == "khz" else 1.0)
+        high = abs(float(b_s.replace(",", "."))) * (1000.0 if b_u.lower() == "khz" else 1.0)
+    else:
+        nums = [abs(n) for n in _all_floats(stripped, comma_is_decimal=True)]
+        if len(nums) < 2:
+            return None
+        low, high = nums[0], nums[1]
+        if re.search(r"\bkhz\b", s, re.IGNORECASE):
+            low *= 1000.0
+            high *= 1000.0
+
     if low > high:
         low, high = high, low
     return low, high
@@ -197,14 +214,14 @@ def parse_liters(s: Optional[str]) -> Optional[float]:
     if not s:
         return None
     metric_m = re.search(
-        r"(-?\d+(?:[.,]\d+)?)\s*(?:dm[³3]|l\b|liters?|litres?)",
+        r"(-?\d+(?:[.,]\d+)?)\s*(?:dm\^?[³3]|l\b|liters?|litres?)",
         s,
         re.IGNORECASE,
     )
     if metric_m:
         return float(metric_m.group(1).replace(",", "."))
     ft3_m = re.search(
-        r"(-?\d+(?:[.,]\d+)?)\s*(?:ft[³3]|cu\.?\s*ft\.?)", s, re.IGNORECASE
+        r"(-?\d+(?:[.,]\d+)?)\s*(?:ft\^?[³3]|cu\.?\s*ft\.?)", s, re.IGNORECASE
     )
     if ft3_m:
         return float(ft3_m.group(1).replace(",", ".")) * 28.3168
@@ -219,15 +236,15 @@ def parse_sd_cm2(s: Optional[str]) -> Optional[float]:
     if not s:
         return None
     cm2_m = re.search(
-        r"(-?\d+(?:[.,]\d+)?)\s*(?:cm[²2]|sq\.?\s*cm)", s, re.IGNORECASE
+        r"(-?\d+(?:[.,]\d+)?)\s*(?:cm\^?[²2]|sq\.?\s*cm)", s, re.IGNORECASE
     )
     if cm2_m:
         return float(cm2_m.group(1).replace(",", "."))
-    m2_m = re.search(r"(-?\d+(?:[.,]\d+)?)\s*m[²2]\b", s, re.IGNORECASE)
+    m2_m = re.search(r"(-?\d+(?:[.,]\d+)?)\s*m\^?[²2]\b", s, re.IGNORECASE)
     if m2_m:
         return float(m2_m.group(1).replace(",", ".")) * 10000.0
     in2_m = re.search(
-        r"(-?\d+(?:[.,]\d+)?)\s*(?:in[²2]|sq\.?\s*in)", s, re.IGNORECASE
+        r"(-?\d+(?:[.,]\d+)?)\s*(?:in\^?[²2]|sq\.?\s*in)", s, re.IGNORECASE
     )
     if in2_m:
         return float(in2_m.group(1).replace(",", ".")) * 6.4516

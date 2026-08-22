@@ -226,7 +226,7 @@ async def _run_isolated(
             sidecar = write_rejections_sidecar(
                 scraper_name=scraper.name,
                 run_id=run_id,
-                rejected=[f.__dict__ for f in dropped[:20]],
+                rejected=list(dropped[:20]),
                 reason=gate_reason or "",
                 out_dir=rejections_dir,
             )

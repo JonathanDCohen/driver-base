@@ -116,7 +116,9 @@ The page duplicates spec rows for responsive layout (mobile vs desktop). ~92 row
 - Nominal 8 Ω / Min 6.7 Ω, Nominal Power 250 W, Continuous Power 500 W, Sensitivity 98 dB, Range 55–3000 Hz
 - Voice coil 64 mm, Flux 1.3 T, Net weight 5.65 kg
 
-**Field mapping:** identical convention to 18Sound — `Nominal Power Handling` → `power_aes_watts`, `Continuous Power Handling` → `power_long_term_watts`, `Sensitivity` (unlabelled) → `sensitivity_db_1w_1m`.
+**Field mapping:** identical to 18Sound for power — `Nominal Power Handling` → `power_aes_watts`, `Continuous Power Handling` → `power_long_term_watts`.
+
+**Sensitivity slot: `sensitivity_db_2_83v_1m`.** The `Sensitivity` cell has a tooltip icon whose `data-tooltip-content` attribute reads *"Applied RMS Voltage is set to 2.83 V for 8 ohms Nominal Impedance."* — so B&C is measuring at 2.83 V, not 1 W. Values are equivalent for 8 Ω drivers (2.83 V ≈ 1 W) but diverge by 3 dB for 4 Ω, so slot placement matters.
 
 **DriverKind mapping:** `lf-driver` → LF_WOOFER; `hf-driver` → HF_COMPRESSION. (B&C has only these two active categories.)
 
@@ -276,7 +278,14 @@ For discontinued/archived coverage, `https://eminence.com/sitemap_products_1.xml
 
 **Sample product page:** https://www.faitalpro.com/en/products/LF_Loudspeakers/product_details/index.php?id=101050135 (`12PR320`, 8Ω)
 
-**URL case-sensitivity.** Sitemap URLs use lowercase category paths (`/en/products/lf_loudspeakers/...`), but the server also accepts mixed-case (`LF_Loudspeakers`). Both work; use the sitemap's version verbatim. Detail pages are static HTML.
+**URL case-sensitivity — must rewrite.** The sitemap uses lowercase category paths (`/en/products/lf_loudspeakers/...`), but hitting one of those URLs triggers a 301 redirect from `www.faitalpro.com` → `faitalpro.com`, and the redirect target requires **mixed-case category paths** (`LF_Loudspeakers`). The lowercase form 404s after the redirect. `scrapers/faital.py::enumerate` rewrites via `_CATEGORY_MIXED_CASE` before yielding product URLs:
+
+    lf_loudspeakers        → LF_Loudspeakers
+    hf_drivers             → HF_Drivers
+    coaxial_loudspeakers   → Coaxial_Loudspeakers
+    hf_horns               → HF_Horns
+
+Detail pages themselves are static HTML.
 
 **Extraction.** `<table class="tbl_data">` — first `td`/`th` is label, second is value. Selector: `table.tbl_data tr`. Spec data is **duplicated across 6 `tbl_data` tables per page** (tables 0-2 and 4-5 repeat the same values); deduplicate by label (take first occurrence).
 

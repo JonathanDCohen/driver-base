@@ -22,5 +22,12 @@ def register(cls: type[Scraper]) -> type[Scraper]:
 
 def instantiate_all() -> list[Scraper]:
     """Import concrete scraper modules and return instances of each registered class."""
+    from driver_base.scrapers import bcspeakers  # noqa: F401
+    from driver_base.scrapers import beyma  # noqa: F401
+    from driver_base.scrapers import dayton  # noqa: F401
     from driver_base.scrapers import eighteensound  # noqa: F401
+    from driver_base.scrapers import eminence  # noqa: F401
+    from driver_base.scrapers import faital  # noqa: F401
+    from driver_base.scrapers import hoqs  # noqa: F401
+    from driver_base.scrapers import rcf  # noqa: F401
     return [cls() for cls in SCRAPERS.values()]

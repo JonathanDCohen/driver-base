@@ -71,19 +71,27 @@ def _fold_unicode(s: str) -> str:
 
 def _preserve_measurement_context(raw: str, normalized: str) -> str:
     """If raw contains a measurement-context parenthetical, retain it in the
-    normalized form. Substring-matches each token against the parenthetical
-    content, then prunes tokens that are subsumed by a longer matched token
-    so 'peak to peak' doesn't also register as 'peak'.
+    normalized form. Word-boundary-matches each token against the
+    parenthetical content, then prunes tokens subsumed by a longer matched
+    token so 'peak to peak' doesn't also register as 'peak'.
+
+    Word-boundary matching is critical: bare `token in inner` misfires on
+    'max' inside '(Xmax)', appending a spurious '(max)' to the normalized
+    key.
     """
     hits: list[str] = []
     for m in re.finditer(r"[\(\[]([^)\]]+)[\)\]]", raw):
         inner = _fold_unicode(m.group(1)).strip().lower()
         for token in _MEASUREMENT_CONTEXT_TOKENS:  # longest-first
-            if token in inner and token not in hits:
-                # skip if another (longer) already-matched token contains this one
-                if any(token in longer and token != longer for longer in hits):
-                    continue
-                hits.append(token)
+            if token in hits:
+                continue
+            pattern = r"(?<![a-z0-9])" + re.escape(token) + r"(?![a-z0-9])"
+            if not re.search(pattern, inner):
+                continue
+            # skip if another (longer) already-matched token contains this one
+            if any(token in longer and token != longer for longer in hits):
+                continue
+            hits.append(token)
     if hits:
         joined = " ".join(sorted(set(hits)))
         return f"{normalized} ({joined})"

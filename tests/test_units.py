@@ -48,6 +48,9 @@ def test_parse_frequency(s: str, expected: float) -> None:
     ("30 - 4,000 Hz", (30.0, 4000.0)),
     ("35 to 1000 Hz", (35.0, 1000.0)),
     ("1 - 2 kHz", (1000.0, 2000.0)),
+    # Eminence mixed units: low = Hz, high = kHz
+    ("33 Hz - 0.3 kHz", (33.0, 300.0)),
+    ("50 Hz - 2 kHz", (50.0, 2000.0)),
 ])
 def test_parse_range(s: str, expected: tuple[float, float]) -> None:
     got = parse_range(s)
@@ -133,6 +136,7 @@ def test_parse_mass_g(s: str, expected: float) -> None:
     ("242 liters", 242.0),
     ("143,9 (5.08)", 143.9),        # European decimal comma
     ("11.71 cu.ft.", 331.5),        # imperial only → convert
+    ("113.3 dm^3 (4.00 ft^3)", 113.3),   # Faital caret-notation superscript
 ])
 def test_parse_liters(s: str, expected: float) -> None:
     got = parse_liters(s)
@@ -147,6 +151,7 @@ def test_parse_liters(s: str, expected: float) -> None:
     ("1225 sq cm", 1225.0),
     ("0.120 m2", 1200.0),
     ("0.1255 m²", 1255.0),
+    ("539 cm^2 (83.55 in^2)", 539.0),   # Faital caret notation
 ])
 def test_parse_sd_cm2(s: str, expected: float) -> None:
     got = parse_sd_cm2(s)
