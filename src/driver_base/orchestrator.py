@@ -41,6 +41,7 @@ from driver_base.rate_limiter import HostRateLimiter
 from driver_base.rejections import write_rejections_sidecar
 from driver_base.robots import RobotsCache
 from driver_base.sanity import check_record_count, sanity_check_fragment
+from driver_base.sensitivity import derive_missing_sensitivity
 
 MAX_SCRAPER_CONCURRENCY = 4
 MAX_FOLLOWUP_ROUNDS = 2
@@ -376,6 +377,9 @@ def _post_parse_pipeline(
 ) -> list[Driver]:
     for f in fragments:
         sanity_check_fragment(f)
+
+    for f in fragments:
+        derive_missing_sensitivity(f)
 
     for f in fragments:
         if f.driver_kind is None:
