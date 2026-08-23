@@ -52,9 +52,29 @@ def test_no_op_when_neither_populated() -> None:
     assert f.power_program_watts is None
 
 
-def test_no_op_on_long_term_or_peak() -> None:
-    """Long-term and peak are NOT derived — ratios vary by manufacturer."""
-    f = _frag(power_long_term_watts=800.0, power_peak_watts=1200.0)
+def test_derives_long_term_from_aes_when_missing() -> None:
+    """AES is a continuous test — when the mfg doesn't publish a separately-
+    tested long-term number, use AES as the continuous rating."""
+    f = _frag(power_aes_watts=300.0)
     derive_missing_power(f)
-    assert f.power_aes_watts is None
-    assert f.power_program_watts is None
+    assert f.power_long_term_watts == pytest.approx(300.0)
+    assert f.spec_source["power_long_term_watts"] == SpecSource.DERIVED
+
+
+def test_does_not_overwrite_manufacturer_long_term() -> None:
+    """When a mfg publishes a distinct larger continuous rating (18Sound / B&C /
+    Celestion), the derivation must NOT overwrite it."""
+    f = _frag(power_aes_watts=1000.0, power_long_term_watts=1400.0)
+    derive_missing_power(f)
+    assert f.power_long_term_watts == pytest.approx(1400.0)
+    assert "power_long_term_watts" not in f.spec_source   # not derived — preserved
+
+
+def test_derives_long_term_from_program_via_aes() -> None:
+    """When only Program is published, we derive AES first, then long_term."""
+    f = _frag(power_program_watts=1000.0)   # → aes 500 → long_term 500
+    derive_missing_power(f)
+    assert f.power_aes_watts == pytest.approx(500.0)
+    assert f.power_long_term_watts == pytest.approx(500.0)
+    assert f.spec_source["power_aes_watts"] == SpecSource.DERIVED
+    assert f.spec_source["power_long_term_watts"] == SpecSource.DERIVED

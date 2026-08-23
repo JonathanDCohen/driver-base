@@ -113,7 +113,15 @@ class DriverFragment:
     impedance_nominal_ohm: Optional[float] = None
     impedance_min_ohm: Optional[float] = None
 
-    # Power (see per_manufacturer_strategy for exact label→field mapping)
+    # Power. See per_manufacturer_strategy for scraper label→field mappings.
+    # `power.derive_missing_power` fills these post-parse:
+    #   - `power_program_watts` ↔ `power_aes_watts` at 2× per AES standard
+    #   - `power_long_term_watts` = `power_aes_watts` when long_term is empty
+    #     (AES is a 2h continuous test; mfgs that don't publish a distinct
+    #     longer-duration rating effectively treat AES as their continuous
+    #     rating). Manufacturers that DO publish a distinct larger continuous
+    #     number (18Sound, B&C, Celestion) have this slot populated
+    #     directly and the derivation is a no-op.
     power_aes_watts: Optional[float] = None
     power_program_watts: Optional[float] = None
     power_long_term_watts: Optional[float] = None
