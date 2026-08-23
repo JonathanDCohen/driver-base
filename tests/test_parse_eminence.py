@@ -62,10 +62,12 @@ def test_parse_kilomax_pro_18a(scraper: EminenceScraper) -> None:
     assert f.le_mh == pytest.approx(1.59)         # "1.59m H" quirk parsed
     assert f.ebp_hz == pytest.approx(65.0)
 
-    # Electrical / commercial
+    # Electrical / commercial — Eminence's "Watts" IS the AES rating
+    # (Program 2500 = 2× Watts 1250 confirms the AES convention).
     assert f.impedance_nominal_ohm == pytest.approx(8.0)
     assert f.power_program_watts == pytest.approx(2500.0)
-    assert f.power_long_term_watts == pytest.approx(1250.0)   # "Watts" → long_term
+    assert f.power_aes_watts == pytest.approx(1250.0)
+    assert f.power_long_term_watts is None
 
     # Sensitivity — Eminence convention: 1W/1m slot
     assert f.sensitivity_db_1w_1m == pytest.approx(95.8)

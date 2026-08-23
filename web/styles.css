@@ -46,6 +46,7 @@ nav .brand-logo { font-family: 'Roboto Mono', monospace; font-weight: 500; paddi
 .compact-table .mono { font-family: 'Roboto Mono', ui-monospace, Menlo, monospace; }
 .compact-table td a { color: #00695c; }
 .null { color: #b0bec5; }
+.derived-mark { color: #90a4ae; font-size: 10px; padding-left: 1px; cursor: help; font-weight: bold; }
 
 .row-count { padding: 8px 0; font-size: 13px; }
 .padded { padding: 32px 16px; }

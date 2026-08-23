@@ -354,8 +354,14 @@ function app() {
         return `${Math.round(v)}<span class="null">·${inches.toFixed(1)}″</span>`;
       }
       if (col.key === "impedance_nominal_ohm") return `${v}&nbsp;Ω`;
-      if (typeof v === "number") return fmtNumber(v);
-      return String(v);
+      let base = typeof v === "number" ? fmtNumber(v) : String(v);
+      // A derived spec (sensitivity or power computed from another slot + Z or
+      // 2x-AES) is marked in spec_source; append a subtle dagger + tooltip.
+      const src = d.spec_source && d.spec_source[col.key];
+      if (src === "derived") {
+        base += '<sup class="derived-mark" title="derived from another spec (2.83V↔1W via impedance, or program↔AES ×2)">†</sup>';
+      }
+      return base;
     },
 
     updateUrl() {

@@ -38,6 +38,7 @@ from driver_base.interface import (
 from driver_base.merge import assign_canonical_ids, merge_fragments_by_id
 from driver_base.model import Driver, DriverFragment
 from driver_base.rate_limiter import HostRateLimiter
+from driver_base.power import derive_missing_power
 from driver_base.rejections import write_rejections_sidecar
 from driver_base.robots import RobotsCache
 from driver_base.sanity import check_record_count, sanity_check_fragment
@@ -380,6 +381,7 @@ def _post_parse_pipeline(
 
     for f in fragments:
         derive_missing_sensitivity(f)
+        derive_missing_power(f)
 
     for f in fragments:
         if f.driver_kind is None:

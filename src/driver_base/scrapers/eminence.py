@@ -103,7 +103,7 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     # electrical / commercial
     "nominal impedance":                       ("impedance_nominal_ohm", parse_impedance),
     "program power":                           ("power_program_watts",   parse_power),
-    "watts":                                   ("power_long_term_watts", parse_power),  # smaller than program per Eminence convention
+    "watts":                                   ("power_aes_watts",       parse_power),  # Eminence 'Watts' is the AES rating (2× → 'Program Power' matches AES convention)
     "sensitivity":                             ("sensitivity_db_1w_1m",  parse_float),
     "usable frequency range":                  ("__freq_range__",        parse_range),
     # physical
