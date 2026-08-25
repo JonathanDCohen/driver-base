@@ -34,9 +34,9 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
 }
 .sort-bar > span { font-size: 13px; }
 .sort-chip-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; min-height: 32px; }
-.sort-chip-list .chip { display: inline-flex; align-items: center; gap: 4px; cursor: default; margin: 0; }
-.sort-chip-list .chip .drag-handle { font-size: 18px; cursor: grab; color: #616161; }
-.sort-chip-list .chip a { display: inline-flex; align-items: center; color: inherit; }
+.sort-chip-list .chip { display: inline-flex; align-items: center; gap: 4px; cursor: grab; margin: 0; user-select: none; }
+.sort-chip-list .chip:active { cursor: grabbing; }
+.sort-chip-list .chip a { display: inline-flex; align-items: center; color: inherit; cursor: pointer; }
 .sort-chip-list .chip a .material-icons { font-size: 16px; }
 .sort-chip-list .chip .close { cursor: pointer; }
 

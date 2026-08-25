@@ -422,8 +422,9 @@ function app() {
       const el = this.$refs.sortChips;
       if (!el || !window.Sortable) return;
       Sortable.create(el, {
-        handle: ".drag-handle",
         animation: 150,
+        filter: "a, .close",
+        preventOnFilter: false,
         onEnd: (evt) => {
           const from = evt.oldIndex;
           const to = evt.newIndex;
