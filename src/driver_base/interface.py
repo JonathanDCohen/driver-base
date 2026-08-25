@@ -58,6 +58,9 @@ class SeedContext:
 class SeedRef:
     url: str
     context: SeedContext = field(default_factory=SeedContext)
+    # When set, the fetcher POSTs these fields as application/x-www-form-urlencoded.
+    # Tuple-of-pairs (not dict) so SeedRef stays hashable and cache keys are stable.
+    post_data: Optional[tuple[tuple[str, str], ...]] = None
 
 
 @dataclass(frozen=True)
@@ -105,6 +108,8 @@ class FetchCtx(Protocol):
 
     async def fetch(self, url: str) -> "RawArtifact | FetchError": ...
     async def fetch_many(self, urls: list[str]) -> list["RawArtifact | FetchError"]: ...
+    async def fetch_seed(self, seed: SeedRef) -> "RawArtifact | FetchError": ...
+    async def fetch_seeds(self, seeds: list[SeedRef]) -> list["RawArtifact | FetchError"]: ...
 
 
 class Scraper(ABC):

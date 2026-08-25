@@ -147,7 +147,11 @@ class _BoundFetchCtx:
         self.httpx = httpx_fetcher
 
     async def fetch(
-        self, url: str, *, force_refresh: bool = False
+        self,
+        url: str,
+        *,
+        force_refresh: bool = False,
+        post_data: Optional[tuple[tuple[str, str], ...]] = None,
     ) -> "RawArtifact | FetchError":
         kind = self.scraper.preferred_fetcher(url)
         if kind == FetcherKind.PLAYWRIGHT:
@@ -157,13 +161,29 @@ class _BoundFetchCtx:
         if kind == FetcherKind.XLSX:
             # v1: fall through to httpx (works for direct xlsx downloads too)
             pass
-        return await self.httpx.fetch(url, force_refresh=force_refresh)
+        return await self.httpx.fetch(
+            url, force_refresh=force_refresh, post_data=post_data
+        )
 
     async def fetch_many(
         self, urls: list[str], *, force_refresh: bool = False
     ) -> list["RawArtifact | FetchError"]:
         return await asyncio.gather(
             *[self.fetch(u, force_refresh=force_refresh) for u in urls]
+        )
+
+    async def fetch_seed(
+        self, seed: SeedRef, *, force_refresh: bool = False
+    ) -> "RawArtifact | FetchError":
+        return await self.fetch(
+            seed.url, force_refresh=force_refresh, post_data=seed.post_data
+        )
+
+    async def fetch_seeds(
+        self, seeds: list[SeedRef], *, force_refresh: bool = False
+    ) -> list["RawArtifact | FetchError"]:
+        return await asyncio.gather(
+            *[self.fetch_seed(s, force_refresh=force_refresh) for s in seeds]
         )
 
 
@@ -307,7 +327,7 @@ async def _run_seed_phase(
         if not new_seeds:
             break
         seen_seeds.update(s.url for s in new_seeds)
-        arts = await ctx.fetch_many([s.url for s in new_seeds], force_refresh=force_refresh)
+        arts = await ctx.fetch_seeds(new_seeds, force_refresh=force_refresh)
         _tally_fetches(arts, fetch_stats)
         seed_arts_ok = [a for a in arts if isinstance(a, RawArtifact)]
         enum = scraper.enumerate(seed_arts_ok)

@@ -35,16 +35,24 @@ def _parse_iso(s: str) -> datetime:
     return datetime.fromisoformat(s)
 
 
-def _key(scraper_name: str, url: str) -> str:
+PostData = Optional[tuple[tuple[str, str], ...]]
+
+
+def _key(scraper_name: str, url: str, post_data: PostData = None) -> str:
     h = hashlib.sha256()
     h.update(scraper_name.encode("utf-8"))
     h.update(b":")
     h.update(url.encode("utf-8"))
+    if post_data is not None:
+        h.update(b":POST:")
+        h.update(repr(post_data).encode("utf-8"))
     return h.hexdigest()
 
 
-def _paths(root: Path, scraper_name: str, url: str) -> tuple[Path, Path]:
-    key = _key(scraper_name, url)
+def _paths(
+    root: Path, scraper_name: str, url: str, post_data: PostData = None
+) -> tuple[Path, Path]:
+    key = _key(scraper_name, url, post_data)
     dir_ = root / scraper_name / key[:2]
     return dir_ / f"{key}.body", dir_ / f"{key}.meta.json"
 
@@ -55,11 +63,15 @@ class Cache:
         self.ttl = ttl
 
     def read(
-        self, scraper_name: str, url: str, force_refresh: bool = False
+        self,
+        scraper_name: str,
+        url: str,
+        force_refresh: bool = False,
+        post_data: PostData = None,
     ) -> Optional[RawArtifact]:
         if force_refresh:
             return None
-        body_p, meta_p = _paths(self.root, scraper_name, url)
+        body_p, meta_p = _paths(self.root, scraper_name, url, post_data)
         if not body_p.exists() or not meta_p.exists():
             return None
         try:
@@ -86,11 +98,16 @@ class Cache:
             from_cache=True,
         )
 
-    def write(self, scraper_name: str, artifact: RawArtifact) -> None:
+    def write(
+        self,
+        scraper_name: str,
+        artifact: RawArtifact,
+        post_data: PostData = None,
+    ) -> None:
         """Store `artifact` in the cache. Non-2xx responses are silently skipped."""
         if not (200 <= artifact.status < 300):
             return
-        body_p, meta_p = _paths(self.root, scraper_name, artifact.url)
+        body_p, meta_p = _paths(self.root, scraper_name, artifact.url, post_data)
         body_p.parent.mkdir(parents=True, exist_ok=True)
         body_p.write_bytes(artifact.body)
         meta_p.write_text(

@@ -24,7 +24,7 @@ from typing import Optional
 import httpx
 
 from driver_base.cache import Cache
-from driver_base.interface import FetchError, RawArtifact
+from driver_base.interface import FetchError, RawArtifact, SeedRef
 from driver_base.rate_limiter import HostRateLimiter
 
 DEFAULT_USER_AGENT = "driver-base/0.1 (+contact: jon@joncohen.dev)"
@@ -69,9 +69,15 @@ class HttpxFetcher:
             self._client = None
 
     async def fetch(
-        self, url: str, *, force_refresh: bool = False
+        self,
+        url: str,
+        *,
+        force_refresh: bool = False,
+        post_data: Optional[tuple[tuple[str, str], ...]] = None,
     ) -> "RawArtifact | FetchError":
-        cached = self.cache.read(self.scraper_name, url, force_refresh=force_refresh)
+        cached = self.cache.read(
+            self.scraper_name, url, force_refresh=force_refresh, post_data=post_data
+        )
         if cached is not None:
             return cached
 
@@ -84,7 +90,10 @@ class HttpxFetcher:
                 await asyncio.sleep(base_delay)
             await self.rate_limiter.throttle(url)
             try:
-                resp = await client.get(url)
+                if post_data is not None:
+                    resp = await client.post(url, data=dict(post_data))
+                else:
+                    resp = await client.get(url)
             except httpx.TimeoutException:
                 if i == len(_BACKOFF_SCHEDULE):
                     return FetchError(url=url, kind="transient", reason="timeout", attempts=attempts)
@@ -113,7 +122,7 @@ class HttpxFetcher:
                     body_sha=hashlib.sha256(body).hexdigest(),
                     from_cache=False,
                 )
-                self.cache.write(self.scraper_name, artifact)
+                self.cache.write(self.scraper_name, artifact, post_data=post_data)
                 return artifact
 
             if status in _PERMANENT_STATUSES:
@@ -140,6 +149,20 @@ class HttpxFetcher:
     ) -> list["RawArtifact | FetchError"]:
         return await asyncio.gather(
             *[self.fetch(u, force_refresh=force_refresh) for u in urls]
+        )
+
+    async def fetch_seed(
+        self, seed: "SeedRef", *, force_refresh: bool = False
+    ) -> "RawArtifact | FetchError":
+        return await self.fetch(
+            seed.url, force_refresh=force_refresh, post_data=seed.post_data
+        )
+
+    async def fetch_seeds(
+        self, seeds: list["SeedRef"], *, force_refresh: bool = False
+    ) -> list["RawArtifact | FetchError"]:
+        return await asyncio.gather(
+            *[self.fetch_seed(s, force_refresh=force_refresh) for s in seeds]
         )
 
 

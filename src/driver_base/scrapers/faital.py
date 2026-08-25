@@ -1,9 +1,16 @@
 """Faital Pro (faitalpro.com) scraper.
 
-Enumeration: parse `faitalpro-sitemap.xml`, filter to English product-detail
-URLs `/en/products/{CATEGORY}/product_details/index.php?id={ID}`. Yields
-18 active English products; archived_products/ paths are excluded at
-enumerate (v1 scope: active only). Category slug → DriverKind directly.
+Enumeration: seed each of the four category listing pages. The two large
+categories (LF_Loudspeakers, HF_Drivers) render their product tables via
+XHR — the browser POSTs to `<category>/search.php` with the default filter
+and injects the response into `#main_content`. We POST directly instead of
+running JS. The two small categories (Coaxial_Loudspeakers, HF_Horns) ship
+their tables inline in the listing HTML. Either way, enumerate scrapes
+`product_details/index.php?id=<N>` occurrences from the response body and
+tags each product with the DriverKind derived from the seed URL.
+
+The sitemap is NOT used — it lists only a handful of the ~158 active
+English products.
 
 Extraction: `table.tbl_data tr` label/value pairs. The spec data appears in
 6 tables per page (mobile + desktop layouts); the parser deduplicates by
@@ -53,31 +60,54 @@ from driver_base.units import (
 )
 
 
-_BASE = "https://www.faitalpro.com"
-_SITEMAP_URL = f"{_BASE}/faitalpro-sitemap.xml"
+_BASE = "https://faitalpro.com"
 
-# The Faital sitemap has lowercase category paths; the live server redirects
-# `www.faitalpro.com` → `faitalpro.com` (without www), and the redirect
-# target requires MIXED-case category paths — lowercase 404s. Rewrite before
-# yielding product URLs from enumerate.
+# Use the no-www hostname directly. `www.faitalpro.com` 301-redirects to
+# `faitalpro.com`, and httpx drops POST bodies on 301 (RFC-compliant), which
+# breaks the search.php seeds. Category paths are mixed-case — lowercase 404s.
+# Kind is set from the seed URL in enumerate().
 _CATEGORY_TO_KIND: dict[str, DriverKind] = {
-    "lf_loudspeakers":      DriverKind.LF_WOOFER,
-    "hf_drivers":           DriverKind.HF_COMPRESSION,
-    "coaxial_loudspeakers": DriverKind.COAX,
-    "hf_horns":             DriverKind.HORN,
-}
-_CATEGORY_MIXED_CASE: dict[str, str] = {
-    "lf_loudspeakers":      "LF_Loudspeakers",
-    "hf_drivers":           "HF_Drivers",
-    "coaxial_loudspeakers": "Coaxial_Loudspeakers",
-    "hf_horns":             "HF_Horns",
+    "LF_Loudspeakers":      DriverKind.LF_WOOFER,
+    "HF_Drivers":           DriverKind.HF_COMPRESSION,
+    "Coaxial_Loudspeakers": DriverKind.COAX,
+    "HF_Horns":             DriverKind.HORN,
 }
 
-_PRODUCT_URL_RE = re.compile(
-    r"https?://www\.faitalpro\.com/en/products/(?P<category>[^/]+)/product_details/index\.php\?id=(?P<id>\d+)",
-    re.IGNORECASE,
+# Default filter payloads copied verbatim from each listing page's
+# `update_data()` JS. Wide-open ranges — matches "show me everything".
+# LF_Loudspeakers/search.php filter:
+_LF_SEARCH_POST: tuple[tuple[str, str], ...] = (
+    ("neodymium", "10"), ("ferrite", "20"),
+    ("size", "All"),
+    ("powermin", "20"), ("powermax", "3000"),
+    ("vcmin", "15"), ("vcmax", "170"),
+    ("fsmin", "20"), ("fsmax", "180"),
+    ("demod", "1"), ("nodemod", "1"),
 )
-_LOC_RE = re.compile(r"<loc>([^<]+)</loc>", re.IGNORECASE)
+# HF_Drivers/search.php filter:
+_HF_SEARCH_POST: tuple[tuple[str, str], ...] = (
+    ("neodymium", "10"), ("ferrite", "20"),
+    ("size", "All"),
+    ("powermin", "30"), ("powermax", "120"),
+    ("vcdiam", "All"),
+    ("crossfreqmin", "0.4"), ("crossfreqmax", "2.6"),
+    ("demod", "1"), ("nodemod", "1"),
+    ("dshape1", "Dome"), ("dshape2", "Annular"), ("dshape3", "Double Edge Cone"),
+    ("dmaterial1", "Titanium"), ("dmaterial2", "Ketone Polymer"),
+    ("dmaterial3", "Paper"), ("dmaterial4", "Carbon Fiber"),
+    ("plugdesign1", "Annular"), ("plugdesign2", "Radial"),
+)
+
+# Match the URL segment naming the category, in either a seed URL
+# (`.../en/products/LF_Loudspeakers/search.php` or `.../en/products/HF_Horns/`)
+# or a discovered product URL.
+_SEED_CATEGORY_RE = re.compile(
+    r"/en/products/(?P<category>LF_Loudspeakers|HF_Drivers|Coaxial_Loudspeakers|HF_Horns)/"
+)
+# `product_details/index.php?id=101050135` — id is the only capture we need;
+# category comes from the seed URL that yielded this body. search.php responses
+# JSON-escape the slash as `product_details\/index.php` — optional backslash.
+_PRODUCT_ID_RE = re.compile(r"product_details\\?/index\.php\?id=(\d+)")
 
 # `FaitalPRO | LF Loudspeakers | 12PR320 (8Ω)` → group(1) = '12PR320'
 _TITLE_MODEL_RE = re.compile(r"\|\s*([^|()]+?)\s*(?:\(|$)")
@@ -139,39 +169,67 @@ class FaitalScraper(Scraper):
     name = "faital"
     manufacturer_display = "Faital Pro"
     schema_version = "1.0"
-    expected_min_records = 15    # recon: 18 active English URLs
+    expected_min_records = 120   # recon: ~158 active English URLs across 4 categories
     max_seed_rounds = 2
 
     def discover_seeds(self) -> list[SeedRef]:
-        return [SeedRef(url=_SITEMAP_URL, context=SeedContext())]
+        return [
+            SeedRef(
+                url=f"{_BASE}/en/products/LF_Loudspeakers/search.php",
+                context=SeedContext(
+                    driver_kind_hint=DriverKind.LF_WOOFER,
+                    category_id="LF_Loudspeakers",
+                ),
+                post_data=_LF_SEARCH_POST,
+            ),
+            SeedRef(
+                url=f"{_BASE}/en/products/HF_Drivers/search.php",
+                context=SeedContext(
+                    driver_kind_hint=DriverKind.HF_COMPRESSION,
+                    category_id="HF_Drivers",
+                ),
+                post_data=_HF_SEARCH_POST,
+            ),
+            SeedRef(
+                url=f"{_BASE}/en/products/Coaxial_Loudspeakers/",
+                context=SeedContext(
+                    driver_kind_hint=DriverKind.COAX,
+                    category_id="Coaxial_Loudspeakers",
+                ),
+            ),
+            SeedRef(
+                url=f"{_BASE}/en/products/HF_Horns/",
+                context=SeedContext(
+                    driver_kind_hint=DriverKind.HORN,
+                    category_id="HF_Horns",
+                ),
+            ),
+        ]
 
     def enumerate(self, seed_artifacts: list[RawArtifact]) -> EnumerateResult:
         products: list[SeedRef] = []
         seen: set[str] = set()
         for art in seed_artifacts:
+            m = _SEED_CATEGORY_RE.search(art.url)
+            if not m:
+                continue
+            category = m.group("category")
+            kind = _CATEGORY_TO_KIND[category]
             body = art.body.decode("utf-8", errors="ignore")
-            for loc in _LOC_RE.findall(body):
-                m = _PRODUCT_URL_RE.match(loc.strip())
-                if not m:
+            for pid in _PRODUCT_ID_RE.findall(body):
+                product_url = (
+                    f"{_BASE}/en/products/{category}"
+                    f"/product_details/index.php?id={pid}"
+                )
+                if product_url in seen:
                     continue
-                category = m.group("category").lower()
-                # v1 excludes archived_products
-                if category == "archived_products":
-                    continue
-                kind = _CATEGORY_TO_KIND.get(category)
-                if kind is None:
-                    continue
-                # Rewrite the lowercase category path to mixed-case so the
-                # `faitalpro.com` (no-www) redirect target returns 200, not 404.
-                mixed = _CATEGORY_MIXED_CASE.get(category, category)
-                rewritten = loc.replace(f"/en/products/{category}/", f"/en/products/{mixed}/")
-                if rewritten in seen:
-                    continue
-                seen.add(rewritten)
+                seen.add(product_url)
                 products.append(
                     SeedRef(
-                        url=rewritten,
-                        context=SeedContext(driver_kind_hint=kind, category_id=category),
+                        url=product_url,
+                        context=SeedContext(
+                            driver_kind_hint=kind, category_id=category
+                        ),
                     )
                 )
         return EnumerateResult(product_urls=products)

@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from collections import Counter
+
 import pytest
 
-from driver_base.interface import DriverKind, SeedContext
+from driver_base.interface import DriverKind, RawArtifact, SeedContext
 from driver_base.model import MagnetType, SpecSource
 from driver_base.scrapers.faital import FaitalScraper
 from tests.conftest import load_fixture
@@ -18,27 +20,52 @@ def scraper() -> FaitalScraper:
     return FaitalScraper()
 
 
-def test_enumerate_active_english_only(scraper: FaitalScraper) -> None:
-    seed = load_fixture(
-        "faital", "seeds/sitemap.xml",
-        url="https://www.faitalpro.com/faitalpro-sitemap.xml",
-    )
-    res = scraper.enumerate([seed])
-    # Sitemap has 18 active English URLs; v1 excludes archived_products.
-    assert len(res.product_urls) == 18
-    from collections import Counter
+def _seed(relpath: str, url: str) -> RawArtifact:
+    return load_fixture("faital", relpath, url=url)
+
+
+def test_enumerate_all_categories(scraper: FaitalScraper) -> None:
+    seeds = [
+        _seed(
+            "seeds/LF_Loudspeakers_search.html",
+            "https://www.faitalpro.com/en/products/LF_Loudspeakers/search.php",
+        ),
+        _seed(
+            "seeds/HF_Drivers_search.html",
+            "https://www.faitalpro.com/en/products/HF_Drivers/search.php",
+        ),
+        _seed(
+            "seeds/Coaxial_Loudspeakers.html",
+            "https://www.faitalpro.com/en/products/Coaxial_Loudspeakers/",
+        ),
+        _seed(
+            "seeds/HF_Horns.html",
+            "https://www.faitalpro.com/en/products/HF_Horns/",
+        ),
+    ]
+    res = scraper.enumerate(seeds)
+
+    # Recon counts (captured 2026-08-25): 104 LF + 35 HF + 14 coax + 5 horns = 158.
+    # Assert floors, not exact counts — Faital adds/retires SKUs over time.
     kinds = Counter(p.context.driver_kind_hint for p in res.product_urls)
-    assert kinds[DriverKind.LF_WOOFER] >= 12
-    assert kinds[DriverKind.HF_COMPRESSION] >= 1
-    # every URL is /en/, none archived
+    assert kinds[DriverKind.LF_WOOFER] >= 90
+    assert kinds[DriverKind.HF_COMPRESSION] >= 30
+    assert kinds[DriverKind.COAX] >= 12
+    assert kinds[DriverKind.HORN] >= 4
+    assert len(res.product_urls) >= 130
+
+    # All URLs are the canonical mixed-case English form.
     assert all("/en/products/" in p.url for p in res.product_urls)
-    assert all("archived_products" not in p.url for p in res.product_urls)
+    assert all("product_details/index.php?id=" in p.url for p in res.product_urls)
+    # No dupes.
+    urls = [p.url for p in res.product_urls]
+    assert len(urls) == len(set(urls))
 
 
 def test_parse_12pr320(scraper: FaitalScraper) -> None:
     raw = load_fixture("faital", "products/12PR320.html", url=_12PR320_URL)
     res = scraper.parse_artifact(
-        raw, SeedContext(driver_kind_hint=DriverKind.LF_WOOFER, category_id="lf_loudspeakers"),
+        raw, SeedContext(driver_kind_hint=DriverKind.LF_WOOFER, category_id="LF_Loudspeakers"),
     )
     assert len(res.fragments) == 1
     f = res.fragments[0]

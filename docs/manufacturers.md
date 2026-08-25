@@ -15,7 +15,7 @@ The selectors below are the ones the validator's script actually used. Substitut
 | Celestion | celestion.com | `product-sitemap.xml` (213 URLs) | static HTML | `div.product-detail-spec-col-line` (div pairs) | 213 | 10-second `Crawl-delay`; guitar-bass drivers exempt from T/S REJECT |
 | Dayton Audio | daytonaudio.com | 14 subcategory pages with `?pagenum=N` | static HTML | `#collapseTwo table.table tbody tr` (table) | ~370 | Silent pagination wrap; extensive imperial units; `--` = null |
 | Eminence | eminence.com | `/products.json?limit=250` (Shopify) | static HTML | `table#em-detail tr` (table) | 155 active / 201 with archived | No category on product → `classify_driver_kind()` from `product_type` |
-| Faital Pro | faitalpro.com | `faitalpro-sitemap.xml` filtered to `/en/` | static HTML | `table.tbl_data tr` (table) | 18 active EN (36 with archived) | Footnote suffixes on labels; `÷` frequency separator |
+| Faital Pro | faitalpro.com | 4 category listings — POST `<cat>/search.php` for LF+HF-drivers, static GET for coax+HF-horns | static HTML | `table.tbl_data tr` (table) | 158 URLs enumerated (104 LF + 35 HF + 14 coax + 5 horn) | Footnote suffixes on labels; `÷` frequency separator; POST bodies dropped on 301 → use no-www host |
 | HOQS | hoqs.org | `/products.json?limit=250` (Shopify) | static HTML | `var speakerData = ({...});` (inline JS object) | 13 | **Sensitivity is `2.83V/1m`, not `1W/1m`** |
 | RCF | rcf.it | 6 category pages via `?serieId=` | static HTML | `div.specifications div.row > div.col-md-6:first-child + div.col-md-6.font-family-semibold` (div pairs) | 137 (103 excl. Custom Designs) | No usable sitemap; Liferay OAuth endpoints 403 without token |
 | Beyma | beyma.com | 12 English category pages (10 kept, 2 dropped) | static HTML | `div.block-product-features div.items div.item` (div pairs) | ~194 active | `passive-filter` + `accesories` slugs dropped at enumeration |
@@ -273,20 +273,19 @@ For discontinued/archived coverage, `https://eminence.com/sitemap_products_1.xml
 
 **Homepage:** https://www.faitalpro.com (Italy). `robots.txt` allows product pages and the sitemap; disallows utility paths like `/tech_spec/`, `/where_to_buy/`, form submitters.
 
-**Enumeration.** Parse `https://www.faitalpro.com/faitalpro-sitemap.xml` (663 total URLs) and filter English product detail URLs matching `/en/products/[CATEGORY]/product_details/index.php?id=[ID]`. Yields **36 English URLs (18 active + 18 archived)**. For v1, filter out `archived_products` at enumeration to keep active only: **18 records**.
+**Enumeration.** Seed the four category listing pages. The two large categories (`LF_Loudspeakers`, `HF_Drivers`) render their product tables via an XHR — the browser POSTs to `<category>/search.php` with the listing page's JS default filter and injects the response into `#main_content`. The scraper does the same POST directly. The two small categories (`Coaxial_Loudspeakers`, `HF_Horns`) ship their tables inline in the initial HTML — plain GET.
 
-**Do NOT** try to enumerate via `search.php` (a POST-driven catalog). The WAF returns HTTP 403 for typical AJAX call signatures. The sitemap is the sanctioned path even though `lastmod` dates show 2017 (spec pages are still current).
+Either way, `enumerate` scrapes `product_details/index.php?id=<N>` occurrences from the response body and derives DriverKind from the seed URL. Recon (2026-08-25): **104 LF + 35 HF-drivers + 14 coax + 5 horns = 158 URLs**. (`sitemap.xml` was tried first — it only lists 18 non-archived English URLs, a fraction of the real catalog — and is now abandoned.)
 
-**Sample product page:** https://www.faitalpro.com/en/products/LF_Loudspeakers/product_details/index.php?id=101050135 (`12PR320`, 8Ω)
+**Sample product page:** https://faitalpro.com/en/products/LF_Loudspeakers/product_details/index.php?id=101050135 (`12PR320`, 8Ω)
 
-**URL case-sensitivity — must rewrite.** The sitemap uses lowercase category paths (`/en/products/lf_loudspeakers/...`), but hitting one of those URLs triggers a 301 redirect from `www.faitalpro.com` → `faitalpro.com`, and the redirect target requires **mixed-case category paths** (`LF_Loudspeakers`). The lowercase form 404s after the redirect. `scrapers/faital.py::enumerate` rewrites via `_CATEGORY_MIXED_CASE` before yielding product URLs:
-
-    lf_loudspeakers        → LF_Loudspeakers
-    hf_drivers             → HF_Drivers
-    coaxial_loudspeakers   → Coaxial_Loudspeakers
-    hf_horns               → HF_Horns
+**Host + URL case-sensitivity.** Two related quirks:
+1. `www.faitalpro.com` 301-redirects to `faitalpro.com`. httpx drops POST bodies on 301 (RFC-compliant), so seeding `search.php` on the www host makes the filter payload vanish and the endpoint returns "No Results". Fix: seed the no-www host directly (`_BASE = "https://faitalpro.com"`).
+2. Category paths are mixed-case (`LF_Loudspeakers`, `HF_Drivers`, `Coaxial_Loudspeakers`, `HF_Horns`); lowercase forms 404. The scraper embeds the mixed-case slugs in its seed URLs.
 
 Detail pages themselves are static HTML.
+
+**search.php filter payloads.** Copied verbatim from each listing page's `update_data()` JS init (the wide-open "show me everything" defaults). LF is 10 fields; HF-drivers adds shape/material/plug-design multi-selects. Stored as tuples-of-pairs in `faital.py` (`_LF_SEARCH_POST`, `_HF_SEARCH_POST`) so `SeedRef` stays hashable.
 
 **Extraction.** `<table class="tbl_data">` — first `td`/`th` is label, second is value. Selector: `table.tbl_data tr`. Spec data is **duplicated across 6 `tbl_data` tables per page** (tables 0-2 and 4-5 repeat the same values); deduplicate by label (take first occurrence).
 
@@ -307,19 +306,19 @@ Detail pages themselves are static HTML.
 
 **Label taxonomy caution:** Faital uses BOTH stripped footnote parentheticals (`(1)`, `(2)`, `(3)`) that should be stripped by `FOOTNOTE_SUFFIX` and unit parentheticals (`Sensitivity (1W/1m)`) that should be `UNIT_ANNOTATION` (strip, but sensitivity slot depends on it). `labels.py` handles both.
 
-**DriverKind mapping:** from sitemap URL path.
+**DriverKind mapping:** from the seed URL that yielded each product URL.
 ```
-lf_loudspeakers        → LF_WOOFER
-hf_drivers             → HF_COMPRESSION
-coaxial_loudspeakers   → COAX
-hf_horns               → HORN
+LF_Loudspeakers        → LF_WOOFER
+HF_Drivers             → HF_COMPRESSION
+Coaxial_Loudspeakers   → COAX
+HF_Horns               → HORN
 ```
 
 **Quirks:**
 - `Shipping Box` label case varies: `Shipping Box(Single Carton Box)` (LF) vs `Shipping Box(Single carton box)` (HF, lowercase c). Compare case-insensitively.
 - Some products have `Push Terminals`/`Recone Kit` fields that vary by impedance version (`- 8 Ohm Version`, `- 4 Ohm Version`). Not scraped as Driver fields; ignored or stored as sidecar SKU refs.
 
-**Recon count:** 18 active English URLs. `expected_min_records = 15` (declared in `data/baselines.yaml`; below the code default because Faital's public English catalog is genuinely small).
+**Recon count:** 158 product URLs across 4 categories (2026-08-25 fetch). `expected_min_records = 120` declared inline in `scrapers/faital.py`. Last live run: 158 fragments parsed → 124 final drivers (34 dropped in `assign_canonical_ids` / `merge_fragments_by_id` / `enforce_consistency` — TODO: audit and either recover or document the reason per model).
 
 ---
 
