@@ -1,7 +1,7 @@
-// Driver-base SPA. Alpine.js component + SortableJS for the sort chips + column reordering.
+// Driver-base SPA. Alpine.js component + SortableJS for the sort chips.
 // State (filters + sorts) is mirrored to the URL for shareability.
-// Column order + visibility and units preference persist in first-party cookies
-// (`db_cols`, `db_units`).
+// Column visibility and units preference persist in first-party cookies
+// (`db_cols`, `db_units`). Column order is fixed by DEFAULT_COLUMN_ORDER.
 
 const COLUMN_META = {
   manufacturer:              { label: "Manufacturer",       numeric: false, sortable: true  },
@@ -33,9 +33,9 @@ const SORTABLE_FIELDS = Object.entries(COLUMN_META)
   .filter(([, m]) => m.sortable)
   .map(([key, m]) => ({ key, label: m.label, numeric: m.numeric }));
 
-// Manufacturer + Model are always the first two columns, always visible,
-// and can't be dragged or dropped over. Everything else is user-orderable
-// and hideable.
+// Manufacturer + Model are always the first two columns and always visible.
+// Everything else follows DEFAULT_COLUMN_ORDER and is user-hideable via the
+// Columns picker; the order itself isn't user-editable.
 const FIXED_KEYS = ["manufacturer", "model"];
 const IS_FIXED = new Set(FIXED_KEYS);
 
@@ -161,9 +161,10 @@ function writeURLState(state) {
   window.history.replaceState(null, "", url);
 }
 
-// Cookie format: comma-separated tokens in display order for the non-fixed
-// columns only. Each token is `key` (visible) or `key:h` (hidden). Fixed
-// columns are always first and always visible, so they're not stored.
+// Cookie format: comma-separated tokens for non-fixed columns. Each token is
+// `key` (visible) or `key:h` (hidden). Position in the cookie is ignored on
+// read — order is always taken from DEFAULT_COLUMN_ORDER. Fixed columns are
+// always visible and aren't stored.
 function readColumnsCookie() {
   const m = document.cookie.match(/(?:^|; )db_cols=([^;]*)/);
   if (!m) return null;
@@ -200,25 +201,16 @@ function defaultColumns() {
   ];
 }
 
-// Reconcile a stored cookie against the current catalog: prepend fixed keys,
-// drop unknown/duplicate keys, then append any new catalog keys as hidden so
-// schema additions surface in the picker without hijacking a returning
-// user's layout.
+// Order is always DEFAULT_COLUMN_ORDER (with unknown-to-default keys appended
+// hidden); the cookie only contributes visibility. This normalizes any stale
+// cookies from the earlier drag-to-reorder feature.
 function reconcileColumns(stored) {
   if (!stored) return defaultColumns();
-  const known = new Set(Object.keys(COLUMN_META));
-  const seen = new Set();
-  const out = FIXED_KEYS.map((k) => {
-    seen.add(k);
-    return { key: k, visible: true };
-  });
-  for (const c of stored) {
-    if (!known.has(c.key) || seen.has(c.key)) continue;
-    seen.add(c.key);
-    out.push({ key: c.key, visible: !!c.visible });
-  }
-  for (const k of known) if (!seen.has(k)) out.push({ key: k, visible: false });
-  return out;
+  const visibleByKey = new Map(stored.map((c) => [c.key, !!c.visible]));
+  return defaultColumns().map((c) => ({
+    key: c.key,
+    visible: IS_FIXED.has(c.key) ? true : (visibleByKey.has(c.key) ? visibleByKey.get(c.key) : c.visible),
+  }));
 }
 
 function app() {
@@ -265,7 +257,6 @@ function app() {
       // SortableJS init AFTER data + first render.
       this.$nextTick(() => {
         this.installSortable();
-        this.installColumnSortable();
       });
     },
 
@@ -361,7 +352,7 @@ function app() {
       return FIXED_KEYS.map((k) => ({ key: k, ...COLUMN_META[k] }));
     },
 
-    get reorderableColumns() {
+    get scrollableColumns() {
       return this.columns
         .filter((c) => c.visible && !IS_FIXED.has(c.key))
         .map((c) => ({ key: c.key, ...COLUMN_META[c.key] }));
@@ -425,25 +416,6 @@ function app() {
           const moved = this.sorts.splice(from, 1)[0];
           this.sorts.splice(to, 0, moved);
           this.updateUrl();
-        },
-      });
-    },
-
-    installColumnSortable() {
-      const row = this.$refs.headerRow;
-      if (!row || !window.Sortable) return;
-      Sortable.create(row, {
-        animation: 150,
-        onEnd: () => {
-          // Read the new order of reorderable ths from the DOM, then merge
-          // back into this.columns preserving hidden entries' positions.
-          const newOrder = [...row.querySelectorAll("th")].map((th) => th.dataset.key);
-          const iter = newOrder[Symbol.iterator]();
-          this.columns = this.columns.map((c) => {
-            if (IS_FIXED.has(c.key) || !c.visible) return c;
-            return { key: iter.next().value, visible: true };
-          });
-          writeColumnsCookie(this.columns);
         },
       });
     },

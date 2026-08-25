@@ -75,26 +75,6 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
 .null { color: #b0bec5; }
 .derived-mark { color: #90a4ae; font-size: 10px; padding-left: 1px; cursor: help; font-weight: bold; }
 
-/* Reorderable column headers — grab cursor + hover highlights to signal
- * drag affordance and clarify column boundaries. Fixed identity columns
- * (Manufacturer + Model) intentionally don't get the class, so they render
- * as static headers with a default cursor. */
-.compact-table th.reorderable {
-  cursor: grab;
-  user-select: none;
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
-  transition: background-color .12s, border-color .12s;
-}
-.compact-table th.reorderable:hover {
-  background: #dde3e6;
-  border-left-color: #90a4ae;
-  border-right-color: #90a4ae;
-}
-.compact-table th.reorderable.sortable-chosen,
-.compact-table th.reorderable.sortable-drag { cursor: grabbing; }
-.compact-table th.reorderable.sortable-ghost { opacity: .35; background: #b0bec5; }
-
 /* Columns picker */
 .picker { position: relative; }
 .picker-btn { padding: 0 10px; height: 32px; line-height: 32px; }
