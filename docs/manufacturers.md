@@ -297,6 +297,7 @@ Detail pages themselves are static HTML.
 **Field mapping (Faital):**
 - `AES Power Handling (1)` → `power_aes_watts` (strip footnote suffix `(N)`)
 - `Maximum Power Handling (2)` → `power_peak_watts`
+- HF compression drivers publish two AES/Max ratings side by side, tied to different crossover points — e.g. `AES Power above 0.9 kHz = 100 W` and `AES Power above 0.65 kHz = 50 W`. The scraper collapses `above X kHz` to the plain `handling` label; first-occurrence-wins keeps the higher-crossover rating (which matches Faital's own "Minimum Crossover Frequency" for the driver). If you need the aggressive-crossover derating, it isn't in the output today — see `docs/tasks.md`.
 - `Sensitivity (1W/1m)` → `sensitivity_db_1w_1m` (labelled explicitly)
 - `Xdamage (5)` → `xmech_mm` stored **as-reported** (one-way, not peak-to-peak). Faital's footnote reads "Maximum excursion before permanent damage" with no p-p qualifier; empirically Xdamage/Xmax ratios cluster at 1.7–1.85 across the LF catalog, which is only physical if both are one-way. The framework's `xmech_mm` field is nominally p-p (`model.py:103`), so `consistency.py:_XMECH_ONE_WAY_MANUFACTURERS` bypasses the `xmech ≥ 1.9*xmax` gate for Faital. See `docs/tasks.md` — "surface per-manufacturer assumptions" for the plan to make this visible in output.
 - `Bl` value `13.5 N/A` — the `N/A` unit is Newton-per-Ampere, equivalent to T·m. `parse_bl_tm` returns 13.5.

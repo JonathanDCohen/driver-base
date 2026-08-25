@@ -109,6 +109,16 @@ _SEED_CATEGORY_RE = re.compile(
 # JSON-escape the slash as `product_details\/index.php` — optional backslash.
 _PRODUCT_ID_RE = re.compile(r"product_details\\?/index\.php\?id=(\d+)")
 
+# HF compression drivers publish per-crossover-frequency AES/Max ratings —
+# "AES Power above 0.9 kHz" and "AES Power above 0.65 kHz" side by side. Collapse
+# both to the plain `aes power handling` / `maximum power handling` labels used
+# by LF drivers so they hit the same map entries. The higher-crossover rating
+# (safer, matches "Minimum Crossover Frequency") is listed first in every Faital
+# HF page we've inspected, so the first-occurrence-wins dedup keeps that one.
+_POWER_ABOVE_KHZ_RE = re.compile(
+    r"^(aes power|maximum power) above [\d.]+ khz$"
+)
+
 # `FaitalPRO | LF Loudspeakers | 12PR320 (8Ω)` → group(1) = '12PR320'
 _TITLE_MODEL_RE = re.compile(r"\|\s*([^|()]+?)\s*(?:\(|$)")
 
@@ -250,6 +260,9 @@ class FaitalScraper(Scraper):
                 if not label or not value or value in ("--", "-"):
                     continue
                 key = normalize_label(label)
+                m = _POWER_ABOVE_KHZ_RE.match(key)
+                if m:
+                    key = f"{m.group(1)} handling"
                 if key not in specs:
                     specs[key] = value
 
