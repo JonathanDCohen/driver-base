@@ -82,7 +82,7 @@ def test_parse_12pr320(scraper: FaitalScraper) -> None:
     assert f.vas_liters == pytest.approx(113.3)   # "113.3 dm^3" caret notation
     assert f.sd_cm2 == pytest.approx(539.0)       # "539 cm^2" caret notation
     assert f.xmax_mm == pytest.approx(7.37)
-    assert f.xmech_mm == pytest.approx(17.0)      # "Xdamage" pp AS-REPORTED
+    assert f.xmech_mm == pytest.approx(17.0)      # "Xdamage" one-way AS-REPORTED
     assert f.mms_g == pytest.approx(51.4)
     assert f.cms_mm_per_n == pytest.approx(0.28)
     assert f.bl_tm == pytest.approx(13.5)         # "13.5 N/A" (Newton/Ampere = T·m)

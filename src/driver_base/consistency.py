@@ -25,6 +25,14 @@ class RejectedDriver:
     reason: str
 
 
+# Manufacturers whose reported Xdamage / xmech_mm is ONE-WAY, not peak-to-peak.
+# The `xmech ≥ 1.9 * xmax` gate assumes p-p and is meaningless for one-way values
+# (both are then in the same units, and Xdamage typically sits 1.5–2× Xmax — well
+# under 1.9). Skip the gate for these manufacturers. This is an ASSUMPTION we're
+# tracking — see docs/tasks.md "surface per-manufacturer assumptions".
+_XMECH_ONE_WAY_MANUFACTURERS: frozenset[str] = frozenset({"Faital Pro"})
+
+
 _MIN_BANDWIDTH_HZ: dict[DriverKind, float] = {
     DriverKind.LF_WOOFER: 500.0,
     DriverKind.FULLRANGE: 500.0,
@@ -61,7 +69,11 @@ def _hard_gates(d: Driver) -> None:
     if not d.model:
         raise ParseConsistencyFailure("model is empty")
 
-    if d.xmech_mm is not None and d.xmax_mm is not None:
+    if (
+        d.xmech_mm is not None
+        and d.xmax_mm is not None
+        and d.manufacturer not in _XMECH_ONE_WAY_MANUFACTURERS
+    ):
         if d.xmech_mm < 1.9 * d.xmax_mm:
             raise ParseConsistencyFailure(
                 f"xmech_under_doubling: {d.xmech_mm} < 1.9*{d.xmax_mm}"

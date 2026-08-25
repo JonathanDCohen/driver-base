@@ -298,7 +298,7 @@ Detail pages themselves are static HTML.
 - `AES Power Handling (1)` → `power_aes_watts` (strip footnote suffix `(N)`)
 - `Maximum Power Handling (2)` → `power_peak_watts`
 - `Sensitivity (1W/1m)` → `sensitivity_db_1w_1m` (labelled explicitly)
-- `Xdamage (5)` → `xmech_mm` (peak-to-peak by Faital's convention; store as-reported per the framework rule)
+- `Xdamage (5)` → `xmech_mm` stored **as-reported** (one-way, not peak-to-peak). Faital's footnote reads "Maximum excursion before permanent damage" with no p-p qualifier; empirically Xdamage/Xmax ratios cluster at 1.7–1.85 across the LF catalog, which is only physical if both are one-way. The framework's `xmech_mm` field is nominally p-p (`model.py:103`), so `consistency.py:_XMECH_ONE_WAY_MANUFACTURERS` bypasses the `xmech ≥ 1.9*xmax` gate for Faital. See `docs/tasks.md` — "surface per-manufacturer assumptions" for the plan to make this visible in output.
 - `Bl` value `13.5 N/A` — the `N/A` unit is Newton-per-Ampere, equivalent to T·m. `parse_bl_tm` returns 13.5.
 - Frequency range separator is `÷` (division sign), not `-`: `45÷5000 Hz`. `parse_range` handles.
 - `NET Air Volume filled by Loudspeaker` for LF → `air_volume_l` (custom field, low priority); HF uses `NET Air Volume filled by HF Driver` — normalize.

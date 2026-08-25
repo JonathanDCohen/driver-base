@@ -128,7 +128,7 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     "vas":                         ("vas_liters",             parse_liters),
     "sd":                          ("sd_cm2",                 parse_sd_cm2),
     "xmax":                        ("xmax_mm",                parse_length_mm),
-    "xdamage":                     ("xmech_mm",               parse_length_mm),   # Faital pp AS-REPORTED
+    "xdamage":                     ("xmech_mm",               parse_length_mm),   # Faital ONE-WAY AS-REPORTED (framework nominally p-p; see docs/manufacturers.md)
     "mms":                         ("mms_g",                  parse_mass_g),
     "bl":                          ("bl_tm",                  parse_bl_tm),
     "le":                          ("le_mh",                  parse_le_mh),
