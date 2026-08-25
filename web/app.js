@@ -208,7 +208,6 @@ function reconcileColumns(stored) {
 function app() {
   return {
     drivers: [],
-    schemaVersion: "?",
     generatedAt: "?",
     statusLabel: "loading…",
 
@@ -231,7 +230,6 @@ function app() {
         const resp = await fetch("drivers.json", { cache: "no-store" });
         if (!resp.ok) throw new Error(`fetch drivers.json → ${resp.status}`);
         const data = await resp.json();
-        this.schemaVersion = data.schema_version || "?";
         this.generatedAt = data.generated_at || "?";
         this.drivers = (data.drivers || []).map((d) => ({
           ...d,
