@@ -96,6 +96,24 @@
             </div>
           </div>
 
+          <div class="picker units-picker" @click.outside="unitsPickerOpen = false">
+            <button type="button" class="btn-flat waves-effect picker-btn" @click="unitsPickerOpen = !unitsPickerOpen">
+              <i class="material-icons left">straighten</i><span x-text="units === 'imperial' ? 'Imperial' : 'Metric'"></span>
+            </button>
+            <div class="picker-popover" x-show="unitsPickerOpen" x-transition.opacity>
+              <ul>
+                <li>
+                  <a href="#" class="picker-item" :class="units === 'metric' ? 'picker-item-active' : ''"
+                     @click.prevent="setUnits('metric'); unitsPickerOpen = false">Metric (mm, kg)</a>
+                </li>
+                <li>
+                  <a href="#" class="picker-item" :class="units === 'imperial' ? 'picker-item-active' : ''"
+                     @click.prevent="setUnits('imperial'); unitsPickerOpen = false">Imperial (in, lb)</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
           <div class="picker col-picker" @click.outside="pickerOpen = false">
             <button type="button" class="btn-flat waves-effect picker-btn" @click="pickerOpen = !pickerOpen">
               <i class="material-icons left">view_column</i>Columns
@@ -122,7 +140,7 @@
             <thead>
               <tr>
                 <template x-for="col in fixedColumns" :key="col.key">
-                  <th :data-key="col.key" x-text="col.label"></th>
+                  <th :data-key="col.key" x-text="columnLabel(col.key)"></th>
                 </template>
               </tr>
             </thead>
@@ -144,7 +162,7 @@
                   <template x-for="col in reorderableColumns" :key="col.key">
                     <th class="reorderable" :data-key="col.key"
                         :class="col.numeric ? 'right-align' : ''"
-                        x-text="col.label"></th>
+                        x-text="columnLabel(col.key)"></th>
                   </template>
                 </tr>
               </thead>

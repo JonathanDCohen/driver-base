@@ -115,6 +115,7 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
 .picker-popover label span { padding-left: 28px; }
 .picker-item { display: block; padding: 4px 0; font-size: 13px; color: #263238; }
 .picker-item:hover { color: #00695c; }
+.picker-item-active { color: #00695c; font-weight: 500; }
 .col-picker-reset { display: block; padding: 8px 14px 2px; font-size: 12px; color: #00695c; }
 
 .row-count { padding: 8px 0 0; font-size: 13px; }

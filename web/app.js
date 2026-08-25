@@ -1,6 +1,7 @@
 // Driver-base SPA. Alpine.js component + SortableJS for the sort chips + column reordering.
 // State (filters + sorts) is mirrored to the URL for shareability.
-// Column order + visibility persist in a first-party cookie (`db_cols`).
+// Column order + visibility and units preference persist in first-party cookies
+// (`db_cols`, `db_units`).
 
 const COLUMN_META = {
   manufacturer:              { label: "Manufacturer",       numeric: false, sortable: true  },
@@ -43,6 +44,7 @@ const DEFAULT_COLUMN_ORDER = [
   ...FIXED_KEYS,
   "driver_kind",
   "nominal_size_mm",
+  "net_weight_kg",
   "impedance_nominal_ohm",
   "fs_hz",
   "qts",
@@ -57,7 +59,11 @@ const DEFAULT_COLUMN_ORDER = [
 ];
 
 const COLUMN_COOKIE = "db_cols";
+const UNITS_COOKIE = "db_units";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+
+const MM_PER_INCH = 25.4;
+const LB_PER_KG = 2.2046226;
 
 const DRIVER_KIND_LABEL = {
   lf_woofer: "LF woofer",
@@ -175,6 +181,16 @@ function writeColumnsCookie(columns) {
   document.cookie = `${COLUMN_COOKIE}=${val}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
 }
 
+function readUnitsCookie() {
+  const m = document.cookie.match(/(?:^|; )db_units=([^;]*)/);
+  if (!m) return null;
+  return m[1] === "imperial" ? "imperial" : m[1] === "metric" ? "metric" : null;
+}
+
+function writeUnitsCookie(units) {
+  document.cookie = `${UNITS_COOKIE}=${units}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+}
+
 function defaultColumns() {
   const inDefault = new Set(DEFAULT_COLUMN_ORDER);
   const rest = Object.keys(COLUMN_META).filter((k) => !inDefault.has(k));
@@ -217,8 +233,10 @@ function app() {
 
     sortableFields: SORTABLE_FIELDS,
     columns: [],           // ordered { key, visible } — includes fixed keys at [0..1]
+    units: "metric",       // "metric" | "imperial" — affects Size and Weight display + labels
     pickerOpen: false,
     sortPickerOpen: false,
+    unitsPickerOpen: false,
     scrolled: false,       // right table has scrollLeft > 0 — drives shadow on fixed table
 
     async init() {
@@ -226,6 +244,7 @@ function app() {
       Object.assign(this.filters, state.filters);
       this.sorts = state.sorts;
       this.columns = reconcileColumns(readColumnsCookie());
+      this.units = readUnitsCookie() || "metric";
 
       try {
         const resp = await fetch("drivers.json", { cache: "no-store" });
@@ -377,6 +396,12 @@ function app() {
       this.updateUrl();
     },
 
+    setUnits(u) {
+      if (u !== "metric" && u !== "imperial") return;
+      this.units = u;
+      writeUnitsCookie(u);
+    },
+
     toggleSortDir(i) {
       this.sorts[i].dir = this.sorts[i].dir === "asc" ? "desc" : "asc";
       this.updateUrl();
@@ -436,11 +461,13 @@ function app() {
     },
 
     columnLabel(key) {
+      if (key === "nominal_size_mm") return this.units === "imperial" ? "Size (in)" : "Size (mm)";
+      if (key === "net_weight_kg")   return this.units === "imperial" ? "Weight (lb)" : "Weight (kg)";
       return (COLUMN_META[key] || { label: key }).label;
     },
 
     fieldLabel(key) {
-      return (COLUMN_META[key] || { label: key }).label;
+      return this.columnLabel(key);
     },
 
     formatCell(d, col) {
@@ -456,8 +483,10 @@ function app() {
       }
       if (col.key === "driver_kind") return d._kind_label || v;
       if (col.key === "nominal_size_mm") {
-        const inches = v / 25.4;
-        return `${Math.round(v)}<span class="null">·${inches.toFixed(1)}″</span>`;
+        return this.units === "imperial" ? `${(v / MM_PER_INCH).toFixed(1)}″` : `${Math.round(v)}`;
+      }
+      if (col.key === "net_weight_kg") {
+        return this.units === "imperial" ? fmtNumber(v * LB_PER_KG) : fmtNumber(v);
       }
       if (col.key === "impedance_nominal_ohm") return `${v}&nbsp;Ω`;
       let base = typeof v === "number" ? fmtNumber(v) : String(v);
