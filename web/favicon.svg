@@ -9,10 +9,5 @@
 
     <!-- Flag of the 1 continuing as the slash through the 0 -->
     <line x1="30" y1="14" x2="10" y2="44"/>
-
-    <!-- Sound waves -->
-    <path d="M 42 24 Q 46 32 42 40"/>
-    <path d="M 48 19 Q 55 32 48 45"/>
-    <path d="M 54 14 Q 62 32 54 50"/>
   </g>
 </svg>
