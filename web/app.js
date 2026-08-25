@@ -1,34 +1,46 @@
-// Driver-base SPA. Alpine.js component + SortableJS for the sort chips.
+// Driver-base SPA. Alpine.js component + SortableJS for the sort chips + column reordering.
 // State (filters + sorts) is mirrored to the URL for shareability.
+// Column order + visibility persist in a first-party cookie (`db_cols`).
 
-const SORTABLE_FIELDS = [
-  { key: "manufacturer",              label: "Manufacturer",       numeric: false },
-  { key: "model",                     label: "Model",              numeric: false },
-  { key: "nominal_size_mm",           label: "Size",               numeric: true  },
-  { key: "impedance_nominal_ohm",     label: "Impedance",          numeric: true  },
-  { key: "fs_hz",                     label: "Fs",                 numeric: true  },
-  { key: "qts",                       label: "Qts",                numeric: true  },
-  { key: "qes",                       label: "Qes",                numeric: true  },
-  { key: "qms",                       label: "Qms",                numeric: true  },
-  { key: "vas_liters",                label: "Vas (L)",            numeric: true  },
-  { key: "sd_cm2",                    label: "Sd (cm²)",           numeric: true  },
-  { key: "xmax_mm",                   label: "Xmax",               numeric: true  },
-  { key: "mms_g",                     label: "Mms",                numeric: true  },
-  { key: "bl_tm",                     label: "Bl",                 numeric: true  },
-  { key: "re_ohm",                    label: "Re",                 numeric: true  },
-  { key: "le_mh",                     label: "Le",                 numeric: true  },
-  { key: "sensitivity_db_1w_1m",      label: "SPL 1W/1m",          numeric: true  },
-  { key: "sensitivity_db_2_83v_1m",   label: "SPL 2.83V/1m",       numeric: true  },
-  { key: "power_aes_watts",           label: "AES (W)",            numeric: true  },
-  { key: "power_long_term_watts",     label: "Continuous (W)",     numeric: true  },
-  { key: "freq_low_hz",               label: "Freq low",           numeric: true  },
-  { key: "freq_high_hz",              label: "Freq high",          numeric: true  },
-  { key: "net_weight_kg",             label: "Weight (kg)",        numeric: true  },
-];
+const COLUMN_META = {
+  manufacturer:              { label: "Manufacturer",       numeric: false, sortable: true  },
+  model:                     { label: "Model",              numeric: false, sortable: true  },
+  driver_kind:               { label: "Type",               numeric: false, sortable: false },
+  nominal_size_mm:           { label: "Size",               numeric: true,  sortable: true  },
+  impedance_nominal_ohm:     { label: "Impedance",          numeric: true,  sortable: true  },
+  fs_hz:                     { label: "Fs",                 numeric: true,  sortable: true  },
+  qts:                       { label: "Qts",                numeric: true,  sortable: true  },
+  qes:                       { label: "Qes",                numeric: true,  sortable: true  },
+  qms:                       { label: "Qms",                numeric: true,  sortable: true  },
+  vas_liters:                { label: "Vas (L)",            numeric: true,  sortable: true  },
+  sd_cm2:                    { label: "Sd (cm²)",           numeric: true,  sortable: true  },
+  xmax_mm:                   { label: "Xmax",               numeric: true,  sortable: true  },
+  mms_g:                     { label: "Mms",                numeric: true,  sortable: true  },
+  bl_tm:                     { label: "Bl",                 numeric: true,  sortable: true  },
+  re_ohm:                    { label: "Re",                 numeric: true,  sortable: true  },
+  le_mh:                     { label: "Le",                 numeric: true,  sortable: true  },
+  sensitivity_db_1w_1m:      { label: "SPL 1W/1m",          numeric: true,  sortable: true  },
+  sensitivity_db_2_83v_1m:   { label: "SPL 2.83V/1m",       numeric: true,  sortable: true  },
+  power_aes_watts:           { label: "AES (W)",            numeric: true,  sortable: true  },
+  power_long_term_watts:     { label: "Continuous (W)",     numeric: true,  sortable: true  },
+  freq_low_hz:               { label: "Freq low",           numeric: true,  sortable: true  },
+  freq_high_hz:              { label: "Freq high",          numeric: true,  sortable: true  },
+  net_weight_kg:             { label: "Weight (kg)",        numeric: true,  sortable: true  },
+};
 
-const VISIBLE_COLUMNS = [
-  "manufacturer",
-  "model",
+const SORTABLE_FIELDS = Object.entries(COLUMN_META)
+  .filter(([, m]) => m.sortable)
+  .map(([key, m]) => ({ key, label: m.label, numeric: m.numeric }));
+
+// Manufacturer + Model are always the first two columns, always visible,
+// and can't be dragged or dropped over. Everything else is user-orderable
+// and hideable.
+const FIXED_KEYS = ["manufacturer", "model"];
+const IS_FIXED = new Set(FIXED_KEYS);
+
+// Default column order (visible) when no cookie is set.
+const DEFAULT_COLUMN_ORDER = [
+  ...FIXED_KEYS,
   "driver_kind",
   "nominal_size_mm",
   "impedance_nominal_ohm",
@@ -43,6 +55,9 @@ const VISIBLE_COLUMNS = [
   "freq_low_hz",
   "freq_high_hz",
 ];
+
+const COLUMN_COOKIE = "db_cols";
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 const DRIVER_KIND_LABEL = {
   lf_woofer: "LF woofer",
@@ -140,6 +155,56 @@ function writeURLState(state) {
   window.history.replaceState(null, "", url);
 }
 
+// Cookie format: comma-separated tokens in display order for the non-fixed
+// columns only. Each token is `key` (visible) or `key:h` (hidden). Fixed
+// columns are always first and always visible, so they're not stored.
+function readColumnsCookie() {
+  const m = document.cookie.match(/(?:^|; )db_cols=([^;]*)/);
+  if (!m) return null;
+  return m[1].split(",").filter(Boolean).map((tok) => {
+    const [key, flag] = tok.split(":");
+    return { key, visible: flag !== "h" };
+  });
+}
+
+function writeColumnsCookie(columns) {
+  const val = columns
+    .filter((c) => !IS_FIXED.has(c.key))
+    .map((c) => (c.visible ? c.key : `${c.key}:h`))
+    .join(",");
+  document.cookie = `${COLUMN_COOKIE}=${val}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+}
+
+function defaultColumns() {
+  const inDefault = new Set(DEFAULT_COLUMN_ORDER);
+  const rest = Object.keys(COLUMN_META).filter((k) => !inDefault.has(k));
+  return [
+    ...DEFAULT_COLUMN_ORDER.map((k) => ({ key: k, visible: true })),
+    ...rest.map((k) => ({ key: k, visible: false })),
+  ];
+}
+
+// Reconcile a stored cookie against the current catalog: prepend fixed keys,
+// drop unknown/duplicate keys, then append any new catalog keys as hidden so
+// schema additions surface in the picker without hijacking a returning
+// user's layout.
+function reconcileColumns(stored) {
+  if (!stored) return defaultColumns();
+  const known = new Set(Object.keys(COLUMN_META));
+  const seen = new Set();
+  const out = FIXED_KEYS.map((k) => {
+    seen.add(k);
+    return { key: k, visible: true };
+  });
+  for (const c of stored) {
+    if (!known.has(c.key) || seen.has(c.key)) continue;
+    seen.add(c.key);
+    out.push({ key: c.key, visible: !!c.visible });
+  }
+  for (const k of known) if (!seen.has(k)) out.push({ key: k, visible: false });
+  return out;
+}
+
 function app() {
   return {
     drivers: [],
@@ -152,15 +217,15 @@ function app() {
     pageSize: 500,
 
     sortableFields: SORTABLE_FIELDS,
-    visibleColumns: VISIBLE_COLUMNS.map(
-      (k) => SORTABLE_FIELDS.find((f) => f.key === k) ||
-             { key: k, label: k, numeric: false }
-    ),
+    columns: [],           // ordered { key, visible } — includes fixed keys at [0..1]
+    pickerOpen: false,
+    scrolled: false,       // right table has scrollLeft > 0 — drives shadow on fixed table
 
     async init() {
       const state = parseURLState();
       Object.assign(this.filters, state.filters);
       this.sorts = state.sorts;
+      this.columns = reconcileColumns(readColumnsCookie());
 
       try {
         const resp = await fetch("drivers.json", { cache: "no-store" });
@@ -185,6 +250,7 @@ function app() {
           M.FormSelect.init(document.querySelectorAll("select"));
         } catch (_) {}
         this.installSortable();
+        this.installColumnSortable();
       });
     },
 
@@ -276,6 +342,22 @@ function app() {
       return this.sortableFields.filter((f) => !used.has(f.key));
     },
 
+    get fixedColumns() {
+      return FIXED_KEYS.map((k) => ({ key: k, ...COLUMN_META[k] }));
+    },
+
+    get reorderableColumns() {
+      return this.columns
+        .filter((c) => c.visible && !IS_FIXED.has(c.key))
+        .map((c) => ({ key: c.key, ...COLUMN_META[c.key] }));
+    },
+
+    // Non-fixed rows shown in the picker checkbox list. Fixed columns
+    // (Manufacturer, Model) are always on and don't appear here.
+    get pickerColumns() {
+      return this.columns.filter((c) => !IS_FIXED.has(c.key));
+    },
+
     // --- actions ---
     onFilterChange() { this.updateUrl(); },
 
@@ -333,8 +415,43 @@ function app() {
       });
     },
 
+    installColumnSortable() {
+      const row = this.$refs.headerRow;
+      if (!row || !window.Sortable) return;
+      Sortable.create(row, {
+        animation: 150,
+        onEnd: () => {
+          // Read the new order of reorderable ths from the DOM, then merge
+          // back into this.columns preserving hidden entries' positions.
+          const newOrder = [...row.querySelectorAll("th")].map((th) => th.dataset.key);
+          const iter = newOrder[Symbol.iterator]();
+          this.columns = this.columns.map((c) => {
+            if (IS_FIXED.has(c.key) || !c.visible) return c;
+            return { key: iter.next().value, visible: true };
+          });
+          writeColumnsCookie(this.columns);
+        },
+      });
+    },
+
+    toggleColumn(key) {
+      const c = this.columns.find((x) => x.key === key);
+      if (!c) return;
+      c.visible = !c.visible;
+      writeColumnsCookie(this.columns);
+    },
+
+    resetColumns() {
+      this.columns = defaultColumns();
+      writeColumnsCookie(this.columns);
+    },
+
+    columnLabel(key) {
+      return (COLUMN_META[key] || { label: key }).label;
+    },
+
     fieldLabel(key) {
-      return (this.sortableFields.find((f) => f.key === key) || { label: key }).label;
+      return (COLUMN_META[key] || { label: key }).label;
     },
 
     formatCell(d, col) {

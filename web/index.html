@@ -88,27 +88,71 @@
               </template>
             </select>
           </div>
+
+          <div class="col-picker" @click.outside="pickerOpen = false">
+            <button type="button" class="btn-flat waves-effect col-picker-btn" @click="pickerOpen = !pickerOpen">
+              <i class="material-icons left">view_column</i>Columns
+            </button>
+            <div class="col-picker-popover" x-show="pickerOpen" x-transition.opacity>
+              <div class="col-picker-hint grey-text">Drag column headers to reorder.</div>
+              <ul>
+                <template x-for="c in pickerColumns" :key="c.key">
+                  <li>
+                    <label>
+                      <input type="checkbox" class="filled-in" :checked="c.visible" @change="toggleColumn(c.key)" />
+                      <span x-text="columnLabel(c.key)"></span>
+                    </label>
+                  </li>
+                </template>
+              </ul>
+              <a href="#" class="col-picker-reset" @click.prevent="resetColumns">Reset to defaults</a>
+            </div>
+          </div>
         </div>
 
-        <div class="table-scroll">
-          <table class="striped highlight compact-table">
+        <div class="table-split">
+          <table class="striped highlight compact-table fixed-table" :class="scrolled ? 'is-scrolled' : ''">
             <thead>
               <tr>
-                <template x-for="col in visibleColumns" :key="col.key">
-                  <th x-text="col.label" :class="col.numeric ? 'right-align' : ''"></th>
+                <template x-for="col in fixedColumns" :key="col.key">
+                  <th :data-key="col.key" x-text="col.label"></th>
                 </template>
               </tr>
             </thead>
             <tbody>
               <template x-for="d in visibleRows" :key="d.canonical_id">
                 <tr>
-                  <template x-for="col in visibleColumns" :key="col.key">
-                    <td :class="col.numeric ? 'right-align mono' : ''" x-html="formatCell(d, col)"></td>
+                  <template x-for="col in fixedColumns" :key="col.key">
+                    <td :data-key="col.key" x-html="formatCell(d, col)"></td>
                   </template>
                 </tr>
               </template>
             </tbody>
           </table>
+
+          <div class="scroll-table-wrap" @scroll="scrolled = $event.target.scrollLeft > 0">
+            <table class="striped highlight compact-table">
+              <thead>
+                <tr x-ref="headerRow">
+                  <template x-for="col in reorderableColumns" :key="col.key">
+                    <th class="reorderable" :data-key="col.key"
+                        :class="col.numeric ? 'right-align' : ''"
+                        x-text="col.label"></th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="d in visibleRows" :key="d.canonical_id">
+                  <tr>
+                    <template x-for="col in reorderableColumns" :key="col.key">
+                      <td :data-key="col.key" :class="col.numeric ? 'right-align mono' : ''" x-html="formatCell(d, col)"></td>
+                    </template>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+
           <div x-show="visibleRows.length === 0" class="grey-text center-align padded">
             No drivers match the current filters.
           </div>

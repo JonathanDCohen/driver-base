@@ -40,7 +40,34 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
 .sort-chip-list .chip .close { cursor: pointer; }
 .add-sort select { display: block; margin: 0; height: 32px; padding: 0 8px; border: 1px solid #ccc; border-radius: 3px; background: #fff; font-size: 13px; }
 
-.table-scroll { max-height: calc(100vh - 260px); overflow: auto; background: #fff; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+/* Two side-by-side tables: fixed identity columns on the left (no
+ * horizontal scroll), the rest inside a wrapper that scrolls
+ * horizontally. Vertical scroll lives on the parent so both tables
+ * scroll together. */
+.table-split {
+  display: flex;
+  align-items: flex-start;
+  max-height: calc(100vh - 260px);
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+}
+/* Materialize sets `table { width: 100% }` globally — override for the
+ * fixed table so it sizes to its (short) content rather than eating the
+ * whole flex row. */
+.fixed-table {
+  flex: 0 0 auto; width: auto;
+  border-right: 1px solid #cfd8dc;
+  /* Material elevation: raise the fixed table above the scrolling table
+   * whenever the right side has been scrolled off its origin. Parent
+   * .table-split already clips both axes so leftward bleed is contained. */
+  position: relative; z-index: 2;
+  transition: box-shadow .35s ease;
+}
+.fixed-table.is-scrolled { box-shadow: 6px 0 8px -3px rgba(0,0,0,.22); }
+.scroll-table-wrap { flex: 1 1 auto; min-width: 0; overflow-x: auto; }
+.scroll-table-wrap > table { width: 100%; }
 .compact-table { margin: 0; font-size: 13px; }
 .compact-table th, .compact-table td { padding: 6px 10px; white-space: nowrap; }
 .compact-table thead th { position: sticky; top: 0; background: #eceff1; z-index: 1; }
@@ -49,10 +76,49 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
 .null { color: #b0bec5; }
 .derived-mark { color: #90a4ae; font-size: 10px; padding-left: 1px; cursor: help; font-weight: bold; }
 
+/* Reorderable column headers — grab cursor + hover highlights to signal
+ * drag affordance and clarify column boundaries. Fixed identity columns
+ * (Manufacturer + Model) intentionally don't get the class, so they render
+ * as static headers with a default cursor. */
+.compact-table th.reorderable {
+  cursor: grab;
+  user-select: none;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  transition: background-color .12s, border-color .12s;
+}
+.compact-table th.reorderable:hover {
+  background: #dde3e6;
+  border-left-color: #90a4ae;
+  border-right-color: #90a4ae;
+}
+.compact-table th.reorderable.sortable-chosen,
+.compact-table th.reorderable.sortable-drag { cursor: grabbing; }
+.compact-table th.reorderable.sortable-ghost { opacity: .35; background: #b0bec5; }
+
+/* Columns picker */
+.col-picker { position: relative; }
+.col-picker-btn { padding: 0 10px; height: 32px; line-height: 32px; }
+.col-picker-btn i.material-icons.left { margin-right: 6px; line-height: 32px; height: 32px; }
+.col-picker-popover {
+  position: absolute; right: 0; top: calc(100% + 4px);
+  z-index: 20;
+  min-width: 220px; max-height: 60vh; overflow-y: auto;
+  background: #fff; border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  padding: 8px 0;
+}
+.col-picker-hint { font-size: 11px; padding: 0 14px 6px; }
+.col-picker-popover ul { list-style: none; margin: 0; padding: 0; }
+.col-picker-popover li { padding: 2px 14px; }
+.col-picker-popover label { display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #263238; min-height: 24px; }
+.col-picker-popover label span { padding-left: 28px; }
+.col-picker-reset { display: block; padding: 8px 14px 2px; font-size: 12px; color: #00695c; }
+
 .row-count { padding: 8px 0; font-size: 13px; }
 .padded { padding: 32px 16px; }
 
 @media (max-width: 992px) {
   .sidebar { position: static; max-height: none; }
-  .table-scroll { max-height: none; }
+  .table-split { max-height: none; }
 }
