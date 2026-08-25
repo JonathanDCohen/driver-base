@@ -243,6 +243,7 @@ function app() {
     pickerOpen: false,
     sortPickerOpen: false,
     scrolled: false,       // right table has scrollLeft > 0 — drives shadow on fixed table
+    hoverIdx: null,        // row index currently hovered in either table — drives shared highlight
 
     dragKey: null,         // column key currently being dragged
     dragOverKey: null,     // column key currently hovered as drop target

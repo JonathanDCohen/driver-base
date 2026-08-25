@@ -119,7 +119,7 @@
         </div>
 
         <div class="table-split">
-          <table class="striped highlight compact-table fixed-table" :class="scrolled ? 'is-scrolled' : ''">
+          <table class="striped compact-table fixed-table" :class="scrolled ? 'is-scrolled' : ''">
             <thead>
               <tr>
                 <template x-for="col in fixedColumns" :key="col.key">
@@ -128,8 +128,9 @@
               </tr>
             </thead>
             <tbody>
-              <template x-for="d in visibleRows" :key="d.canonical_id">
-                <tr>
+              <template x-for="(d, i) in visibleRows" :key="d.canonical_id">
+                <tr :class="hoverIdx === i ? 'row-hover' : ''"
+                    @mouseenter="hoverIdx = i" @mouseleave="hoverIdx = null">
                   <template x-for="col in fixedColumns" :key="col.key">
                     <td :data-key="col.key" x-html="formatCell(d, col)"></td>
                   </template>
@@ -139,7 +140,7 @@
           </table>
 
           <div class="scroll-table-wrap" @scroll="scrolled = $event.target.scrollLeft > 0">
-            <table class="striped highlight compact-table">
+            <table class="striped compact-table">
               <thead>
                 <tr>
                   <template x-for="col in reorderableColumns" :key="col.key">
@@ -156,8 +157,9 @@
                 </tr>
               </thead>
               <tbody>
-                <template x-for="d in visibleRows" :key="d.canonical_id">
-                  <tr>
+                <template x-for="(d, i) in visibleRows" :key="d.canonical_id">
+                  <tr :class="hoverIdx === i ? 'row-hover' : ''"
+                      @mouseenter="hoverIdx = i" @mouseleave="hoverIdx = null">
                     <template x-for="col in reorderableColumns" :key="col.key">
                       <td :data-key="col.key" :class="col.numeric ? 'right-align mono' : ''" x-html="formatCell(d, col)"></td>
                     </template>

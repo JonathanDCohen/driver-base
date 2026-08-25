@@ -73,6 +73,7 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
 .compact-table thead th { position: sticky; top: 0; background: #eceff1; z-index: 1; }
 .compact-table .mono { font-family: 'Roboto Mono', ui-monospace, Menlo, monospace; }
 .compact-table td a { color: #00695c; }
+.compact-table > tbody > tr.row-hover { background-color: rgba(0, 137, 123, 0.22); }
 .null { color: #b0bec5; }
 .derived-mark { color: #90a4ae; font-size: 10px; padding-left: 1px; cursor: help; font-weight: bold; }
 
