@@ -244,11 +244,8 @@ function app() {
         this.statusLabel = "failed to load drivers.json";
       }
 
-      // Materialize + SortableJS init AFTER data + first render.
+      // SortableJS init AFTER data + first render.
       this.$nextTick(() => {
-        try {
-          M.FormSelect.init(document.querySelectorAll("select"));
-        } catch (_) {}
         this.installSortable();
         this.installColumnSortable();
       });
@@ -382,7 +379,6 @@ function app() {
         this.updateUrl();
       }
       ev.target.value = "";
-      this.$nextTick(() => { try { M.FormSelect.init(ev.target); } catch (_) {} });
     },
 
     toggleSortDir(i) {
@@ -393,9 +389,6 @@ function app() {
     removeSort(i) {
       this.sorts.splice(i, 1);
       this.updateUrl();
-      this.$nextTick(() => {
-        try { M.FormSelect.init(document.querySelectorAll("select")); } catch (_) {}
-      });
     },
 
     installSortable() {
