@@ -1,7 +1,10 @@
 // Driver-base SPA. Alpine.js component + SortableJS for the sort chips.
+// Reorderable column headers use native HTML5 drag events — Alpine remains
+// the only DOM mutator so `x-for` re-renders header + body cells in lockstep
+// from the same array (no Sortable/x-for fight).
 // State (filters + sorts) is mirrored to the URL for shareability.
-// Column visibility and units preference persist in first-party cookies
-// (`db_cols`, `db_units`). Column order is fixed by DEFAULT_COLUMN_ORDER.
+// Column order + visibility and units preference persist in first-party cookies
+// (`db_cols`, `db_units`).
 
 const COLUMN_META = {
   manufacturer:              { label: "Manufacturer",       numeric: false, sortable: true  },
@@ -33,9 +36,10 @@ const SORTABLE_FIELDS = Object.entries(COLUMN_META)
   .filter(([, m]) => m.sortable)
   .map(([key, m]) => ({ key, label: m.label, numeric: m.numeric }));
 
-// Manufacturer + Model are always the first two columns and always visible.
-// Everything else follows DEFAULT_COLUMN_ORDER and is user-hideable via the
-// Columns picker; the order itself isn't user-editable.
+// Manufacturer + Model are always the first two columns, always visible, and
+// live in a separate table so they can't be dragged or dropped on. Everything
+// else is user-orderable via native drag-and-drop and hideable via the Columns
+// picker.
 const FIXED_KEYS = ["manufacturer", "model"];
 const IS_FIXED = new Set(FIXED_KEYS);
 
@@ -161,10 +165,9 @@ function writeURLState(state) {
   window.history.replaceState(null, "", url);
 }
 
-// Cookie format: comma-separated tokens for non-fixed columns. Each token is
-// `key` (visible) or `key:h` (hidden). Position in the cookie is ignored on
-// read — order is always taken from DEFAULT_COLUMN_ORDER. Fixed columns are
-// always visible and aren't stored.
+// Cookie format: comma-separated tokens in display order for the non-fixed
+// columns only. Each token is `key` (visible) or `key:h` (hidden). Fixed
+// columns are always first and always visible, so they're not stored.
 function readColumnsCookie() {
   const m = document.cookie.match(/(?:^|; )db_cols=([^;]*)/);
   if (!m) return null;
@@ -201,16 +204,27 @@ function defaultColumns() {
   ];
 }
 
-// Order is always DEFAULT_COLUMN_ORDER (with unknown-to-default keys appended
-// hidden); the cookie only contributes visibility. This normalizes any stale
-// cookies from the earlier drag-to-reorder feature.
+// Reconcile a stored cookie against the current catalog: prepend fixed keys,
+// drop unknown/duplicate keys, then append any new catalog keys as hidden so
+// schema additions surface in the picker without hijacking a returning user's
+// layout.
 function reconcileColumns(stored) {
   if (!stored) return defaultColumns();
-  const visibleByKey = new Map(stored.map((c) => [c.key, !!c.visible]));
-  return defaultColumns().map((c) => ({
-    key: c.key,
-    visible: IS_FIXED.has(c.key) ? true : (visibleByKey.has(c.key) ? visibleByKey.get(c.key) : c.visible),
-  }));
+  const known = new Set(Object.keys(COLUMN_META));
+  const seen = new Set();
+  const out = FIXED_KEYS.map((k) => {
+    seen.add(k);
+    return { key: k, visible: true };
+  });
+  for (const c of stored) {
+    if (!known.has(c.key) || seen.has(c.key) || IS_FIXED.has(c.key)) continue;
+    seen.add(c.key);
+    out.push({ key: c.key, visible: !!c.visible });
+  }
+  for (const k of Object.keys(COLUMN_META)) {
+    if (!seen.has(k)) out.push({ key: k, visible: false });
+  }
+  return out;
 }
 
 function app() {
@@ -230,6 +244,10 @@ function app() {
     sortPickerOpen: false,
     unitsPickerOpen: false,
     scrolled: false,       // right table has scrollLeft > 0 — drives shadow on fixed table
+
+    dragKey: null,         // column key currently being dragged
+    dragOverKey: null,     // column key currently hovered as drop target
+    dragSide: null,        // 'left' | 'right' — which half of the hovered th we're over
 
     async init() {
       const state = parseURLState();
@@ -352,7 +370,7 @@ function app() {
       return FIXED_KEYS.map((k) => ({ key: k, ...COLUMN_META[k] }));
     },
 
-    get scrollableColumns() {
+    get reorderableColumns() {
       return this.columns
         .filter((c) => c.visible && !IS_FIXED.has(c.key))
         .map((c) => ({ key: c.key, ...COLUMN_META[c.key] }));
@@ -418,6 +436,78 @@ function app() {
           this.updateUrl();
         },
       });
+    },
+
+    // Native HTML5 drag handlers for column headers. Alpine is the sole DOM
+    // mutator — drop mutates this.columns, and x-for re-renders both the
+    // header <th>s and every body <td> from the same array on the same tick.
+    onColDragStart(ev, key) {
+      this.dragKey = key;
+      ev.dataTransfer.effectAllowed = "move";
+      ev.dataTransfer.setData("text/plain", key);
+    },
+
+    onColDragOver(ev, key) {
+      if (!this.dragKey || key === this.dragKey) return;
+      ev.dataTransfer.dropEffect = "move";
+      const rect = ev.currentTarget.getBoundingClientRect();
+      this.dragSide = ev.clientX < rect.left + rect.width / 2 ? "left" : "right";
+      this.dragOverKey = key;
+    },
+
+    onColDragLeave(key) {
+      if (this.dragOverKey === key) {
+        this.dragOverKey = null;
+        this.dragSide = null;
+      }
+    },
+
+    onColDrop(targetKey) {
+      const src = this.dragKey;
+      if (!src || src === targetKey) { this.onColDragEnd(); return; }
+      const visible = this.columns.filter((c) => c.visible && !IS_FIXED.has(c.key));
+      const targetVisIdx = visible.findIndex((c) => c.key === targetKey);
+      const srcVisIdx = visible.findIndex((c) => c.key === src);
+      if (targetVisIdx < 0 || srcVisIdx < 0) { this.onColDragEnd(); return; }
+      // Insertion point in the visible sequence, before/after the target.
+      let newPos = targetVisIdx + (this.dragSide === "right" ? 1 : 0);
+      // Removing src first shifts positions past it left by one.
+      if (srcVisIdx < newPos) newPos -= 1;
+      this.reorder(src, newPos);
+      this.onColDragEnd();
+    },
+
+    onColDragEnd() {
+      this.dragKey = null;
+      this.dragOverKey = null;
+      this.dragSide = null;
+    },
+
+    colDragClass(key) {
+      const parts = [];
+      if (this.dragKey === key) parts.push("dragging");
+      if (this.dragOverKey === key && this.dragSide) parts.push(`drop-${this.dragSide}`);
+      return parts.join(" ");
+    },
+
+    // Splice `key` to visible-position `newPos` within this.columns (which
+    // also carries hidden entries and the two fixed keys). Hidden columns
+    // stay where they are relative to the visible reorder; if the user
+    // unhides one later, it reappears at that parked slot.
+    reorder(key, newPos) {
+      const from = this.columns.findIndex((c) => c.key === key);
+      if (from < 0) return;
+      const [moved] = this.columns.splice(from, 1);
+      let visCount = 0;
+      let insertAt = this.columns.length;
+      for (let i = 0; i < this.columns.length; i++) {
+        const c = this.columns[i];
+        if (IS_FIXED.has(c.key) || !c.visible) continue;
+        if (visCount === newPos) { insertAt = i; break; }
+        visCount++;
+      }
+      this.columns.splice(insertAt, 0, moved);
+      writeColumnsCookie(this.columns);
     },
 
     toggleColumn(key) {

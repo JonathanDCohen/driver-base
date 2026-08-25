@@ -119,6 +119,7 @@
               <i class="material-icons left">view_column</i>Columns
             </button>
             <div class="picker-popover" x-show="pickerOpen" x-transition.opacity>
+              <div class="picker-hint grey-text">Drag column headers to reorder.</div>
               <ul>
                 <template x-for="c in pickerColumns" :key="c.key">
                   <li>
@@ -158,9 +159,15 @@
             <table class="striped highlight compact-table">
               <thead>
                 <tr>
-                  <template x-for="col in scrollableColumns" :key="col.key">
-                    <th :data-key="col.key"
-                        :class="col.numeric ? 'right-align' : ''"
+                  <template x-for="col in reorderableColumns" :key="col.key">
+                    <th class="reorderable" :data-key="col.key"
+                        draggable="true"
+                        @dragstart="onColDragStart($event, col.key)"
+                        @dragover.prevent="onColDragOver($event, col.key)"
+                        @dragleave="onColDragLeave(col.key)"
+                        @drop.prevent="onColDrop(col.key)"
+                        @dragend="onColDragEnd"
+                        :class="[col.numeric ? 'right-align' : '', colDragClass(col.key)]"
                         x-text="columnLabel(col.key)"></th>
                   </template>
                 </tr>
@@ -168,7 +175,7 @@
               <tbody>
                 <template x-for="d in visibleRows" :key="d.canonical_id">
                   <tr>
-                    <template x-for="col in scrollableColumns" :key="col.key">
+                    <template x-for="col in reorderableColumns" :key="col.key">
                       <td :data-key="col.key" :class="col.numeric ? 'right-align mono' : ''" x-html="formatCell(d, col)"></td>
                     </template>
                   </tr>
