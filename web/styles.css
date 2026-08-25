@@ -38,7 +38,6 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
 .sort-chip-list .chip a { display: inline-flex; align-items: center; color: inherit; }
 .sort-chip-list .chip a .material-icons { font-size: 16px; }
 .sort-chip-list .chip .close { cursor: pointer; }
-.add-sort select { display: block; margin: 0; height: 32px; padding: 0 8px; border: 1px solid #ccc; border-radius: 3px; background: #fff; font-size: 13px; }
 
 /* Two side-by-side tables: fixed identity columns on the left (no
  * horizontal scroll), the rest inside a wrapper that scrolls
@@ -97,10 +96,11 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
 .compact-table th.reorderable.sortable-ghost { opacity: .35; background: #b0bec5; }
 
 /* Columns picker */
-.col-picker { position: relative; }
-.col-picker-btn { padding: 0 10px; height: 32px; line-height: 32px; }
-.col-picker-btn i.material-icons.left { margin-right: 6px; line-height: 32px; height: 32px; }
-.col-picker-popover {
+.picker { position: relative; }
+.picker-btn { padding: 0 10px; height: 32px; line-height: 32px; }
+.picker-btn i.material-icons.left { margin-right: 6px; line-height: 32px; height: 32px; }
+.picker-btn[disabled] { color: #b0bec5; cursor: not-allowed; }
+.picker-popover {
   position: absolute; right: 0; top: calc(100% + 4px);
   z-index: 20;
   min-width: 220px; max-height: 60vh; overflow-y: auto;
@@ -108,11 +108,13 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
   box-shadow: 0 2px 8px rgba(0,0,0,.18);
   padding: 8px 0;
 }
-.col-picker-hint { font-size: 11px; padding: 0 14px 6px; }
-.col-picker-popover ul { list-style: none; margin: 0; padding: 0; }
-.col-picker-popover li { padding: 2px 14px; }
-.col-picker-popover label { display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #263238; min-height: 24px; }
-.col-picker-popover label span { padding-left: 28px; }
+.picker-hint { font-size: 11px; padding: 0 14px 6px; }
+.picker-popover ul { list-style: none; margin: 0; padding: 0; }
+.picker-popover li { padding: 2px 14px; }
+.picker-popover label { display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #263238; min-height: 24px; }
+.picker-popover label span { padding-left: 28px; }
+.picker-item { display: block; padding: 4px 0; font-size: 13px; color: #263238; }
+.picker-item:hover { color: #00695c; }
 .col-picker-reset { display: block; padding: 8px 14px 2px; font-size: 12px; color: #00695c; }
 
 .row-count { padding: 8px 0 0; font-size: 13px; }

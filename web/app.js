@@ -218,6 +218,7 @@ function app() {
     sortableFields: SORTABLE_FIELDS,
     columns: [],           // ordered { key, visible } — includes fixed keys at [0..1]
     pickerOpen: false,
+    sortPickerOpen: false,
     scrolled: false,       // right table has scrollLeft > 0 — drives shadow on fixed table
 
     async init() {
@@ -369,14 +370,11 @@ function app() {
       this.updateUrl();
     },
 
-    onAddSort(ev) {
-      const field = ev.target.value;
+    addSort(field) {
       if (!field) return;
-      if (!this.sorts.some((s) => s.field === field)) {
-        this.sorts.push({ field, dir: "asc" });
-        this.updateUrl();
-      }
-      ev.target.value = "";
+      if (this.sorts.some((s) => s.field === field)) return;
+      this.sorts.push({ field, dir: "asc" });
+      this.updateUrl();
     },
 
     toggleSortDir(i) {

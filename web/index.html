@@ -79,21 +79,29 @@
             </template>
           </ul>
 
-          <div class="add-sort">
-            <select @change="onAddSort($event)">
-              <option value="" disabled selected>+ add sort</option>
-              <template x-for="f in unusedSortableFields" :key="f.key">
-                <option :value="f.key" x-text="f.label"></option>
-              </template>
-            </select>
+          <div class="picker sort-picker" @click.outside="sortPickerOpen = false">
+            <button type="button" class="btn-flat waves-effect picker-btn"
+                    :disabled="unusedSortableFields.length === 0"
+                    @click="sortPickerOpen = !sortPickerOpen">
+              <i class="material-icons left">sort</i>Add sort
+            </button>
+            <div class="picker-popover" x-show="sortPickerOpen" x-transition.opacity>
+              <ul>
+                <template x-for="f in unusedSortableFields" :key="f.key">
+                  <li>
+                    <a href="#" class="picker-item" @click.prevent="addSort(f.key); sortPickerOpen = false" x-text="f.label"></a>
+                  </li>
+                </template>
+              </ul>
+            </div>
           </div>
 
-          <div class="col-picker" @click.outside="pickerOpen = false">
-            <button type="button" class="btn-flat waves-effect col-picker-btn" @click="pickerOpen = !pickerOpen">
+          <div class="picker col-picker" @click.outside="pickerOpen = false">
+            <button type="button" class="btn-flat waves-effect picker-btn" @click="pickerOpen = !pickerOpen">
               <i class="material-icons left">view_column</i>Columns
             </button>
-            <div class="col-picker-popover" x-show="pickerOpen" x-transition.opacity>
-              <div class="col-picker-hint grey-text">Drag column headers to reorder.</div>
+            <div class="picker-popover" x-show="pickerOpen" x-transition.opacity>
+              <div class="picker-hint grey-text">Drag column headers to reorder.</div>
               <ul>
                 <template x-for="c in pickerColumns" :key="c.key">
                   <li>
