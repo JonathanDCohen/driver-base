@@ -48,18 +48,6 @@ assumption invisible to anyone reading `xmech_mm` in the output.
 
 ---
 
-## Faital: 34 fragments still lost between parse and final records
-
-**Added:** 2026-08-25 (partially resolved same day)
-
-After the seed rewrite: 158 parsed → 124 kept, 34 rejected. Cause identified for
-31 of them: the `xmech ≥ 1.9 * xmax` consistency gate rejecting drivers where
-Faital reports Xdamage one-way (see assumption note above). Bypass landed for
-Faital. **Re-run and check the remaining 3 rejections** after that change is
-merged — they may be legitimate data issues.
-
----
-
 ## Faital: potential new fields identified but not added
 
 **Added:** 2026-08-25

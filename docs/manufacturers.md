@@ -318,7 +318,7 @@ HF_Horns               → HORN
 - `Shipping Box` label case varies: `Shipping Box(Single Carton Box)` (LF) vs `Shipping Box(Single carton box)` (HF, lowercase c). Compare case-insensitively.
 - Some products have `Push Terminals`/`Recone Kit` fields that vary by impedance version (`- 8 Ohm Version`, `- 4 Ohm Version`). Not scraped as Driver fields; ignored or stored as sidecar SKU refs.
 
-**Recon count:** 158 product URLs across 4 categories (2026-08-25 fetch). `expected_min_records = 120` declared inline in `scrapers/faital.py`. Last live run: 158 fragments parsed → 124 final drivers (34 dropped in `assign_canonical_ids` / `merge_fragments_by_id` / `enforce_consistency` — TODO: audit and either recover or document the reason per model).
+**Recon count:** 158 product URLs across 4 categories (2026-08-25 fetch). `expected_min_records = 120` declared inline in `scrapers/faital.py`. Live run 2026-08-25: 158 fragments parsed → 158 final drivers (0 dropped) matching site totals per category exactly.
 
 ---
 

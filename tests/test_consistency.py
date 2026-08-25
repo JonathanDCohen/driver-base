@@ -52,10 +52,12 @@ def test_warn_xmech_ratio_high() -> None:
     assert any(f.startswith("xmech_xmax_ratio_high") for f in kept[0].warn_flags)
 
 
-def test_reject_impedance_min_greater_than_nominal() -> None:
-    d = _driver(impedance_nominal_ohm=8.0, impedance_min_ohm=10.0)
-    _, rejected = enforce_consistency([d])
-    assert "impedance_min>nominal" in rejected[0].reason
+def test_keep_impedance_min_slightly_above_nominal() -> None:
+    # Nominal is a rating bin; min > nominal by a fraction is legitimate and
+    # published by e.g. Faital HF drivers. Gate removed 2026-08-25.
+    d = _driver(impedance_nominal_ohm=8.0, impedance_min_ohm=8.4)
+    kept, rejected = enforce_consistency([d])
+    assert len(kept) == 1 and not rejected
 
 
 def test_reject_power_long_term_less_than_aes() -> None:

@@ -79,11 +79,9 @@ def _hard_gates(d: Driver) -> None:
                 f"xmech_under_doubling: {d.xmech_mm} < 1.9*{d.xmax_mm}"
             )
 
-    if d.impedance_min_ohm is not None and d.impedance_nominal_ohm is not None:
-        if d.impedance_min_ohm > d.impedance_nominal_ohm + 0.05:
-            raise ParseConsistencyFailure(
-                f"impedance_min>nominal: {d.impedance_min_ohm}>{d.impedance_nominal_ohm}"
-            )
+    # Nominal impedance is a rating bin (4/8/16 Ω), not a physical maximum, so
+    # min impedance can legitimately sit slightly above nominal (Faital HF drivers
+    # routinely publish 8.1–8.4 Ω min on an 8 Ω nominal). Gate removed 2026-08-25.
 
     if d.power_aes_watts is not None:
         for field_name in (
