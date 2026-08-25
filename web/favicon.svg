@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect x="0" y="0" width="64" height="64" rx="10" ry="10" fill="#00796B"/>
   <g fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"
-     transform="translate(32 32) scale(1.35) translate(-26 -32)">
+     transform="translate(32 32) scale(1.35) translate(-23 -32)">
     <!-- Voice coil: squared-off monospace 0 -->
     <rect x="12" y="22" width="12" height="20" rx="3" ry="3"/>
 
