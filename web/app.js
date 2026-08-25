@@ -65,7 +65,7 @@ const DRIVER_KIND_LABEL = {
   tweeter: "Tweeter",
   coax: "Coaxial",
   horn: "Horn",
-  passive: "Passive",
+  passive: "Passive radiator",
   shaker: "Shaker",
   fullrange: "Fullrange",
   guitar_bass: "Guitar/bass",
