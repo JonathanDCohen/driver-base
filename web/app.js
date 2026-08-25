@@ -16,7 +16,7 @@ const COLUMN_META = {
   qts:                       { label: "Qts",                numeric: true,  sortable: true  },
   qes:                       { label: "Qes",                numeric: true,  sortable: true  },
   qms:                       { label: "Qms",                numeric: true,  sortable: true  },
-  vas_liters:                { label: "Vas (L)",            numeric: true,  sortable: true  },
+  vas_liters:                { label: "Vas",                numeric: true,  sortable: true  },
   sd_cm2:                    { label: "Sd (cm²)",           numeric: true,  sortable: true  },
   xmax_mm:                   { label: "Xmax",               numeric: true,  sortable: true  },
   mms_g:                     { label: "Mms",                numeric: true,  sortable: true  },
@@ -68,6 +68,7 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 const MM_PER_INCH = 25.4;
 const LB_PER_KG = 2.2046226;
+const CUFT_PER_LITER = 0.0353146667;
 
 const DRIVER_KIND_LABEL = {
   lf_woofer: "LF woofer",
@@ -231,7 +232,6 @@ function app() {
   return {
     drivers: [],
     generatedAt: "?",
-    statusLabel: "loading…",
 
     filters: { q: "", mfg: [], kind: [], impedance: [], size_in: [] },
     sorts: [],
@@ -239,10 +239,9 @@ function app() {
 
     sortableFields: SORTABLE_FIELDS,
     columns: [],           // ordered { key, visible } — includes fixed keys at [0..1]
-    units: "metric",       // "metric" | "imperial" — affects Size and Weight display + labels
+    units: "metric",       // "metric" | "imperial" — affects Size, Weight, Vas display + labels
     pickerOpen: false,
     sortPickerOpen: false,
-    unitsPickerOpen: false,
     scrolled: false,       // right table has scrollLeft > 0 — drives shadow on fixed table
 
     dragKey: null,         // column key currently being dragged
@@ -266,10 +265,8 @@ function app() {
           _size_bucket: sizeBucketOf(d.nominal_size_mm),
           _kind_label: DRIVER_KIND_LABEL[d.driver_kind] || d.driver_kind,
         }));
-        this.statusLabel = `${this.drivers.length} drivers · updated ${this.generatedAt.slice(0, 10)}`;
       } catch (e) {
         console.error(e);
-        this.statusLabel = "failed to load drivers.json";
       }
 
       // SortableJS init AFTER data + first render.
@@ -525,6 +522,7 @@ function app() {
     columnLabel(key) {
       if (key === "nominal_size_mm") return this.units === "imperial" ? "Size (in)" : "Size (mm)";
       if (key === "net_weight_kg")   return this.units === "imperial" ? "Weight (lb)" : "Weight (kg)";
+      if (key === "vas_liters")      return this.units === "imperial" ? "Vas (ft³)" : "Vas (L)";
       return (COLUMN_META[key] || { label: key }).label;
     },
 
@@ -549,6 +547,9 @@ function app() {
       }
       if (col.key === "net_weight_kg") {
         return this.units === "imperial" ? fmtNumber(v * LB_PER_KG) : fmtNumber(v);
+      }
+      if (col.key === "vas_liters") {
+        return this.units === "imperial" ? fmtNumber(v * CUFT_PER_LITER) : fmtNumber(v);
       }
       if (col.key === "impedance_nominal_ohm") return `${v}&nbsp;Ω`;
       let base = typeof v === "number" ? fmtNumber(v) : String(v);

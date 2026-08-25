@@ -24,9 +24,6 @@
         </svg>
         driver-base
       </a>
-      <ul class="right hide-on-med-and-down">
-        <li><a><span x-text="statusLabel"></span></a></li>
-      </ul>
     </div>
   </nav>
 
@@ -65,54 +62,11 @@
       <!-- Main -->
       <section class="col s12 m8 l9 main">
         <div class="sort-bar">
-          <span class="grey-text">Sort priority:</span>
-          <ul id="sort-chips" class="sort-chip-list" x-ref="sortChips">
-            <template x-for="(s, i) in sorts" :key="s.field">
-              <li class="chip teal lighten-4" :data-idx="i">
-                <span class="drag-handle material-icons">drag_indicator</span>
-                <span x-text="fieldLabel(s.field)"></span>
-                <a href="#" @click.prevent="toggleSortDir(i)" :title="s.dir === 'asc' ? 'ascending' : 'descending'">
-                  <i class="material-icons" x-text="s.dir === 'asc' ? 'arrow_upward' : 'arrow_downward'"></i>
-                </a>
-                <i class="close material-icons" @click="removeSort(i)">close</i>
-              </li>
-            </template>
-          </ul>
-
-          <div class="picker sort-picker" @click.outside="sortPickerOpen = false">
-            <button type="button" class="btn-flat waves-effect picker-btn"
-                    :disabled="unusedSortableFields.length === 0"
-                    @click="sortPickerOpen = !sortPickerOpen">
-              <i class="material-icons left">sort</i>Add sort
-            </button>
-            <div class="picker-popover" x-show="sortPickerOpen" x-transition.opacity>
-              <ul>
-                <template x-for="f in unusedSortableFields" :key="f.key">
-                  <li>
-                    <a href="#" class="picker-item" @click.prevent="addSort(f.key); sortPickerOpen = false" x-text="f.label"></a>
-                  </li>
-                </template>
-              </ul>
-            </div>
-          </div>
-
-          <div class="picker units-picker" @click.outside="unitsPickerOpen = false">
-            <button type="button" class="btn-flat waves-effect picker-btn" @click="unitsPickerOpen = !unitsPickerOpen">
-              <i class="material-icons left">straighten</i><span x-text="units === 'imperial' ? 'Imperial' : 'Metric'"></span>
-            </button>
-            <div class="picker-popover" x-show="unitsPickerOpen" x-transition.opacity>
-              <ul>
-                <li>
-                  <a href="#" class="picker-item" :class="units === 'metric' ? 'picker-item-active' : ''"
-                     @click.prevent="setUnits('metric'); unitsPickerOpen = false">Metric (mm, kg)</a>
-                </li>
-                <li>
-                  <a href="#" class="picker-item" :class="units === 'imperial' ? 'picker-item-active' : ''"
-                     @click.prevent="setUnits('imperial'); unitsPickerOpen = false">Imperial (in, lb)</a>
-                </li>
-              </ul>
-            </div>
-          </div>
+          <button type="button" class="btn-flat waves-effect picker-btn units-toggle"
+                  :title="units === 'imperial' ? 'Switch to metric (mm, kg, L)' : 'Switch to imperial (in, lb, ft³)'"
+                  @click="setUnits(units === 'imperial' ? 'metric' : 'imperial')">
+            <i class="material-icons left">straighten</i><span x-text="units === 'imperial' ? 'Imperial' : 'Metric'"></span>
+          </button>
 
           <div class="picker col-picker" @click.outside="pickerOpen = false">
             <button type="button" class="btn-flat waves-effect picker-btn" @click="pickerOpen = !pickerOpen">
@@ -133,6 +87,36 @@
               <a href="#" class="col-picker-reset" @click.prevent="resetColumns">Reset to defaults</a>
             </div>
           </div>
+
+          <div class="picker sort-picker" @click.outside="sortPickerOpen = false">
+            <button type="button" class="btn-flat waves-effect picker-btn"
+                    :disabled="unusedSortableFields.length === 0"
+                    @click="sortPickerOpen = !sortPickerOpen">
+              <i class="material-icons left">sort</i>Add sort
+            </button>
+            <div class="picker-popover" x-show="sortPickerOpen" x-transition.opacity>
+              <ul>
+                <template x-for="f in unusedSortableFields" :key="f.key">
+                  <li>
+                    <a href="#" class="picker-item" @click.prevent="addSort(f.key); sortPickerOpen = false" x-text="f.label"></a>
+                  </li>
+                </template>
+              </ul>
+            </div>
+          </div>
+
+          <ul id="sort-chips" class="sort-chip-list" x-ref="sortChips">
+            <template x-for="(s, i) in sorts" :key="s.field">
+              <li class="chip teal lighten-4" :data-idx="i">
+                <span class="drag-handle material-icons">drag_indicator</span>
+                <span x-text="fieldLabel(s.field)"></span>
+                <a href="#" @click.prevent="toggleSortDir(i)" :title="s.dir === 'asc' ? 'ascending' : 'descending'">
+                  <i class="material-icons" x-text="s.dir === 'asc' ? 'arrow_upward' : 'arrow_downward'"></i>
+                </a>
+                <i class="close material-icons" @click="removeSort(i)">close</i>
+              </li>
+            </template>
+          </ul>
         </div>
 
         <div class="table-split">
@@ -189,12 +173,14 @@
           </div>
         </div>
 
-        <div class="row-count grey-text center-align">
-          <span x-text="`${visibleRows.length} / ${drivers.length} drivers`"></span>
-          <span x-show="paginated" x-text="` (showing first ${pageSize})`"></span>
-        </div>
-        <div class="table-footnote grey-text center-align">
-          <sup class="derived-mark">&dagger;</sup> derived from another spec
+        <div class="table-footer grey-text">
+          <span>
+            <span x-text="`${visibleRows.length} / ${drivers.length} drivers`"></span><span x-show="paginated" x-text="` (showing first ${pageSize})`"></span>
+          </span>
+          <span class="sep">·</span>
+          <span x-text="`updated ${generatedAt.slice(0, 10)}`"></span>
+          <span class="sep">·</span>
+          <span><sup class="derived-mark">&dagger;</sup> derived from another spec</span>
         </div>
       </section>
     </div>
