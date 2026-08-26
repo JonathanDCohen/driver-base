@@ -9,7 +9,7 @@
 const COLUMN_META = {
   manufacturer:              { label: "Manufacturer",       numeric: false, sortable: true  },
   model:                     { label: "Model",              numeric: false, sortable: true  },
-  driver_kind:               { label: "Type",               numeric: false, sortable: false },
+  driver_kind:               { label: "Type",               numeric: false, sortable: true  },
   nominal_size_mm:           { label: "Size",               numeric: true,  sortable: true  },
   impedance_nominal_ohm:     { label: "Impedance",          numeric: true,  sortable: true  },
   fs_hz:                     { label: "Fs",                 numeric: true,  sortable: true  },
