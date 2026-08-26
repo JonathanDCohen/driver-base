@@ -133,10 +133,14 @@ def parse_impedance(s: Optional[str]) -> Optional[float]:
 
 
 def parse_power(s: Optional[str]) -> Optional[float]:
-    """Return watts. Handles kW."""
+    """Return watts. Handles kW and thousands commas ('1,300 watts')."""
     if s is None:
         return None
-    v = _first_float(s)
+    # Strip thousands commas first so '1,300' isn't read as European '1.300'
+    # by _first_float's comma-is-decimal heuristic. Dayton's spec tables
+    # write four-digit power ratings this way ('1,300 watts', '2,600 watts').
+    stripped = re.sub(r"(?<=\d),(?=\d{3}(?!\d))", "", s)
+    v = _first_float(stripped)
     if v is None:
         return None
     if re.search(r"\bkw\b", s, re.IGNORECASE):

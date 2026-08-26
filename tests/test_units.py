@@ -80,6 +80,10 @@ def test_parse_impedance(s: str, expected: float) -> None:
     ("50 watts", 50.0),
     ("1600 W AES", 1600.0),
     ("1.2 kW", 1200.0),
+    # Dayton writes four-digit ratings with a thousands comma; must not be
+    # read as European decimal ('1,300' → 1.3).
+    ("1,300 watts", 1300.0),
+    ("2,600 watts", 2600.0),
 ])
 def test_parse_power(s: str, expected: float) -> None:
     assert parse_power(s) == pytest.approx(expected)
