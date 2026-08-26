@@ -161,6 +161,29 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     "depth":                       ("depth_mm",               parse_length_mm),
     "net weight":                  ("net_weight_kg",          _weight_kg),
     "magnet":                      ("magnet_type",            lambda s: normalize_magnet_type(s)),
+    # Coax pages use abbreviated forms of the same labels — keep original entries
+    # above (for LF/HF pages) and add abbreviated aliases here.
+    "nom. diameter":               ("nominal_size_mm",        parse_length_mm),
+    "nom. impedance":              ("impedance_nominal_ohm",  parse_impedance),
+    "max power handling":          ("power_peak_watts",       parse_power),
+}
+
+
+# Coax "Technical Parameters" is a 3-column table — label | LF value | HF value.
+# The generic map above populates fields from the LF value (cells[1]); this map
+# routes the HF value (cells[2]) to the coax_hf_* fields. Only labels that have
+# both an LF and HF variant need entries here; single-section labels (e.g.
+# `Basket Material`, `Cone Surround`) don't.
+_LABEL_MAP_COAX_HF: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]] = {
+    "nominal impedance":           ("coax_hf_impedance_nominal_ohm", parse_impedance),
+    "nom. impedance":              ("coax_hf_impedance_nominal_ohm", parse_impedance),
+    "minimum impedance":           ("coax_hf_impedance_min_ohm",     parse_impedance),
+    "aes power handling":          ("coax_hf_power_aes_watts",       parse_power),
+    "max power handling":          ("coax_hf_power_peak_watts",      parse_power),
+    "maximum power handling":      ("coax_hf_power_peak_watts",      parse_power),
+    "sensitivity (1w/1m)":         ("coax_hf_sensitivity_db_1w_1m",  parse_float),
+    "frequency range":             ("__coax_hf_freq_range__",        parse_range),
+    "voice coil diameter":         ("coax_hf_voice_coil_diameter_mm", parse_length_mm),
 }
 
 
@@ -249,22 +272,52 @@ class FaitalScraper(Scraper):
     ) -> ParseResult:
         soup = BeautifulSoup(raw.body, "lxml")
 
-        specs: dict[str, str] = {}
-        for table in soup.select("table.tbl_data"):
-            for tr in table.select("tr"):
-                cells = tr.find_all(["td", "th"])
+        # `tbl_data` = mini "quick specs" tables shared across LF/HF/coax pages.
+        # `tbl_datasheet` = master table; coax's 3-col "Technical Parameters"
+        # block (label | LF | HF) lives ONLY here. Use `recursive=False` on cell
+        # lookup so nested tables don't bleed their content into outer rows.
+        specs: dict[str, str] = {}          # label → LF-or-only value
+        specs_hf: dict[str, str] = {}       # label → HF value (3-col rows only)
+        for table in soup.select("table.tbl_data, table.tbl_datasheet"):
+            for tr in table.find_all("tr"):
+                cells = tr.find_all(["td", "th"], recursive=False)
                 if len(cells) < 2:
                     continue
-                label = cells[0].get_text(strip=True)
-                value = cells[1].get_text(strip=True)
-                if not label or not value or value in ("--", "-"):
+                label = cells[0].get_text(" ", strip=True)
+                # `Re [LF]` and `Re [HF]` come as 2-col rows with the [LF]/[HF]
+                # tag baked into the label. Preserve the tag so `re` doesn't
+                # collide across sections after normalize_label strips brackets.
+                if "[LF]" in label:
+                    label = label.replace("[LF]", "").strip()
+                    hf_from_2col = False
+                    force_lf = True
+                elif "[HF]" in label:
+                    label = label.replace("[HF]", "").strip()
+                    force_lf = False
+                    hf_from_2col = True
+                else:
+                    force_lf = False
+                    hf_from_2col = False
+                if not label:
                     continue
                 key = normalize_label(label)
                 m = _POWER_ABOVE_KHZ_RE.match(key)
                 if m:
                     key = f"{m.group(1)} handling"
-                if key not in specs:
-                    specs[key] = value
+                value_lf = cells[1].get_text(" ", strip=True)
+                value_hf = cells[2].get_text(" ", strip=True) if len(cells) >= 3 else None
+                if hf_from_2col:
+                    # `Re [HF]` — the single value belongs to the HF section.
+                    if value_lf and value_lf not in ("--", "-") and key not in specs_hf:
+                        specs_hf[key] = value_lf
+                    continue
+                if value_lf and value_lf not in ("--", "-") and key not in specs:
+                    specs[key] = value_lf
+                if value_hf and value_hf not in ("--", "-") and key not in specs_hf:
+                    specs_hf[key] = value_hf
+                # `force_lf` is redundant (already-populated in `specs`) but
+                # named to make the [LF]-tag intent explicit at the callsite.
+                del force_lf
 
         title_text = soup.title.get_text(strip=True) if soup.title else ""
         model = _model_from_title(title_text)
@@ -278,6 +331,14 @@ class FaitalScraper(Scraper):
             driver_kind=seed_context.driver_kind_hint,
             model=model,
         )
+
+        # Route Re from 2-col [HF] rows into coax_hf_re_ohm (no map entry needed
+        # since it's a single-column value promoted directly to the HF slot).
+        if "re" in specs_hf:
+            re_hf = parse_impedance(specs_hf["re"])
+            if re_hf is not None:
+                frag.coax_hf_re_ohm = re_hf
+                frag.spec_source["coax_hf_re_ohm"] = SpecSource.HTML_TABLE
 
         for norm_label, raw_val in specs.items():
             mapping = _LABEL_MAP.get(norm_label)
@@ -293,6 +354,25 @@ class FaitalScraper(Scraper):
                 frag.freq_high_hz = high
                 frag.spec_source["freq_low_hz"] = SpecSource.HTML_TABLE
                 frag.spec_source["freq_high_hz"] = SpecSource.HTML_TABLE
+                continue
+            setattr(frag, field_name, parsed)
+            frag.spec_source[field_name] = SpecSource.HTML_TABLE
+
+        # Coax HF-section fields.
+        for norm_label, raw_val in specs_hf.items():
+            mapping = _LABEL_MAP_COAX_HF.get(norm_label)
+            if mapping is None or mapping[0] is None:
+                continue
+            field_name, parser = mapping
+            parsed = parser(raw_val) if parser else raw_val
+            if parsed is None:
+                continue
+            if field_name == "__coax_hf_freq_range__":
+                low, high = parsed  # type: ignore[misc]
+                frag.coax_hf_freq_low_hz = low
+                frag.coax_hf_freq_high_hz = high
+                frag.spec_source["coax_hf_freq_low_hz"] = SpecSource.HTML_TABLE
+                frag.spec_source["coax_hf_freq_high_hz"] = SpecSource.HTML_TABLE
                 continue
             setattr(frag, field_name, parsed)
             frag.spec_source[field_name] = SpecSource.HTML_TABLE

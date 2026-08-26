@@ -144,6 +144,20 @@ class DriverFragment:
     # Nominal size
     nominal_size_mm: Optional[float] = None
 
+    # Coax HF-section fields — populated only for `driver_kind = COAX`. The
+    # generic fields above hold the coax LF-section values (that's the primary
+    # usable range); these carry the HF section's rating. Same pattern will be
+    # used for future multi-section speaker kinds — see docs/tasks.md.
+    coax_hf_impedance_nominal_ohm: Optional[float] = None
+    coax_hf_impedance_min_ohm: Optional[float] = None
+    coax_hf_power_aes_watts: Optional[float] = None
+    coax_hf_power_peak_watts: Optional[float] = None
+    coax_hf_sensitivity_db_1w_1m: Optional[float] = None
+    coax_hf_freq_low_hz: Optional[float] = None
+    coax_hf_freq_high_hz: Optional[float] = None
+    coax_hf_voice_coil_diameter_mm: Optional[float] = None
+    coax_hf_re_ohm: Optional[float] = None
+
     status: DriverStatus = DriverStatus.ACTIVE
 
     # Diagnostics
@@ -223,3 +237,14 @@ class Driver:
     msrp_amount: Optional[float] = None
 
     nominal_size_mm: Optional[float] = None
+
+    # Coax HF section — see DriverFragment for docstring.
+    coax_hf_impedance_nominal_ohm: Optional[float] = None
+    coax_hf_impedance_min_ohm: Optional[float] = None
+    coax_hf_power_aes_watts: Optional[float] = None
+    coax_hf_power_peak_watts: Optional[float] = None
+    coax_hf_sensitivity_db_1w_1m: Optional[float] = None
+    coax_hf_freq_low_hz: Optional[float] = None
+    coax_hf_freq_high_hz: Optional[float] = None
+    coax_hf_voice_coil_diameter_mm: Optional[float] = None
+    coax_hf_re_ohm: Optional[float] = None

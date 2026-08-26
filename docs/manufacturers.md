@@ -305,6 +305,11 @@ Detail pages themselves are static HTML.
 - `NET Air Volume filled by Loudspeaker` for LF → `air_volume_l` (custom field, low priority); HF uses `NET Air Volume filled by HF Driver` — normalize.
 - `Push Terminals - 8 Ohm Version` (impedance in label) → part number sidecar, not a Driver field.
 
+**Coax pages (Coaxial_Loudspeakers)** have a distinct layout:
+- The "Technical Parameters" block is a 3-column table — `label | LF value | HF value` — for impedance, power, sensitivity, frequency range, VC diameter, magnet, winding/former material, flux density, min. crossover freq, dispersion angle, diaphragm material/shape. This block lives only in `<table class="tbl_datasheet">`, not in the mini `tbl_data` tables that most other labels appear in. The parser must select both classes and use `find_all(recursive=False)` on cells to avoid picking up nested-table content.
+- LF-section values populate the generic Driver fields (`impedance_nominal_ohm`, `power_aes_watts`, `sensitivity_db_1w_1m`, `freq_low_hz`/`freq_high_hz`, `voice_coil_diameter_mm`, `magnet_type`). HF-section values populate `coax_hf_*` counterparts. Same pattern applies to `Re [LF]` / `Re [HF]` rows (2-column with a bracketed tag on the label) → `re_ohm` / `coax_hf_re_ohm`.
+- Labels are abbreviated on coax pages: `Nom. Diameter`, `Nom. Impedance`, `Min. Cross. Freq.`, `Max Power Handling`. Aliased into `_LABEL_MAP` so the same field routing applies.
+
 **Label taxonomy caution:** Faital uses BOTH stripped footnote parentheticals (`(1)`, `(2)`, `(3)`) that should be stripped by `FOOTNOTE_SUFFIX` and unit parentheticals (`Sensitivity (1W/1m)`) that should be `UNIT_ANNOTATION` (strip, but sensitivity slot depends on it). `labels.py` handles both.
 
 **DriverKind mapping:** from the seed URL that yielded each product URL.
