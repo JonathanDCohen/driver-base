@@ -99,6 +99,24 @@ def _model_from_title(title: str) -> Optional[str]:
     return parts[-1] if parts else None
 
 
+# Beyma coax pages combine LF- and HF-section values into a single row labelled
+# `X LF/HF` with a value like `8/16 ohm` or `350/90 W AES`. Split the value on
+# the first `/` to route the LF number to the generic field and the HF number
+# to the coax_hf_* field.
+_COAX_LF_HF_PAIR_RE = re.compile(r"^\s*([\d.]+)\s*/\s*([\d.]+)")
+# label → (LF-field, HF-field). None for either side means "don't route".
+_COAX_LFHF_LABELS: dict[str, tuple[Optional[str], Optional[str]]] = {
+    "nominal impedance lf/hf":   ("impedance_nominal_ohm",  "coax_hf_impedance_nominal_ohm"),
+    "minimum impedance lf/hf":   ("impedance_min_ohm",      "coax_hf_impedance_min_ohm"),
+    "power capacity lf/hf":      ("power_aes_watts",        "coax_hf_power_aes_watts"),
+    "sensitivity lf/hf":         ("sensitivity_db_1w_1m",   "coax_hf_sensitivity_db_1w_1m"),
+    "voice coil diameter lf/hf": ("voice_coil_diameter_mm", "coax_hf_voice_coil_diameter_mm"),
+    # `program power lf/hf` = `700/180 w` — LF Program routes to
+    # power_program_watts; there's no coax_hf_power_program_watts today.
+    "program power lf/hf":       ("power_program_watts",    None),
+}
+
+
 _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]] = {
     # electrical / commercial
     "power capacity":              ("power_aes_watts",        parse_power),
@@ -215,7 +233,26 @@ class BeymaScraper(Scraper):
             frag.diaphragm_shape = "AMT"
             frag.spec_source["diaphragm_shape"] = SpecSource.INFERRED
 
+        is_coax = seed_context.category_id == "coaxial"
+
         for norm_label, raw_val in specs.items():
+            # Coax LF/HF-split rows first — value is like `8/16 ohm`.
+            if is_coax and norm_label in _COAX_LFHF_LABELS:
+                m = _COAX_LF_HF_PAIR_RE.match(raw_val)
+                if m:
+                    lf_field, hf_field = _COAX_LFHF_LABELS[norm_label]
+                    try:
+                        lf_val = float(m.group(1))
+                        hf_val = float(m.group(2))
+                    except ValueError:
+                        continue
+                    if lf_field is not None:
+                        setattr(frag, lf_field, lf_val)
+                        frag.spec_source[lf_field] = SpecSource.HTML_DIV_PAIRS
+                    if hf_field is not None:
+                        setattr(frag, hf_field, hf_val)
+                        frag.spec_source[hf_field] = SpecSource.HTML_DIV_PAIRS
+                continue
             mapping = _LABEL_MAP.get(norm_label)
             if mapping is None or mapping[0] is None:
                 continue
