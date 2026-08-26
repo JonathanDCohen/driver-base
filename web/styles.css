@@ -220,22 +220,11 @@ html[data-theme="dark"] .input-field input[type=text]:not(.browser-default) { bo
 .compact-table td a { color: var(--link); }
 table.compact-table > tbody > tr.row-hover { background-color: rgba(0, 137, 123, 0.22); }
 .null { color: var(--text-faint); }
-/* Rendered as a real <button> so clicks + keyboard focus both work. Reset
- * the browser button chrome so it reads as a tiny superscript dagger. */
-.derived-mark {
-  color: var(--text-faint);
-  font-size: 10px;
-  padding: 0 1px;
-  margin: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  font-weight: bold;
-  line-height: 1;
-  vertical-align: super;
-}
-.derived-mark:hover, .derived-mark:focus-visible { color: var(--text); outline: none; }
-/* Legend rendering: same visual mark, but static (not a button). */
+/* Dagger sigil marking derived/inferred/override cells. Click opens a
+ * popover (delegated handler on the table body, see app.js). */
+.derived-mark { color: var(--text-faint); font-size: 10px; padding-left: 1px; cursor: pointer; font-weight: bold; }
+.derived-mark:hover { color: var(--text); }
+/* Legend rendering: same visual mark, but static (not clickable). */
 .derived-mark.legend { cursor: default; }
 
 /* Click-triggered popover explaining a specific field's spec source. Anchored

@@ -690,10 +690,11 @@ function app() {
       }
       const note = specSourceNote(d, col.key);
       if (note) {
-        // Rendered as a real <button> so keyboard focus + click both work,
-        // and Enter/Space activate it. Popover is opened by a delegated
-        // click handler on the table body (see openSpecPopover).
-        base += ` <button type="button" class="derived-mark" data-note="${escapeAttr(note)}" aria-label="spec-source explanation">†</button>`;
+        // Plain <sup> — a real <button> looked awful (browser chrome, focus
+        // ring, alignment fights with the surrounding number). Click is
+        // handled via a delegated listener on the table body; a11y is not
+        // a priority for this affordance.
+        base += `<sup class="derived-mark" data-note="${escapeAttr(note)}">†</sup>`;
       }
       return base;
     },
