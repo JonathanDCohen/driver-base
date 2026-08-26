@@ -33,15 +33,15 @@ const COLUMN_META = {
   // Coax HF-section fields — populated only for coaxial drivers. The generic
   // fields above hold the coax LF-section values; these carry the HF section.
   // Hidden by default (relevant to a small subset of records).
-  coax_hf_impedance_nominal_ohm: { label: "HF Impedance",    numeric: true,  sortable: true  },
-  coax_hf_impedance_min_ohm:     { label: "HF Imp min",      numeric: true,  sortable: true  },
-  coax_hf_power_aes_watts:       { label: "HF AES (W)",      numeric: true,  sortable: true  },
-  coax_hf_power_peak_watts:      { label: "HF Peak (W)",     numeric: true,  sortable: true  },
-  coax_hf_sensitivity_db_1w_1m:  { label: "HF SPL 1W/1m",    numeric: true,  sortable: true  },
-  coax_hf_freq_low_hz:           { label: "HF Freq low",     numeric: true,  sortable: true  },
-  coax_hf_freq_high_hz:          { label: "HF Freq high",    numeric: true,  sortable: true  },
-  coax_hf_voice_coil_diameter_mm:{ label: "HF VC ⌀",         numeric: true,  sortable: true  },
-  coax_hf_re_ohm:                { label: "HF Re",           numeric: true,  sortable: true  },
+  coax_hf_impedance_nominal_ohm: { label: "(Coax) HF Impedance", numeric: true,  sortable: true  },
+  coax_hf_impedance_min_ohm:     { label: "(Coax) HF Imp min",   numeric: true,  sortable: true  },
+  coax_hf_power_aes_watts:       { label: "(Coax) HF AES (W)",   numeric: true,  sortable: true  },
+  coax_hf_power_peak_watts:      { label: "(Coax) HF Peak (W)",  numeric: true,  sortable: true  },
+  coax_hf_sensitivity_db_1w_1m:  { label: "(Coax) HF SPL 1W/1m", numeric: true,  sortable: true  },
+  coax_hf_freq_low_hz:           { label: "(Coax) HF Freq low",  numeric: true,  sortable: true  },
+  coax_hf_freq_high_hz:          { label: "(Coax) HF Freq high", numeric: true,  sortable: true  },
+  coax_hf_voice_coil_diameter_mm:{ label: "(Coax) HF VC ⌀",      numeric: true,  sortable: true  },
+  coax_hf_re_ohm:                { label: "(Coax) HF Re",        numeric: true,  sortable: true  },
 };
 
 const SORTABLE_FIELDS = Object.entries(COLUMN_META)
