@@ -107,6 +107,20 @@ const SIZE_BUCKETS_MM = [
   { label: '21"', min: 520, max: 545 },
 ];
 
+// Sort picker/menu entries alphabetically by label, with kind-specific fields
+// (coax_hf_*) grouped after the generic ones. Keeps the dropdowns scannable
+// while segregating the sub-catalog that only applies to a small subset of
+// records. `keyOf` and `labelOf` are property accessors so this works for both
+// pickerColumns entries ({key, visible}) and sortableFields entries ({key, label}).
+function sortPickerEntries(entries, keyOf, labelOf) {
+  const bucket = (e) => (keyOf(e).startsWith("coax_hf_") ? 1 : 0);
+  return entries.slice().sort((a, b) => {
+    const db = bucket(a) - bucket(b);
+    if (db !== 0) return db;
+    return labelOf(a).localeCompare(labelOf(b));
+  });
+}
+
 function fmtNumber(v, decimals = 2) {
   if (v == null || Number.isNaN(v)) return null;
   if (Math.abs(v) >= 100) return v.toFixed(0);
@@ -373,7 +387,11 @@ function app() {
 
     get unusedSortableFields() {
       const used = new Set(this.sorts.map((s) => s.field));
-      return this.sortableFields.filter((f) => !used.has(f.key));
+      return sortPickerEntries(
+        this.sortableFields.filter((f) => !used.has(f.key)),
+        (f) => f.key,
+        (f) => f.label,
+      );
     },
 
     get fixedColumns() {
@@ -387,9 +405,15 @@ function app() {
     },
 
     // Non-fixed rows shown in the picker checkbox list. Fixed columns
-    // (Manufacturer, Model) are always on and don't appear here.
+    // (Manufacturer, Model) are always on and don't appear here. Sorted
+    // alphabetically for readability — the actual column display order
+    // lives in `this.columns` (drag-reorderable) and is unaffected.
     get pickerColumns() {
-      return this.columns.filter((c) => !IS_FIXED.has(c.key));
+      return sortPickerEntries(
+        this.columns.filter((c) => !IS_FIXED.has(c.key)),
+        (c) => c.key,
+        (c) => COLUMN_META[c.key]?.label ?? c.key,
+      );
     },
 
     // --- actions ---
