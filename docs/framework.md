@@ -19,7 +19,6 @@ driver-base/
 ├── data/
 │   ├── drivers.json                       # THE artifact; consumed by SPA
 │   ├── aliases.yaml                       # canonical_id rewrites; human-edited
-│   ├── overrides.yaml                     # per-driver field overrides; human-edited
 │   ├── baselines.yaml                     # per-scraper expected_min_records overrides
 │   ├── collision_registry.yaml            # first-seen -v2 suffix persistence (v2)
 │   ├── cache/{scraper}/{sha}.body         # response cache (gitignored)
@@ -39,7 +38,7 @@ driver-base/
 │   ├── magnets.py                         # normalize_magnet_type(raw) -> MagnetType
 │   ├── id.py                              # canonical_id builder
 │   ├── aliases.py                         # load/apply aliases.yaml
-│   ├── overrides.py                       # load/apply overrides.yaml
+│   ├── overrides.py                       # OVERRIDES list + apply_overrides()
 │   ├── merge.py                           # merge_fragments_by_id
 │   ├── consistency.py                     # cross-field REJECT gates
 │   ├── sanity.py                          # single-field REJECT + WARN gates
@@ -95,7 +94,7 @@ Every scraper implements three pure functions and the orchestrator wires them to
                      |
               sanity gates             (single-field REJECT / WARN; delta vs baseline)
                      |
-              apply_overrides          (hand-patch field values from overrides.yaml; end-of-pipeline in __main__)
+              apply_overrides          (hand-patch field values from OVERRIDES; end-of-pipeline in __main__, freshly-parsed drivers only)
                      |
               per_scraper_status ok | preserved | blocked
 ```
@@ -725,19 +724,23 @@ model_aliases:
 
 ## Overrides
 
-`data/overrides.yaml` is human-edited, checked into git. Used sparingly — for cases where the manufacturer's own published spec is wrong (typo, obvious data-entry error) and we have high confidence in the correct value from another source on the same page (URL slug, product name, feature bullets, datasheet PDF).
+`src/driver_base/overrides.py` holds a module-level `OVERRIDES: list[Override]`. Used sparingly — for cases where the manufacturer's own published spec is wrong (typo, obvious data-entry error) and we have high confidence in the correct value from another source on the same page (URL slug, product name, feature bullets, datasheet PDF).
 
-```yaml
-# overrides.yaml — hand-patched field values for individual drivers
-
-overrides:
-  dayton__ss18_22__2ohm:
-    reason: "Dayton spec-table typo lists 15\"; URL/model/feature-bullet all say 18\"."
-    fields:
-      nominal_size_mm: 457.2
+```python
+OVERRIDES = [
+    Override(
+        canonical_id="dayton__ss18_22__2ohm",
+        field="nominal_size_mm",
+        value=457.2,
+        note='Dayton\'s spec table lists 15"',
+        still_needed=lambda d: d.nominal_size_mm == 381.0,   # the known-bad value
+    ),
+]
 ```
 
-Applied by `apply_overrides(drivers, overrides)` in `__main__.py` after all scraper runs and per-manufacturer regen preservation, so an override in this file takes effect regardless of which scraper is invoked. Each overridden field is stamped `spec_source: override` and rendered with the "inferred or derived" sigil in the web UI. Unknown field names fail loudly on load. Overrides for canonical_ids not present in the current dataset are silently skipped (a manufacturer might have been dropped by a gate this run).
+**`still_needed(driver)` is a self-verification gate.** Phrase it as "did we still re-parse the specific bad value this override corrects" — NOT "does the value still match ours." Two reasons: (1) checking against OUR value assumes we're right — if the vendor eventually publishes a different-but-plausible value, that check would keep force-overwriting legitimate new data with our guess; (2) float equality is fragile (457.2 vs 460.0 mm both != our value, both plausibly correct). When the predicate returns False, the override is skipped and a `warn_flag: override_no_longer_needed:{field}` is stamped on the driver so a human can retire the entry from OVERRIDES.
+
+Applied by `apply_overrides(drivers)` at the end of `__main__.py`, and only against **freshly-parsed drivers this run** — rehydrated records from a per-scraper regen (`--scraper foo` for a scraper that doesn't own the overridden id) keep whatever override value was baked into them from the prior write, since evaluating `still_needed()` against post-override rehydrated data would always retire the entry as a false positive. Each overridden field is stamped `spec_source: override`, its optional `note` is written to `Driver.override_notes[field_name]`, and the web UI renders both via the "inferred or derived" dagger sigil. Unknown or bookkeeping field names raise `OverrideError` at import time — no runtime typo latency.
 
 ## Merge
 

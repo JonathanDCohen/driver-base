@@ -40,7 +40,7 @@ class SpecSource(str, Enum):
     XLSX = "xlsx"
     INFERRED = "inferred"          # driver_kind from category slug
     DERIVED = "derived"            # xmech doubled from labelled one-way
-    OVERRIDE = "override"          # hand-patched via data/overrides.yaml
+    OVERRIDE = "override"          # hand-patched via OVERRIDES list in driver_base.overrides
 
 
 # Best-first ordering when a field appears in multiple fragments. INLINE_JS
@@ -291,6 +291,6 @@ class Driver:
 
     # Populated by apply_overrides. Maps field_name → short user-facing
     # sentence explaining why that specific field was hand-patched. Only
-    # fields whose overrides.yaml entry declared a `note:` are present.
-    # Not a valid override target itself (see overrides.py).
+    # fields whose Override entry declared a `note` are present. Not a
+    # valid override target itself (see overrides.py).
     override_notes: dict[str, str] = field(default_factory=dict)

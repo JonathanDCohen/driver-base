@@ -1,39 +1,43 @@
-"""Load and apply data/overrides.yaml — hand-patched field values.
+"""Hand-patched field values for individual drivers.
 
-Schema:
+Used sparingly, for cases where a manufacturer's own published spec is
+wrong (typo, obvious data-entry error) and we have high confidence in the
+correct value from another source on the same page (URL slug, product
+name, feature bullets, datasheet PDF).
 
-  overrides:
-    {canonical_id}:
-      reason: "free-text why this override exists (not written to drivers.json)"
-      fields:
-        {field_name}:
-          value: {value}
-          note: "short, user-facing sentence for the web UI popover"
-        # or plain scalar shorthand when a UI note isn't needed:
-        {field_name}: {value}
+Every entry declares a `still_needed(driver)` predicate that gates whether
+the override actually fires this run. The predicate must check that the
+freshly-parsed value is STILL the specific bad value we're compensating
+for — NOT that it matches our corrected value. Rationale:
+
+  1. `d.field == OUR_VALUE` assumes we're right. If the vendor later
+     publishes a different-but-still-plausible value, that check would
+     force-overwrite legitimate new data with our guess.
+  2. Equality on floats is fragile: 457.2 vs 457.20 vs 460.0 (mm) would
+     all trip an anti-match test in surprising ways.
+
+So we phrase predicates as `did we just re-parse the known-bad value`.
+When the predicate returns False, the override is skipped and a
+`warn_flag: override_no_longer_needed:{field}` is stamped on the driver
+so a human knows to retire the entry from OVERRIDES.
 
 Applied post-merge, right before drivers.json is written. Each overridden
-field is stamped with `spec_source = override` so the UI can flag it, and
-its optional `note` is written to `Driver.override_notes[field_name]` so
-the UI can surface the specific reason on click.
-
-Unknown field names raise on load — this file is hand-edited and typos
-should fail loudly.
+field is stamped `spec_source = OVERRIDE` and its `note` (if any) is
+written to `Driver.override_notes[field_name]` so the UI popover can
+surface the specific reason on click.
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from dataclasses import fields as dc_fields
-from pathlib import Path
-from typing import Any
+from typing import Any, Callable, Optional
 
-import yaml
-
-from driver_base.model import Driver, MagnetType, SpecSource
+from driver_base.model import Driver, SpecSource
 
 
 class OverrideError(Exception):
-    """Raised for malformed or field-unknown entries in overrides.yaml."""
+    """Raised when an OVERRIDES entry targets an unknown or bookkeeping field."""
 
 
 _DRIVER_FIELD_TYPES: dict[str, Any] = {f.name: f.type for f in dc_fields(Driver)}
@@ -47,102 +51,106 @@ _NON_OVERRIDABLE: frozenset[str] = frozenset({
 })
 
 
-class Overrides:
-    def __init__(
-        self,
-        values: dict[str, dict[str, Any]],
-        notes: dict[str, dict[str, str]],
-    ) -> None:
-        # {canonical_id: {field_name: coerced_value}}
-        self._values = values
-        # {canonical_id: {field_name: note_string}} — only fields with a note
-        self._notes = notes
+@dataclass(frozen=True)
+class Override:
+    """One hand-patched field on one driver.
 
-    def canonical_ids(self) -> list[str]:
-        return list(self._values.keys())
-
-    def fields_for(self, canonical_id: str) -> dict[str, Any]:
-        return self._values.get(canonical_id, {})
-
-    def notes_for(self, canonical_id: str) -> dict[str, str]:
-        return self._notes.get(canonical_id, {})
-
-
-def load_overrides(path: Path) -> Overrides:
-    if not path.exists():
-        return Overrides({}, {})
-    data: dict[str, Any] = yaml.safe_load(path.read_text()) or {}
-    raw = data.get("overrides") or {}
-    if not isinstance(raw, dict):
-        raise OverrideError("overrides.yaml: top-level `overrides:` must be a mapping")
-    values: dict[str, dict[str, Any]] = {}
-    notes: dict[str, dict[str, str]] = {}
-    for cid, body in raw.items():
-        if not isinstance(body, dict):
-            raise OverrideError(f"overrides.yaml: entry {cid!r} must be a mapping")
-        fields = body.get("fields") or {}
-        if not isinstance(fields, dict):
-            raise OverrideError(f"overrides.yaml: entry {cid!r} `fields:` must be a mapping")
-        entry_values: dict[str, Any] = {}
-        entry_notes: dict[str, str] = {}
-        for name, spec in fields.items():
-            if name not in _DRIVER_FIELD_TYPES:
-                raise OverrideError(
-                    f"overrides.yaml: entry {cid!r} field {name!r} is not a Driver field"
-                )
-            if name in _NON_OVERRIDABLE:
-                raise OverrideError(
-                    f"overrides.yaml: entry {cid!r} field {name!r} is a bookkeeping field, not overridable"
-                )
-            if isinstance(spec, dict):
-                if "value" not in spec:
-                    raise OverrideError(
-                        f"overrides.yaml: entry {cid!r} field {name!r} mapping must include `value:`"
-                    )
-                entry_values[name] = _coerce(name, spec["value"])
-                note = spec.get("note")
-                if note is not None:
-                    entry_notes[name] = str(note).strip()
-            else:
-                entry_values[name] = _coerce(name, spec)
-        values[str(cid)] = entry_values
-        if entry_notes:
-            notes[str(cid)] = entry_notes
-    return Overrides(values, notes)
-
-
-def _coerce(name: str, val: Any) -> Any:
-    # Enum-valued fields need string→enum conversion so downstream code that
-    # asks for e.g. `d.magnet_type.value` doesn't break.
-    if name == "magnet_type" and isinstance(val, str):
-        try:
-            return MagnetType(val)
-        except ValueError as e:
-            raise OverrideError(f"overrides.yaml: bad magnet_type {val!r}") from e
-    return val
-
-
-def apply_overrides(drivers: list[Driver], overrides: Overrides) -> tuple[int, int]:
-    """Mutate `drivers` in place. Returns (drivers_touched, fields_touched).
-
-    Overrides for canonical_ids not present in `drivers` are silently skipped
-    (a manufacturer might have been dropped by a gate this run — we shouldn't
-    force it back). Callers can compare `len(overrides.canonical_ids())` with
-    the returned count to detect that case.
+    Attributes:
+        canonical_id: the driver to patch (silently no-ops if the driver
+            isn't in this run's dataset — a manufacturer might have been
+            preserved via gate failure).
+        field: the Driver dataclass field to overwrite.
+        value: the replacement value. Types are not coerced — pass the
+            right shape (float for float fields, MagnetType enum for
+            magnet_type, etc.).
+        still_needed: **required** predicate over the pre-override Driver.
+            Return True when the upstream data still exhibits the bad
+            value this override corrects. There is intentionally no
+            default: every override must declare when it can be retired,
+            otherwise stale patches accumulate forever with no signal to
+            remove them. Phrase as "the freshly-parsed value still equals
+            the known-bad value" — see the module docstring for why.
+        note: optional short sentence surfaced in the web UI popover on
+            click of the override sigil. Keep tight.
     """
-    by_id = {d.canonical_id: d for d in drivers}
-    d_touched = 0
-    f_touched = 0
-    for cid in overrides.canonical_ids():
-        driver = by_id.get(cid)
+
+    canonical_id: str
+    field: str
+    value: Any
+    still_needed: Callable[[Driver], bool]
+    note: Optional[str] = None
+
+
+OVERRIDES: list[Override] = [
+    Override(
+        canonical_id="dayton__ss18_22__2ohm",
+        field="nominal_size_mm",
+        value=457.2,
+        note='Dayton\'s spec table lists 15"',
+        # Dayton's product-page spec table lists Nominal Diameter as 15"
+        # (381 mm) — a typo; every other signal on the page (URL slug,
+        # model number, feature-bullet, 470 mm overall diameter) says 18".
+        # Predicate is "the table still says 15 inches" — if Dayton fixes
+        # it, we'll get a warn_flag and can retire this entry.
+        still_needed=lambda d: d.nominal_size_mm == 381.0,
+    ),
+]
+
+
+def _validate() -> None:
+    """Called at import time — fails loudly on typos in OVERRIDES."""
+    for ov in OVERRIDES:
+        if ov.field not in _DRIVER_FIELD_TYPES:
+            raise OverrideError(
+                f"OVERRIDES entry {ov.canonical_id!r}: field {ov.field!r} is not a Driver field"
+            )
+        if ov.field in _NON_OVERRIDABLE:
+            raise OverrideError(
+                f"OVERRIDES entry {ov.canonical_id!r}: field {ov.field!r} is a bookkeeping field, not overridable"
+            )
+
+
+_validate()
+
+
+@dataclass
+class OverrideStats:
+    applied_fields: int = 0        # (canonical_id, field) pairs actually written
+    applied_drivers: int = 0       # distinct drivers touched
+    retired_entries: list[str] = field(default_factory=list)  # "cid.field" for each entry whose predicate returned False
+    missing_ids: list[str] = field(default_factory=list)      # canonical_ids in OVERRIDES not present in this run
+
+
+def apply_overrides(drivers: list[Driver]) -> OverrideStats:
+    """Mutate `drivers` in place. Returns a stats bundle for logging.
+
+    For each Override:
+      - if its canonical_id isn't in `drivers`, record it in missing_ids
+        and continue (a preserved-manufacturer scenario)
+      - if still_needed(driver) is False, log warn_flag on the driver and
+        record the entry in retired_entries (skip the patch)
+      - otherwise write the value, stamp spec_source=OVERRIDE, and add the
+        note to driver.override_notes (if the entry declared one)
+    """
+    by_id: dict[str, Driver] = {d.canonical_id: d for d in drivers}
+    touched_drivers: set[str] = set()
+    stats = OverrideStats()
+    for ov in OVERRIDES:
+        driver = by_id.get(ov.canonical_id)
         if driver is None:
+            stats.missing_ids.append(ov.canonical_id)
             continue
-        d_touched += 1
-        notes = overrides.notes_for(cid)
-        for name, val in overrides.fields_for(cid).items():
-            setattr(driver, name, val)
-            driver.spec_source[name] = SpecSource.OVERRIDE
-            if name in notes:
-                driver.override_notes[name] = notes[name]
-            f_touched += 1
-    return d_touched, f_touched
+        if not ov.still_needed(driver):
+            flag = f"override_no_longer_needed:{ov.field}"
+            if flag not in driver.warn_flags:
+                driver.warn_flags.append(flag)
+            stats.retired_entries.append(f"{ov.canonical_id}.{ov.field}")
+            continue
+        setattr(driver, ov.field, ov.value)
+        driver.spec_source[ov.field] = SpecSource.OVERRIDE
+        if ov.note:
+            driver.override_notes[ov.field] = ov.note
+        touched_drivers.add(ov.canonical_id)
+        stats.applied_fields += 1
+    stats.applied_drivers = len(touched_drivers)
+    return stats

@@ -153,19 +153,31 @@ function escapeAttr(s) {
     .replaceAll(">", "&gt;");
 }
 
-// Short explanation for the spec-source dagger. Overrides carry a specific
-// note from data/overrides.yaml (surfaced as driver.override_notes[key]);
-// derived/inferred fall back to a generic phrase.
+// Short explanation for the spec-source dagger. Precedence, per key:
+//   1. driver.override_notes[key] — hand-authored in data/overrides.yaml
+//   2. DERIVED_FIELD_NOTE[key] — field-specific derivation source
+//   3. GENERIC_SPEC_NOTE[src] — generic fallback for the source category
+// Returns null when the source doesn't warrant a dagger at all.
+const DERIVED_FIELD_NOTE = {
+  sensitivity_db_1w_1m:     "Derived from listed 2.83V/1m spec",
+  sensitivity_db_2_83v_1m:  "Derived from listed 1W/1m spec",
+  power_program_watts:      "Derived from listed AES spec",
+  power_aes_watts:          "Derived from listed program spec",
+  power_long_term_watts:    "Derived from listed AES spec",
+};
 const GENERIC_SPEC_NOTE = {
-  derived: "Derived from another spec (SPL 2.83 V ↔ 1 W via impedance, or program ↔ AES ×2).",
-  inferred: "Inferred from context — e.g. driver kind from the category slug.",
-  override: "Manually corrected; upstream spec was wrong.",
+  derived:  "Derived from another spec",
+  inferred: "Inferred from context",
+  override: "Manually corrected; upstream spec was wrong",
 };
 function specSourceNote(d, key) {
   const src = d.spec_source && d.spec_source[key];
   if (!GENERIC_SPEC_NOTE[src]) return null;
   if (src === "override" && d.override_notes && d.override_notes[key]) {
     return d.override_notes[key];
+  }
+  if (src === "derived" && DERIVED_FIELD_NOTE[key]) {
+    return DERIVED_FIELD_NOTE[key];
   }
   return GENERIC_SPEC_NOTE[src];
 }
@@ -690,10 +702,11 @@ function app() {
       }
       const note = specSourceNote(d, col.key);
       if (note) {
-        // Rendered as a real <button> so keyboard focus + click both work,
-        // and Enter/Space activate it. Popover is opened by a delegated
-        // click handler on the table body (see openSpecPopover).
-        base += ` <button type="button" class="derived-mark" data-note="${escapeAttr(note)}" aria-label="spec-source explanation">†</button>`;
+        // Plain <sup> — a real <button> looked awful (browser chrome, focus
+        // ring, alignment fights with the surrounding number). Click is
+        // handled via a delegated listener on the table body; a11y is not
+        // a priority for this affordance.
+        base += `<sup class="derived-mark" data-note="${escapeAttr(note)}">†</sup>`;
       }
       return base;
     },
