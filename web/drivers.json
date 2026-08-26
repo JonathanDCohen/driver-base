@@ -116277,7 +116277,7 @@
       "coax_hf_voice_coil_diameter_mm": null,
       "coax_hf_re_ohm": null,
       "override_notes": {
-        "nominal_size_mm": "Dayton's spec table lists 15\" \u2014 a typo; every other signal on the page (URL, model, feature-bullet, 470 mm frame) says 18\"."
+        "nominal_size_mm": "Dayton's spec table lists 15\""
       }
     },
     {

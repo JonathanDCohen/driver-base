@@ -34,4 +34,4 @@ overrides:
     fields:
       nominal_size_mm:
         value: 457.2
-        note: "Dayton's spec table lists 15\" — a typo; every other signal on the page (URL, model, feature-bullet, 470 mm frame) says 18\"."
+        note: 'Dayton''s spec table lists 15"'
