@@ -1,8 +1,8 @@
-"""HOQS discover_seeds + enumerate."""
+"""HOQS discover_seeds + enumerate + model extraction."""
 
 from __future__ import annotations
 
-from driver_base.interface import DriverKind
+from driver_base.interface import DriverKind, SeedContext
 from driver_base.scrapers.hoqs import HoqsScraper
 from tests.conftest import load_fixture
 
@@ -37,3 +37,17 @@ def test_enumerate_filters_non_drivers_and_tags_kind() -> None:
     assert "hoqs-4x1k-amplifier" not in handles
     assert "hoqs-4x3k-amplifier" not in handles
     assert "hoqs-3-recone-hf143n-rk" not in handles
+
+
+def test_model_extracted_from_og_title_not_legacy_handle() -> None:
+    """A handful of HOQS product URLs have legacy slugs that no longer match the
+    current SKU (e.g. `hoqs-carbon-fiber-18` is now the F185C). The model must
+    come from the storefront's og:title, not the handle."""
+    s = HoqsScraper()
+    raw = load_fixture(
+        "hoqs", "products/f185c-legacy-slug.html",
+        url="https://hoqs.org/products/hoqs-carbon-fiber-18",
+    )
+    res = s.parse_artifact(raw, SeedContext(driver_kind_hint=DriverKind.LF_WOOFER))
+    assert len(res.fragments) == 1
+    assert res.fragments[0].model == "F185C"

@@ -98,6 +98,15 @@ _GENERAL_KEY_MAP: dict[str, tuple[str, Any]] = {
 
 _SPEAKER_DATA_RE = re.compile(r"var speakerData = (\{.*?\});", re.DOTALL)
 
+# Product-page `<meta property="og:title" content="HOQS MODEL descriptor...">`.
+# Handle-based model extraction is unreliable — several HOQS product URL slugs
+# don't match the current model name (e.g. `hoqs-f216c-neo-21` is now the N216C;
+# `hoqs-carbon-fiber-18` is the F185C). The `og:title` (and the storefront's
+# products.json title) are kept in sync with the actual product name.
+_OG_TITLE_RE = re.compile(
+    r'<meta\s+property="og:title"\s+content="([^"]+)"', re.IGNORECASE
+)
+
 
 def _kind_for_product(product_type: str, handle: str) -> Optional[DriverKind]:
     if product_type in _SKIP_TYPES:
@@ -120,6 +129,20 @@ def _model_from_handle(handle: str) -> Optional[str]:
     if not parts:
         return None
     return parts[0].upper()
+
+
+def _model_from_og_title(html: str) -> Optional[str]:
+    """`HOQS N216C 21" Neodymium LF` → `N216C`. Second whitespace-separated
+    token after the `HOQS` prefix, HTML-entity-decoded."""
+    m = _OG_TITLE_RE.search(html)
+    if not m:
+        return None
+    from html import unescape
+    title = unescape(m.group(1)).strip()
+    tokens = title.split()
+    if len(tokens) < 2 or tokens[0].upper() != "HOQS":
+        return None
+    return tokens[1]
 
 
 @register
@@ -173,7 +196,9 @@ class HoqsScraper(Scraper):
             return ParseResult(fragments=[])
 
         handle = raw.url.rsplit("/", 1)[-1]
-        model = _model_from_handle(handle)
+        # Prefer the current storefront model name (og:title) — several handles
+        # are legacy slugs that no longer match the SKU.
+        model = _model_from_og_title(text) or _model_from_handle(handle)
         if not model:
             return ParseResult(fragments=[])
 
