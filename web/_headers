@@ -1,7 +1,0 @@
-# Cloudflare Pages cache headers.
-# drivers.json: 1 week — matches the weekly scrape cadence.
-/drivers.json
-  Cache-Control: public, max-age=604800, s-maxage=604800
-
-/*
-  Cache-Control: public, max-age=3600
