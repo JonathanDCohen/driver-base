@@ -1,0 +1,55 @@
+name: Weekly scrape
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  group: scrape-workflow
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run all scrapers
+        run: uv run driver-base
+
+      - name: Validate dataset
+        run: |
+          jq empty web/drivers.json
+          count=$(jq '.drivers | length' web/drivers.json)
+          echo "drivers.json parsed cleanly with $count records."
+          if [ "$count" -lt 1 ]; then
+            echo "::error::drivers.json has no records — refusing to commit."
+            exit 1
+          fi
+
+      - name: Commit updated dataset
+        run: |
+          git config user.name "driver-base-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add web/drivers.json data/rejections
+          if git diff --cached --quiet; then
+            echo "No dataset changes to commit."
+            exit 0
+          fi
+          git commit -m "Weekly scrape: $(date -u +%Y-%m-%d) [skip ci]"
+          git push

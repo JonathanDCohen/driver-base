@@ -7,15 +7,17 @@ JSON for use by simulation tools, DIY builders, and research.
 
 - `src/driver_base/` — Python scraper and normalizer (per-manufacturer
   adapters, field mapping, cross-manufacturer reconciliation).
-- `data/drivers.json` — the current published dataset.
-- `data/cache/` — scraped source pages (input to the scraper).
-- `data/rejections/` — records dropped during normalization, with reasons.
+- `web/drivers.json` — the current published dataset, served alongside the
+  web UI so a single Cloudflare Pages deploy covers both.
 - `web/` — small web UI for browsing the dataset.
+- `data/cache/` — scraped source pages (scraper input, not published).
+- `data/rejections/` — records dropped during normalization, with reasons.
+- `data/aliases.yaml` — manual canonical_id rewrites.
 - `docs/` — design notes and field reference.
 
 ## Using the dataset
 
-`data/drivers.json` is a single JSON file. Each record describes one driver
+`web/drivers.json` is a single JSON file. Each record describes one driver
 with a normalized set of fields (Thiele/Small parameters, physical
 dimensions, power ratings, etc.). Simulation programs are welcome to bundle
 or sync it — see the license section below.
@@ -29,8 +31,8 @@ license; datasets expect a data license.
 - **Code** (everything under `src/`, `web/`, `tests/`, and the project
   configuration) — [Apache License 2.0](LICENSE). Includes an explicit
   patent grant.
-- **Dataset** (the JSON files under `data/` and the schema/compilation they
-  represent) — [Creative Commons Attribution 4.0](LICENSE-DATA)
+- **Dataset** (`web/drivers.json` and the schema/compilation it represents)
+  — [Creative Commons Attribution 4.0](LICENSE-DATA)
   (CC BY 4.0). Attribute as:
 
   > Data from driver-base (https://github.com/JonathanDCohen/driver-base),

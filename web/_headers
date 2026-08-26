@@ -1,7 +1,7 @@
 # Cloudflare Pages cache headers.
-# drivers.json: short cache so weekly regen shows up promptly; SPA assets: long cache.
+# drivers.json: 1 week — matches the weekly scrape cadence.
 /drivers.json
-  Cache-Control: public, max-age=300, s-maxage=300
+  Cache-Control: public, max-age=604800, s-maxage=604800
 
 /*
   Cache-Control: public, max-age=3600

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-A Python 3.10+ asyncio harness that scrapes ~9 speaker-driver manufacturer sites weekly and produces one versioned `data/drivers.json` for a static Cloudflare Pages SPA to consume. Scope for v1 is **manufacturer scrapers only**; retailer scraping (Parts Express, Solen, Madisound) is out of scope. La Voce is deferred (site unreachable — see `memory/la-voce-parked.md`).
+A Python 3.10+ asyncio harness that scrapes ~9 speaker-driver manufacturer sites weekly and produces one versioned `web/drivers.json` for a static Cloudflare Pages SPA to consume. Scope for v1 is **manufacturer scrapers only**; retailer scraping (Parts Express, Solen, Madisound) is out of scope. La Voce is deferred (site unreachable — see `memory/la-voce-parked.md`).
 
 The design was arrived at across three workflows that (a) reconned each manufacturer, (b) empirically validated the recon with throwaway Python scripts (10/10 converged with 0.00 % numerical delta on sampled T/S values), and (c) iterated framework synthesis against two adversarial reviewers. This doc captures the design that emerged; per-manufacturer specifics live in `docs/manufacturers.md`.
 
@@ -771,9 +771,9 @@ CI runs `uv run pytest tests/ --ignore=tests/integration` on every PR. Integrati
 
 ## Deployment
 
-**GitHub Actions cron** (`.github/workflows/scrape.yml`): weekly on Sunday 00:00 UTC. Runs `uv run python -m driver_base.run --output data/drivers.json`. On success, commits `data/drivers.json` (and any updated `data/rejections/*.json`) to a `data-update/YYYY-MM-DD` branch and opens an auto-mergeable PR labelled `data-update`. Uses `concurrency: group: scrape-workflow` to prevent overlap. If a `data-update` PR is open at the start of a run, that PR's `drivers.json` becomes the baseline (not `main`).
+**GitHub Actions cron** (`.github/workflows/scrape.yml`): weekly on Sunday 00:00 UTC (plus `workflow_dispatch` for manual runs). Runs `uv run driver-base` which writes `web/drivers.json` and any `data/rejections/*.json`, then commits those changes directly to `main` with a `[skip ci]` message. Uses `concurrency: group: scrape-workflow` to prevent overlap. The push to `main` triggers a Cloudflare Pages redeploy.
 
-**Cloudflare Pages**: connect the repo; build command none; output directory `web/`; deploy `web/drivers.json` alongside the SPA. `_headers` file caps `drivers.json` cache to 5 minutes; SPA assets cached long. First-time CF Pages hookup steps live in `docs/deployment.md` (out of scope for this doc).
+**Cloudflare Pages**: connect the repo; build command none; output directory `web/`; deploy `web/drivers.json` alongside the SPA. `_headers` file caps `drivers.json` cache to 1 week (matches the scrape cadence); SPA assets cached 1 hour. First-time CF Pages hookup steps live in `docs/deployment.md` (out of scope for this doc).
 
 ## Known risks
 

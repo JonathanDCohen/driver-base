@@ -25,7 +25,7 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         prog="driver-base",
         description="Scrape speaker-driver catalogs and emit drivers.json",
     )
-    p.add_argument("--output", type=Path, default=Path("data/drivers.json"))
+    p.add_argument("--output", type=Path, default=Path("web/drivers.json"))
     p.add_argument("--cache-root", type=Path, default=Path("data/cache"))
     p.add_argument("--rejections-dir", type=Path, default=Path("data/rejections"))
     p.add_argument("--aliases", type=Path, default=Path("data/aliases.yaml"))
