@@ -16,7 +16,7 @@ const COLUMN_META = {
   qts:                       { label: "Qts",                numeric: true,  sortable: true  },
   qes:                       { label: "Qes",                numeric: true,  sortable: true  },
   qms:                       { label: "Qms",                numeric: true,  sortable: true  },
-  vas_liters:                { label: "Vas",                numeric: true,  sortable: true  },
+  vas_liters:                { label: "Vas",                numeric: true,  sortable: true  },  // unit appended by columnLabel()
   sd_cm2:                    { label: "Sd (cm²)",           numeric: true,  sortable: true  },
   xmax_mm:                   { label: "Xmax",               numeric: true,  sortable: true  },
   mms_g:                     { label: "Mms",                numeric: true,  sortable: true  },
@@ -29,7 +29,7 @@ const COLUMN_META = {
   power_long_term_watts:     { label: "Continuous (W)",     numeric: true,  sortable: true  },
   freq_low_hz:               { label: "Freq low",           numeric: true,  sortable: true  },
   freq_high_hz:              { label: "Freq high",          numeric: true,  sortable: true  },
-  net_weight_kg:             { label: "Weight (kg)",        numeric: true,  sortable: true  },
+  net_weight_kg:             { label: "Weight",             numeric: true,  sortable: true  },  // unit appended by columnLabel()
   // Compression-driver fields (also populate for coax records).
   throat_diameter_mm:        { label: "Throat",             numeric: true,  sortable: true  },
   diaphragm_material:        { label: "Diaphragm material", numeric: false, sortable: true  },
@@ -563,10 +563,15 @@ function app() {
     },
 
     columnLabel(key) {
-      if (key === "nominal_size_mm") return this.units === "imperial" ? "Size (in)" : "Size (mm)";
-      if (key === "net_weight_kg")   return this.units === "imperial" ? "Weight (lb)" : "Weight (kg)";
-      if (key === "vas_liters")      return this.units === "imperial" ? "Vas (ft³)" : "Vas (L)";
-      return (COLUMN_META[key] || { label: key }).label;
+      const meta = COLUMN_META[key] || { label: key };
+      // Diameter-family fields (Size, Throat, coax HF VC, etc.) toggle unit in
+      // the header rather than the cell.
+      if (key.endsWith("_diameter_mm") || key === "nominal_size_mm") {
+        return `${meta.label} (${this.units === "imperial" ? "in" : "mm"})`;
+      }
+      if (key === "net_weight_kg") return `${meta.label} (${this.units === "imperial" ? "lb" : "kg"})`;
+      if (key === "vas_liters")    return `${meta.label} (${this.units === "imperial" ? "ft³" : "L"})`;
+      return meta.label;
     },
 
     fieldLabel(key) {
@@ -585,13 +590,13 @@ function app() {
         return u ? `<a href="${u}" target="_blank" rel="noopener">${v}</a>` : v;
       }
       if (col.key === "driver_kind") return d._kind_label || v;
+      // Diameters (Size, Throat, VC) — unit lives in the header via columnLabel;
+      // cell shows plain value in the current unit family.
       if (col.key === "nominal_size_mm") {
-        return this.units === "imperial" ? `${(v / MM_PER_INCH).toFixed(1)}″` : `${Math.round(v)}`;
+        return this.units === "imperial" ? (v / MM_PER_INCH).toFixed(1) : `${Math.round(v)}`;
       }
-      // Other diameters — throat, VC (coax HF). Same convention as Size: value
-      // only, unit is implied by the current units toggle (mm metric / ″ imperial).
       if (col.key.endsWith("_diameter_mm")) {
-        return this.units === "imperial" ? `${(v / MM_PER_INCH).toFixed(2)}″` : `${Math.round(v)}`;
+        return this.units === "imperial" ? (v / MM_PER_INCH).toFixed(2) : `${Math.round(v)}`;
       }
       if (col.key === "net_weight_kg") {
         return this.units === "imperial" ? fmtNumber(v * LB_PER_KG) : fmtNumber(v);
