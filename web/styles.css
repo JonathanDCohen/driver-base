@@ -259,6 +259,33 @@ html[data-theme="dark"] .btn-flat:focus:not(.units-toggle) { background-color: r
  * mud on dark surfaces. Bump it to our muted token in dark mode. */
 html[data-theme="dark"] .grey-text { color: var(--text-muted) !important; }
 
+/* Dark-mode scrollbars — browsers draw stock light scrollbars against our
+ * dark surfaces otherwise. Scoped to the three scrollable regions rather
+ * than a document-wide *::-webkit-scrollbar so we don't restyle scrollbars
+ * on unrelated third-party embeds. Firefox uses the standard scrollbar-*
+ * properties on the same elements; WebKit/Blink uses the pseudo-elements. */
+html[data-theme="dark"] .table-split,
+html[data-theme="dark"] .sidebar,
+html[data-theme="dark"] .picker-popover {
+  scrollbar-color: #4a5560 #262c34;
+  scrollbar-width: thin;
+}
+html[data-theme="dark"] .table-split::-webkit-scrollbar,
+html[data-theme="dark"] .sidebar::-webkit-scrollbar,
+html[data-theme="dark"] .picker-popover::-webkit-scrollbar { width: 10px; height: 10px; }
+html[data-theme="dark"] .table-split::-webkit-scrollbar-track,
+html[data-theme="dark"] .sidebar::-webkit-scrollbar-track,
+html[data-theme="dark"] .picker-popover::-webkit-scrollbar-track { background: #262c34; }
+html[data-theme="dark"] .table-split::-webkit-scrollbar-thumb,
+html[data-theme="dark"] .sidebar::-webkit-scrollbar-thumb,
+html[data-theme="dark"] .picker-popover::-webkit-scrollbar-thumb { background: #4a5560; border-radius: 5px; }
+html[data-theme="dark"] .table-split::-webkit-scrollbar-thumb:hover,
+html[data-theme="dark"] .sidebar::-webkit-scrollbar-thumb:hover,
+html[data-theme="dark"] .picker-popover::-webkit-scrollbar-thumb:hover { background: #5c6a78; }
+/* The corner square where the horizontal and vertical scrollbars meet on
+ * .table-split (both axes overflow) — untreated it stays white. */
+html[data-theme="dark"] .table-split::-webkit-scrollbar-corner { background: #262c34; }
+
 @media (max-width: 992px) {
   .sidebar { position: static; max-height: none; }
   .table-split { max-height: none; }
