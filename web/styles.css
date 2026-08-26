@@ -111,7 +111,8 @@ table.compact-table > tbody > tr.row-hover { background-color: rgba(0, 137, 123,
 .picker-popover {
   position: absolute; left: 0; top: calc(100% + 4px);
   z-index: 20;
-  min-width: 220px; max-height: 60vh; overflow-y: auto;
+  min-width: 280px; max-height: 60vh; overflow-y: auto;
+  white-space: nowrap;
   background: #fff; border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0,0,0,.18);
   padding: 8px 0;
