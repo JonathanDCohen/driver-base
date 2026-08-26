@@ -154,6 +154,7 @@ _LABEL_MAP: dict[str, tuple[str, Callable[[Optional[str]], object]]] = {
     "minimum impedance": ("impedance_min_ohm", parse_impedance),
     "sensitivity": ("sensitivity_db_1w_1m", parse_float),
     "nominal power handling": ("power_aes_watts", parse_power),
+    "recommended crossover": ("recommended_crossover_hz", parse_frequency),
     "continuous power handling": ("power_long_term_watts", parse_power),
     "frequency range": (_FREQ_RANGE_MARKER, parse_range),
     "nominal diameter": ("nominal_size_mm", parse_length_mm),

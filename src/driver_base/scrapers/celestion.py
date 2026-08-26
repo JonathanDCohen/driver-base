@@ -102,6 +102,10 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     "eia power rating":            ("power_eia_watts",        parse_power),
     "sensitivity":                 ("sensitivity_db_1w_1m",   parse_float),
     "frequency range":             ("__freq_range__",         parse_range),
+    # Coax pages label this "Recommended min. crossover 12dB/oct" (slope info
+    # is baked into the label); normalize_label doesn't strip it, so match the
+    # full string.
+    "recommended min. crossover 12db/oct": ("recommended_crossover_hz", parse_frequency),
     # physical
     "magnet type":                 ("magnet_type",            lambda s: normalize_magnet_type(s)),
     "voice coil diameter":         ("voice_coil_diameter_mm", parse_length_mm),

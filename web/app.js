@@ -34,6 +34,7 @@ const COLUMN_META = {
   throat_diameter_mm:        { label: "Throat ⌀",           numeric: true,  sortable: true  },
   diaphragm_material:        { label: "Diaphragm material", numeric: false, sortable: true  },
   diaphragm_shape:           { label: "Diaphragm shape",    numeric: false, sortable: true  },
+  recommended_crossover_hz:  { label: "Rec. crossover",     numeric: true,  sortable: true  },
   // Coax HF-section fields — populated only for coaxial drivers. The generic
   // fields above hold the coax LF-section values; these carry the HF section.
   // Hidden by default (relevant to a small subset of records).

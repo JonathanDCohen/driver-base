@@ -149,6 +149,10 @@ class DriverFragment:
     throat_diameter_mm: Optional[float] = None
     diaphragm_material: Optional[str] = None    # e.g. "Titanium", "Ketone Polymer"
     diaphragm_shape: Optional[str] = None       # e.g. "Dome", "Annular"
+    # Manufacturer's recommended minimum high-pass crossover — the low-end
+    # frequency at which the driver's HF section can safely be crossed over.
+    # Populated on coax (LF/HF junction) and standalone HF/compression drivers.
+    recommended_crossover_hz: Optional[float] = None
 
     # Coax HF-section fields — populated only for `driver_kind = COAX`. The
     # generic fields above hold the coax LF-section values (that's the primary
@@ -248,6 +252,7 @@ class Driver:
     throat_diameter_mm: Optional[float] = None
     diaphragm_material: Optional[str] = None
     diaphragm_shape: Optional[str] = None
+    recommended_crossover_hz: Optional[float] = None
 
     # Coax HF section — see DriverFragment for docstring.
     coax_hf_impedance_nominal_ohm: Optional[float] = None

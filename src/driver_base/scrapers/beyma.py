@@ -129,6 +129,7 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     "nominal diameter":            ("nominal_size_mm",        parse_length_mm),
     "voice coil diameter":         ("voice_coil_diameter_mm", parse_length_mm),
     "throat diameter":             ("throat_diameter_mm",     parse_length_mm),
+    "recom. crossover frequency":  ("recommended_crossover_hz", parse_frequency),
     "external diameter":           ("overall_diameter_mm",    parse_length_mm),
     "cutout diameter":             ("mounting_diameter_mm",   parse_length_mm),
     "depth":                       ("depth_mm",               parse_length_mm),

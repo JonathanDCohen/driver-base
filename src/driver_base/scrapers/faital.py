@@ -168,6 +168,10 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     # Compression-driver fields (HF pages have no Nominal Diameter; the throat
     # is used to derive `nominal_size_mm` in a post-parse step below).
     "throat diameter":             ("throat_diameter_mm",     parse_length_mm),
+    # HF drivers: `Minimum Crossover Frequency (3)` → `minimum crossover frequency`.
+    # Coax: `Min. Cross. Freq. (4)` in the 3-col HF cell → `min. cross. freq.`
+    # (handled by _LABEL_MAP_COAX_HF below, routing to the same generic field).
+    "minimum crossover frequency": ("recommended_crossover_hz", parse_frequency),
     "diaphragm material":          ("diaphragm_material",     lambda s: s or None),
     "diaphragm shape":             ("diaphragm_shape",        lambda s: s or None),
     # Coax pages use abbreviated forms of the same labels — keep original entries
@@ -198,6 +202,8 @@ _LABEL_MAP_COAX_HF: dict[str, tuple[Optional[str], Optional[Callable[[Optional[s
     # driver, and there's no LF competitor for the diaphragm slot).
     "diaphragm material":          ("diaphragm_material",     lambda s: s or None),
     "diaphragm shape":             ("diaphragm_shape",        lambda s: s or None),
+    # `Min. Cross. Freq.` HF cell → recommended_crossover_hz (LF cell is `-`).
+    "min. cross. freq.":           ("recommended_crossover_hz", parse_frequency),
 }
 
 
