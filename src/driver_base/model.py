@@ -153,6 +153,16 @@ class DriverFragment:
     # frequency at which the driver's HF section can safely be crossed over.
     # Populated on coax (LF/HF junction) and standalone HF/compression drivers.
     recommended_crossover_hz: Optional[float] = None
+    # Voice-coil / cone construction descriptors (strings).
+    winding_material: Optional[str] = None       # VC wire (Cu, Al, Edgewound CCAW, ...)
+    former_material: Optional[str] = None        # VC former (Kapton, Glass Fiber, Nomex, ...)
+    surround_material: Optional[str] = None      # LF surround (Cloth, M-roll, Rubber, ...)
+    phase_plug_design: Optional[str] = None      # HF phase plug (Annular, Radial, N slot, ...)
+    # Motor / mechanical numerics.
+    flux_density_t: Optional[float] = None       # Gap flux density in Tesla
+    xvar_mm: Optional[float] = None              # linear excursion at 10% distortion (one-way)
+    # Suggested sealed / vented enclosure volume, LF drivers.
+    recommended_enclosure_volume_liters: Optional[float] = None
 
     # Coax HF-section fields — populated only for `driver_kind = COAX`. The
     # generic fields above hold the coax LF-section values (that's the primary
@@ -253,6 +263,13 @@ class Driver:
     diaphragm_material: Optional[str] = None
     diaphragm_shape: Optional[str] = None
     recommended_crossover_hz: Optional[float] = None
+    winding_material: Optional[str] = None
+    former_material: Optional[str] = None
+    surround_material: Optional[str] = None
+    phase_plug_design: Optional[str] = None
+    flux_density_t: Optional[float] = None
+    xvar_mm: Optional[float] = None
+    recommended_enclosure_volume_liters: Optional[float] = None
 
     # Coax HF section — see DriverFragment for docstring.
     coax_hf_impedance_nominal_ohm: Optional[float] = None

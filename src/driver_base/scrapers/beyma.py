@@ -130,6 +130,13 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     "voice coil diameter":         ("voice_coil_diameter_mm", parse_length_mm),
     "throat diameter":             ("throat_diameter_mm",     parse_length_mm),
     "recom. crossover frequency":  ("recommended_crossover_hz", parse_frequency),
+    # Construction descriptors.
+    "surround material":           ("surround_material",      lambda s: s or None),
+    "voice coil material":         ("winding_material",       lambda s: s or None),
+    "former material":             ("former_material",        lambda s: s or None),
+    "flux density":                ("flux_density_t",         parse_float),
+    "recommended enclosure":       ("recommended_enclosure_volume_liters", parse_liters),
+    "recommended enclosure volume": ("recommended_enclosure_volume_liters", parse_liters),
     "external diameter":           ("overall_diameter_mm",    parse_length_mm),
     "cutout diameter":             ("mounting_diameter_mm",   parse_length_mm),
     "depth":                       ("depth_mm",               parse_length_mm),

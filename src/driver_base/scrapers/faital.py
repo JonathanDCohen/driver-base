@@ -174,6 +174,13 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     "minimum crossover frequency": ("recommended_crossover_hz", parse_frequency),
     "diaphragm material":          ("diaphragm_material",     lambda s: s or None),
     "diaphragm shape":             ("diaphragm_shape",        lambda s: s or None),
+    # Construction descriptors — mostly LF, some on HF.
+    "winding material":            ("winding_material",       lambda s: s or None),
+    "former material":             ("former_material",        lambda s: s or None),
+    "cone surround":               ("surround_material",      lambda s: s or None),
+    "phase plug design":           ("phase_plug_design",      lambda s: s or None),
+    "flux density":                ("flux_density_t",         parse_float),
+    "net air volume filled by loudspeaker": ("recommended_enclosure_volume_liters", parse_liters),
     # Coax pages use abbreviated forms of the same labels — keep original entries
     # above (for LF/HF pages) and add abbreviated aliases here.
     "nom. diameter":               ("nominal_size_mm",        parse_length_mm),

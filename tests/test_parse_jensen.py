@@ -26,12 +26,17 @@ def test_enumerate_sitemap_filters_to_product_urls(scraper: JensenScraper) -> No
     res = scraper.enumerate([seed])
     # 63 product URLs across 7 categories per recon
     assert len(res.product_urls) == 63
-    # Every URL is a product under a known category, tagged GUITAR_BASS
+    # Every URL is a product under a known category. Kind is GUITAR_BASS except
+    # for /bass-speakers/v-11-compression-driver which is reclassified to
+    # HF_COMPRESSION (it's a horn driver, not a guitar cone).
     for p in res.product_urls:
-        assert p.context.driver_kind_hint == DriverKind.GUITAR_BASS
         assert any(f"/{c}/" in p.url for c in
                    ("vintage-alnico", "vintage-ceramic", "vintage-neo",
                     "jet-series", "mod-series", "d-series", "bass-speakers"))
+        if p.url.rstrip("/").endswith("/v-11-compression-driver"):
+            assert p.context.driver_kind_hint == DriverKind.HF_COMPRESSION
+        else:
+            assert p.context.driver_kind_hint == DriverKind.GUITAR_BASS
 
 
 def test_parse_p12n_emits_two_impedance_fragments(scraper: JensenScraper) -> None:

@@ -105,6 +105,17 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     "depth":                       ("depth_mm",               parse_length_mm),
     "net weight":                  ("net_weight_kg",          _weight_kg),
     "magnet material":             ("magnet_type",            lambda s: normalize_magnet_type(s)),
+    # Construction descriptors.
+    "winding material":            ("winding_material",       lambda s: s or None),
+    "former material":             ("former_material",        lambda s: s or None),
+    "surround shape":              ("surround_material",      lambda s: s or None),
+    "phase plug design":           ("phase_plug_design",      lambda s: s or None),
+    "flux density":                ("flux_density_t",         parse_float),
+    "xvar":                        ("xvar_mm",                parse_length_mm),
+    "diaphragm material":          ("diaphragm_material",     lambda s: s or None),
+    "recommended crossover":       ("recommended_crossover_hz", parse_frequency),
+    # B&C HF also publishes "Continuous Power Handling" already mapped above.
+    # B&C HF publishes "Minimum Impedance" already mapped above.
 }
 
 

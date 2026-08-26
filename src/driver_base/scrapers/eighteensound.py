@@ -165,6 +165,14 @@ _LABEL_MAP: dict[str, tuple[str, Callable[[Optional[str]], object]]] = {
     "net weight": ("net_weight_kg", _parse_kg),
     "magnet material": ("magnet_type", _parse_magnet),
     "diaphragm material": ("diaphragm_material", lambda s: (s or "").strip() or None),
+    "winding material":   ("winding_material",   lambda s: (s or "").strip() or None),
+    "former material":    ("former_material",    lambda s: (s or "").strip() or None),
+    "surround shape":     ("surround_material",  lambda s: (s or "").strip() or None),
+    "phase plug design":  ("phase_plug_design",  lambda s: (s or "").strip() or None),
+    "flux density":       ("flux_density_t",     parse_float),
+    "xvar":               ("xvar_mm",            parse_length_mm),
+    "recommended enclosure": ("recommended_enclosure_volume_liters", parse_liters),
+    "recommended enclosure volume": ("recommended_enclosure_volume_liters", parse_liters),
 }
 
 

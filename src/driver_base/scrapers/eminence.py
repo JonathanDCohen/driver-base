@@ -155,6 +155,66 @@ def _model_from_handle(handle: str) -> str:
     return handle.replace("_", " ").upper().strip() or handle
 
 
+# Fallback for pages without a `table#em-detail`: extract spec fields from the
+# Shopify product `tags` array embedded in the page HTML. Covers the ~40 pages
+# where the em-detail table is missing (dealer-restricted or classic guitar
+# lines) — we get size / power / impedance / voice-coil-diameter / magnet from
+# tags rather than a full spec table.
+_TAGS_JSON_RE = re.compile(r'"tags"\s*:\s*(\[[^\]]*\])')
+_TAG_SIZE_RE   = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*Inch\s*$", re.IGNORECASE)
+_TAG_POWER_RE  = re.compile(r"^\s*(\d+)\s*W(?:atts?)?\s*$", re.IGNORECASE)
+_TAG_IMP_RE    = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*Ohm\s*$", re.IGNORECASE)
+# Voice coil tag: `2" (51 mm) Voice Coil` — the mm value in parens is authoritative.
+_TAG_VC_RE     = re.compile(
+    r'^\s*[\d.]+"\s*\(\s*(\d+(?:\.\d+)?)\s*mm\s*\)\s*Voice Coil\s*$', re.IGNORECASE
+)
+_TAG_MAG_RE    = re.compile(r"^\s*(Ferrite|Ceramic|Neodymium|Alnico)\s*$", re.IGNORECASE)
+
+
+def _apply_tags_fallback(frag: DriverFragment, html: str) -> None:
+    """Set size/power/impedance/VC/magnet from Shopify tags when the em-detail
+    table is absent. Only fills fields that are currently None. Tagged INFERRED."""
+    m = _TAGS_JSON_RE.search(html)
+    if not m:
+        return
+    try:
+        tags = json.loads(m.group(1))
+    except json.JSONDecodeError:
+        return
+    if not isinstance(tags, list):
+        return
+    for tag in tags:
+        if not isinstance(tag, str):
+            continue
+        if frag.nominal_size_mm is None:
+            mm = _TAG_SIZE_RE.match(tag)
+            if mm:
+                frag.nominal_size_mm = float(mm.group(1)) * 25.4
+                frag.spec_source["nominal_size_mm"] = SpecSource.INFERRED
+        if frag.power_aes_watts is None:
+            mm = _TAG_POWER_RE.match(tag)
+            if mm:
+                frag.power_aes_watts = float(mm.group(1))
+                frag.spec_source["power_aes_watts"] = SpecSource.INFERRED
+        if frag.impedance_nominal_ohm is None:
+            mm = _TAG_IMP_RE.match(tag)
+            if mm:
+                frag.impedance_nominal_ohm = float(mm.group(1))
+                frag.spec_source["impedance_nominal_ohm"] = SpecSource.INFERRED
+        if frag.voice_coil_diameter_mm is None:
+            mm = _TAG_VC_RE.match(tag)
+            if mm:
+                frag.voice_coil_diameter_mm = float(mm.group(1))
+                frag.spec_source["voice_coil_diameter_mm"] = SpecSource.INFERRED
+        if frag.magnet_type is None:
+            mm = _TAG_MAG_RE.match(tag)
+            if mm:
+                mt = normalize_magnet_type(mm.group(1))
+                if mt:
+                    frag.magnet_type = mt
+                    frag.spec_source["magnet_type"] = SpecSource.INFERRED
+
+
 @register
 class EminenceScraper(Scraper):
     name = "eminence"
@@ -201,21 +261,21 @@ class EminenceScraper(Scraper):
     ) -> ParseResult:
         soup = BeautifulSoup(raw.body, "lxml")
         table = soup.select_one("table#em-detail")
-        if table is None:
-            return ParseResult(fragments=[])
+        text = raw.body.decode("utf-8", errors="ignore")
 
         specs: dict[str, str] = {}
-        for tr in table.select("tr"):
-            cells = tr.find_all(["td", "th"])
-            if len(cells) < 2:
-                continue
-            label = cells[0].get_text(strip=True)
-            value = cells[1].get_text(strip=True)
-            if not label or not value or value in ("--", "-"):
-                continue
-            key = normalize_label(label)
-            if key not in specs:
-                specs[key] = value
+        if table is not None:
+            for tr in table.select("tr"):
+                cells = tr.find_all(["td", "th"])
+                if len(cells) < 2:
+                    continue
+                label = cells[0].get_text(strip=True)
+                value = cells[1].get_text(strip=True)
+                if not label or not value or value in ("--", "-"):
+                    continue
+                key = normalize_label(label)
+                if key not in specs:
+                    specs[key] = value
 
         handle = raw.url.rstrip("/").rsplit("/", 1)[-1]
         model = _model_from_handle(handle)
@@ -253,5 +313,10 @@ class EminenceScraper(Scraper):
         if frag.throat_diameter_mm is not None and frag.nominal_size_mm is None:
             frag.nominal_size_mm = frag.throat_diameter_mm
             frag.spec_source["nominal_size_mm"] = SpecSource.DERIVED
+
+        # Fill missing fields from Shopify tags — the em-detail table can be
+        # absent (dealer-restricted / classic guitar); tags still carry size,
+        # power, impedance, VC, magnet.
+        _apply_tags_fallback(frag, text)
 
         return ParseResult(fragments=[frag])

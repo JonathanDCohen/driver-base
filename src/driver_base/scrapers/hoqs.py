@@ -78,6 +78,8 @@ _TS_SYMBOL_MAP: dict[str, tuple[str, Any]] = {
     "n0": ("eta_zero_pct", parse_float),
     "ebp": ("ebp_hz", parse_frequency),
     "spl": ("sensitivity_db_2_83v_1m", parse_float),   # HOQS labels sensitivity as 2.83V
+    "cms": ("cms_mm_per_n", parse_float),
+    "rms": ("rms_ns_per_m", parse_float),
 }
 
 # general/physical keys → (Driver field, parser)
@@ -89,6 +91,12 @@ _GENERAL_KEY_MAP: dict[str, tuple[str, Any]] = {
     "Voice Coil Diameter": ("voice_coil_diameter_mm", parse_length_mm),
     "Cone Material": (None, None),                                  # kept for docs
     "Magnetic Material": ("magnet_type", lambda s: normalize_magnet_type(s)),
+    "Winding Material": ("winding_material", lambda s: s or None),
+    "Former Material":  ("former_material",  lambda s: s or None),
+    "Flux Density":     ("flux_density_t",   parse_float),
+    "Throat Diameter":  ("throat_diameter_mm", parse_length_mm),
+    "Diaphragm Material": ("diaphragm_material", lambda s: s or None),
+    "Recommended Crossover Frequency": ("recommended_crossover_hz", parse_frequency),
     "Overall Diameter": ("overall_diameter_mm", parse_length_mm),
     "Bolt Circle Diameter": (None, None),
     "Cutout Diameter": ("mounting_diameter_mm", parse_length_mm),
@@ -187,13 +195,18 @@ class HoqsScraper(Scraper):
         self, raw: RawArtifact, seed_context: SeedContext
     ) -> ParseResult:
         text = raw.body.decode("utf-8", errors="ignore")
+        # Some HOQS pages ship `var speakerData = null;` — the T/S table lives in
+        # a downloadable CSV instead. Emit a minimal fragment (model + kind) so
+        # the product still appears in the catalog, even without T/S params.
         m = _SPEAKER_DATA_RE.search(text)
-        if not m:
-            return ParseResult(fragments=[])
-        try:
-            data = json.loads(m.group(1))
-        except json.JSONDecodeError:
-            return ParseResult(fragments=[])
+        data: dict[str, Any] = {}
+        if m:
+            try:
+                parsed = json.loads(m.group(1))
+                if isinstance(parsed, dict):
+                    data = parsed
+            except json.JSONDecodeError:
+                pass
 
         handle = raw.url.rsplit("/", 1)[-1]
         # Prefer the current storefront model name (og:title) — several handles

@@ -112,6 +112,12 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     # Celestion compression drivers publish `Throat exit` (not "Throat diameter")
     # for the horn throat opening.
     "throat exit":                 ("throat_diameter_mm",     parse_length_mm),
+    # Construction descriptors.
+    "voice coil material":         ("winding_material",       lambda s: s or None),
+    "former material":             ("former_material",        lambda s: s or None),
+    "surround material":           ("surround_material",      lambda s: s or None),
+    "phase plug":                  ("phase_plug_design",      lambda s: s or None),
+    "flux density":                ("flux_density_t",         parse_float),
     "overall diameter":            ("overall_diameter_mm",    parse_length_mm),
     "overall depth":               ("depth_mm",               parse_length_mm),
     "cut-out diameter":            ("mounting_diameter_mm",   parse_length_mm),
@@ -127,13 +133,22 @@ def _kind_from_breadcrumb(text: str) -> DriverKind:
         return DriverKind.GUITAR_BASS
     if "compression" in t:
         return DriverKind.HF_COMPRESSION
+    # Axiperiodic and horn-loaded HF products behave like compression drivers
+    # (a diaphragm feeding a horn) — bucket them there instead of introducing
+    # a separate kind. Precedence: check before the "horn" catch-all.
+    if "axi" in t or "axiperiodic" in t:
+        return DriverKind.HF_COMPRESSION
+    if "hf driver" in t or "high frequency" in t:
+        return DriverKind.HF_COMPRESSION
     if "tweeter" in t:
         return DriverKind.TWEETER
     if "coaxial" in t or "coax" in t:
         return DriverKind.COAX
     if "waveguide" in t or "horn" in t:
-        return DriverKind.HORN
-    if "hf driver" in t:
+        # Passive horn assemblies for compression drivers — no schema fit today,
+        # bucket as HF_COMPRESSION so they survive the global horn filter and
+        # at least keep a record for users searching by model. Their spec
+        # completeness will be spotty.
         return DriverKind.HF_COMPRESSION
     return DriverKind.LF_WOOFER
 

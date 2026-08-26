@@ -35,6 +35,13 @@ const COLUMN_META = {
   diaphragm_material:        { label: "Diaphragm material", numeric: false, sortable: true  },
   diaphragm_shape:           { label: "Diaphragm shape",    numeric: false, sortable: true  },
   recommended_crossover_hz:  { label: "Rec. crossover",     numeric: true,  sortable: true  },
+  winding_material:          { label: "VC winding material", numeric: false, sortable: true },
+  former_material:           { label: "VC former material",  numeric: false, sortable: true },
+  surround_material:         { label: "Surround material",   numeric: false, sortable: true },
+  phase_plug_design:         { label: "Phase plug design",   numeric: false, sortable: true },
+  flux_density_t:            { label: "Flux density (T)",    numeric: true,  sortable: true },
+  xvar_mm:                   { label: "Xvar",                numeric: true,  sortable: true },
+  recommended_enclosure_volume_liters: { label: "Rec. enclosure vol", numeric: true, sortable: true },
   // Coax HF-section fields — populated only for coaxial drivers. The generic
   // fields above hold the coax LF-section values; these carry the HF section.
   // Hidden by default (relevant to a small subset of records).

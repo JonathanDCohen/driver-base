@@ -97,7 +97,10 @@ def parse_range(s: Optional[str]) -> Optional[tuple[float, float]]:
     if not s:
         return None
     # Strip thousands commas so 4,000 doesn't fragment into two numbers.
-    stripped = re.sub(r"(?<=\d),(?=\d{3}\b)", "", s)
+    # Use (?!\d) not \b — `20,000Hz` has no word boundary between `000` and `Hz`
+    # (both are word chars), which caused Celestion's "800-20,000Hz" to parse
+    # as (20, 800) instead of (800, 20000).
+    stripped = re.sub(r"(?<=\d),(?=\d{3}(?!\d))", "", s)
 
     # First-pass: look for explicitly unit-tagged endpoints so mixed
     # `33 Hz - 0.3 kHz` handles correctly.

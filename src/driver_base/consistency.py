@@ -34,7 +34,10 @@ _XMECH_ONE_WAY_MANUFACTURERS: frozenset[str] = frozenset({"Faital Pro"})
 
 
 _MIN_BANDWIDTH_HZ: dict[DriverKind, float] = {
-    DriverKind.LF_WOOFER: 500.0,
+    # Subwoofer-focused LFs legitimately publish narrow ranges (Celestion
+    # FTR12-4080DL 20–300 Hz, TSQ2460 20–200 Hz). Keep this as a sanity
+    # check against parse errors, not as a schema requirement.
+    DriverKind.LF_WOOFER: 100.0,
     DriverKind.FULLRANGE: 500.0,
     DriverKind.COAX: 500.0,
     DriverKind.HF_COMPRESSION: 1000.0,

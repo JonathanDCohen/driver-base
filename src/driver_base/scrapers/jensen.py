@@ -207,10 +207,18 @@ class JensenScraper(Scraper):
                 if key in seen:
                     continue
                 seen.add(key)
+                # V-11 in bass-speakers is actually a compression driver, not a
+                # guitar/bass cone — reclassify by URL.
+                if url.endswith("/v-11-compression-driver") or url.endswith(
+                    "/v-11-compression-driver/"
+                ):
+                    kind = DriverKind.HF_COMPRESSION
+                else:
+                    kind = DriverKind.GUITAR_BASS
                 products.append(
                     SeedRef(
                         url=url,
-                        context=SeedContext(driver_kind_hint=DriverKind.GUITAR_BASS),
+                        context=SeedContext(driver_kind_hint=kind),
                     )
                 )
         return EnumerateResult(product_urls=products)

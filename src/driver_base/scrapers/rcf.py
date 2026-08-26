@@ -111,6 +111,14 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     # HF/coax pages label the magnet field "Magnetics" (plural, without 's').
     "magnetics":                             ("magnet_type",            lambda s: normalize_magnet_type(s)),
     "diaphragm material":                    ("diaphragm_material",     lambda s: (s or "").strip() or None),
+    # Construction descriptors.
+    "voice coil winding material":           ("winding_material",       lambda s: s or None),
+    "voice coil former design":              ("former_material",        lambda s: s or None),  # "Direct Drive Kapton" style
+    "surround material":                     ("surround_material",      lambda s: s or None),
+    "phase plug design":                     ("phase_plug_design",      lambda s: s or None),
+    "flux density":                          ("flux_density_t",         parse_float),
+    # Volume occupied — driver's own displacement, not enclosure recommendation.
+    # RCF doesn't publish a recommended enclosure volume field consistently.
 }
 
 

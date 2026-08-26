@@ -73,7 +73,10 @@ def test_accept_power_long_term_greater_than_aes() -> None:
 
 
 def test_reject_bandwidth_too_narrow_for_lf_woofer() -> None:
-    d = _driver(freq_low_hz=100.0, freq_high_hz=200.0)   # 100Hz bandwidth < 500 for LF_WOOFER
+    # Subwoofer-focused LFs legitimately have narrow ranges (Celestion FTR12/TSQ
+    # series 20–200 Hz); we lowered the LF gate to 100 Hz. Bandwidths under 100 Hz
+    # are still parse-error suspicious. Test with 80 Hz bandwidth.
+    d = _driver(freq_low_hz=100.0, freq_high_hz=180.0)  # 80Hz bandwidth < 100 for LF_WOOFER
     _, rejected = enforce_consistency([d])
     assert "bandwidth_too_narrow" in rejected[0].reason
 
