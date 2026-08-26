@@ -107,6 +107,10 @@ table.compact-table > tbody > tr.row-hover { background-color: rgba(0, 137, 123,
 .compact-table th.reorderable.dragging { opacity: .35; }
 .compact-table th.reorderable.drop-left  { box-shadow: inset  3px 0 0 #00695c; }
 .compact-table th.reorderable.drop-right { box-shadow: inset -3px 0 0 #00695c; }
+/* Sort chip drag/drop feedback — same visual language as the column headers. */
+.sort-chip-list .chip.dragging   { opacity: .35; }
+.sort-chip-list .chip.drop-left  { box-shadow: inset  3px 0 0 #00695c; }
+.sort-chip-list .chip.drop-right { box-shadow: inset -3px 0 0 #00695c; }
 
 /* Columns picker */
 .picker { position: relative; }

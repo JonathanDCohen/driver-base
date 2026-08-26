@@ -1,7 +1,7 @@
-// Driver-base SPA. Alpine.js component + SortableJS for the sort chips.
-// Reorderable column headers use native HTML5 drag events — Alpine remains
-// the only DOM mutator so `x-for` re-renders header + body cells in lockstep
-// from the same array (no Sortable/x-for fight).
+// Driver-base SPA. Alpine.js component. Reorderable column headers AND sort
+// chips use native HTML5 drag events — Alpine remains the only DOM mutator
+// so `x-for` re-renders in lockstep from the same array (no SortableJS/x-for
+// fight, which was silently reverting sort-chip drops).
 // State (filters + sorts) is mirrored to the URL for shareability.
 // Column order + visibility and units preference persist in first-party cookies
 // (`db_cols`, `db_units`).
@@ -280,6 +280,10 @@ function app() {
     dragOverKey: null,     // column key currently hovered as drop target
     dragSide: null,        // 'left' | 'right' — which half of the hovered th we're over
 
+    sortDragField: null,   // sort chip field currently being dragged
+    sortDragOverField: null,
+    sortDragSide: null,
+
     async init() {
       const state = parseURLState();
       Object.assign(this.filters, state.filters);
@@ -300,11 +304,6 @@ function app() {
       } catch (e) {
         console.error(e);
       }
-
-      // SortableJS init AFTER data + first render.
-      this.$nextTick(() => {
-        this.installSortable();
-      });
     },
 
     // --- computed properties ---
@@ -460,22 +459,50 @@ function app() {
       this.updateUrl();
     },
 
-    installSortable() {
-      const el = this.$refs.sortChips;
-      if (!el || !window.Sortable) return;
-      Sortable.create(el, {
-        animation: 150,
-        filter: "a, .close",
-        preventOnFilter: false,
-        onEnd: (evt) => {
-          const from = evt.oldIndex;
-          const to = evt.newIndex;
-          if (from === to) return;
-          const moved = this.sorts.splice(from, 1)[0];
-          this.sorts.splice(to, 0, moved);
-          this.updateUrl();
-        },
-      });
+    // Native HTML5 drag handlers for sort chips — same shape as the column
+    // header reorder, so Alpine stays the sole DOM mutator (no Sortable/x-for
+    // fight, which was silently reverting drops).
+    onSortDragStart(ev, field) {
+      this.sortDragField = field;
+      ev.dataTransfer.effectAllowed = "move";
+      ev.dataTransfer.setData("text/plain", field);
+    },
+    onSortDragOver(ev, field) {
+      if (!this.sortDragField || field === this.sortDragField) return;
+      ev.dataTransfer.dropEffect = "move";
+      const rect = ev.currentTarget.getBoundingClientRect();
+      this.sortDragSide = ev.clientX < rect.left + rect.width / 2 ? "left" : "right";
+      this.sortDragOverField = field;
+    },
+    onSortDragLeave(field) {
+      if (this.sortDragOverField === field) {
+        this.sortDragOverField = null;
+        this.sortDragSide = null;
+      }
+    },
+    onSortDrop(targetField) {
+      const src = this.sortDragField;
+      if (!src || src === targetField) { this.onSortDragEnd(); return; }
+      const srcIdx = this.sorts.findIndex((s) => s.field === src);
+      const tgtIdx = this.sorts.findIndex((s) => s.field === targetField);
+      if (srcIdx < 0 || tgtIdx < 0) { this.onSortDragEnd(); return; }
+      let newPos = tgtIdx + (this.sortDragSide === "right" ? 1 : 0);
+      if (srcIdx < newPos) newPos -= 1;
+      const [moved] = this.sorts.splice(srcIdx, 1);
+      this.sorts.splice(newPos, 0, moved);
+      this.updateUrl();
+      this.onSortDragEnd();
+    },
+    onSortDragEnd() {
+      this.sortDragField = null;
+      this.sortDragOverField = null;
+      this.sortDragSide = null;
+    },
+    sortDragClass(field) {
+      const parts = [];
+      if (this.sortDragField === field) parts.push("dragging");
+      if (this.sortDragOverField === field && this.sortDragSide) parts.push(`drop-${this.sortDragSide}`);
+      return parts.join(" ");
     },
 
     // Native HTML5 drag handlers for column headers. Alpine is the sole DOM

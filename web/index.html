@@ -105,9 +105,17 @@
             </div>
           </div>
 
-          <ul id="sort-chips" class="sort-chip-list" x-ref="sortChips">
+          <ul id="sort-chips" class="sort-chip-list">
             <template x-for="(s, i) in sorts" :key="s.field">
-              <li class="chip teal lighten-4" :data-idx="i" :title="`Drag to reorder · ${s.dir === 'asc' ? 'ascending' : 'descending'}`">
+              <li class="chip teal lighten-4"
+                  draggable="true"
+                  :class="sortDragClass(s.field)"
+                  @dragstart="onSortDragStart($event, s.field)"
+                  @dragover.prevent="onSortDragOver($event, s.field)"
+                  @dragleave="onSortDragLeave(s.field)"
+                  @drop.prevent="onSortDrop(s.field)"
+                  @dragend="onSortDragEnd"
+                  :title="`Drag to reorder · ${s.dir === 'asc' ? 'ascending' : 'descending'}`">
                 <span x-text="fieldLabel(s.field)"></span>
                 <a href="#" @click.prevent="toggleSortDir(i)" :title="s.dir === 'asc' ? 'ascending' : 'descending'">
                   <i class="material-icons" x-text="s.dir === 'asc' ? 'arrow_upward' : 'arrow_downward'"></i>
@@ -188,7 +196,6 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="app.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 </body>
