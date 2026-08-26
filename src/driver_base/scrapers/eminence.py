@@ -21,6 +21,7 @@ Hardware, empty) are filtered out at enumerate.
 from __future__ import annotations
 
 import json
+import re
 from typing import Any, Callable, Optional
 
 from bs4 import BeautifulSoup
@@ -82,6 +83,31 @@ def _weight_kg(s: Optional[str]) -> Optional[float]:
     return g / 1000.0 if g is not None else None
 
 
+# `X", Y mm` pattern — cross-check both sides. Eminence has published typos
+# where the metric value is `0 mm`, an empty string, or has a spurious space
+# (`12", 25 4 mm` where the "254mm" got split). When mm and inches disagree
+# by more than 5%, prefer inches × 25.4 — typos are almost always on the
+# metric side, and the inches value is the primary spec.
+_INCHES_RE = re.compile(r"([\d.]+)\s*(?:\"|″|in\b)", re.IGNORECASE)
+
+def _parse_diameter_mm(s: Optional[str]) -> Optional[float]:
+    mm = parse_length_mm(s)
+    if s is None:
+        return mm
+    m = _INCHES_RE.search(s)
+    if m:
+        try:
+            inches_mm = float(m.group(1)) * 25.4
+        except ValueError:
+            return mm
+        if mm is None or mm < 1.0:
+            return inches_mm
+        # Both present — trust inches when metric is way off.
+        if abs(mm - inches_mm) / inches_mm > 0.05:
+            return inches_mm
+    return mm
+
+
 _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]] = {
     # T/S (verbose Eminence labels)
     "resonant frequency":                      ("fs_hz",           parse_frequency),
@@ -104,15 +130,22 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     "nominal impedance":                       ("impedance_nominal_ohm", parse_impedance),
     "program power":                           ("power_program_watts",   parse_power),
     "watts":                                   ("power_aes_watts",       parse_power),  # Eminence 'Watts' is the AES rating (2× → 'Program Power' matches AES convention)
+    "power rating":                            ("power_aes_watts",       parse_power),  # HF/tweeter pages use "Power Rating" instead of "Watts"
     "sensitivity":                             ("sensitivity_db_1w_1m",  parse_float),
     "usable frequency range":                  ("__freq_range__",        parse_range),
+    "recommended crossover":                   ("recommended_crossover_hz", parse_frequency),
+    "low rec. crossover":                      ("recommended_crossover_hz", parse_frequency),
     # physical
-    "nominal basket diameter":                 ("nominal_size_mm",       parse_length_mm),
-    "voice coil diameter":                     ("voice_coil_diameter_mm", parse_length_mm),
-    "overall diameter":                        ("overall_diameter_mm",   parse_length_mm),
-    "baffle hole diameter":                    ("mounting_diameter_mm",  parse_length_mm),
-    "depth":                                   ("depth_mm",              parse_length_mm),
+    "nominal basket diameter":                 ("nominal_size_mm",       _parse_diameter_mm),
+    "voice coil diameter":                     ("voice_coil_diameter_mm", _parse_diameter_mm),
+    "overall diameter":                        ("overall_diameter_mm",   _parse_diameter_mm),
+    "baffle hole diameter":                    ("mounting_diameter_mm",  _parse_diameter_mm),
+    "depth":                                   ("depth_mm",              _parse_diameter_mm),
+    # HF compression drivers and tweeters publish `Throat Size` in place of
+    # `Nominal basket diameter`; used as size fallback in the post-parse step.
+    "throat size":                             ("throat_diameter_mm",    _parse_diameter_mm),
     "net weight":                              ("net_weight_kg",         _weight_kg),
+    "weight":                                  ("net_weight_kg",         _weight_kg),  # HF/tweeter pages use "Weight"
     "magnet material":                         ("magnet_type",           lambda s: normalize_magnet_type(s)),
 }
 
@@ -212,5 +245,13 @@ class EminenceScraper(Scraper):
                 continue
             setattr(frag, field_name, parsed)
             frag.spec_source[field_name] = SpecSource.HTML_TABLE
+
+        # HF compression drivers and tweeters publish `Throat Size` but no
+        # `Nominal basket diameter` — use throat as size (Faital/18Sound/Beyma/
+        # B&C/Celestion pattern). Only compression drivers/tweeters publish
+        # Throat Size on Eminence pages so the fallback is safe.
+        if frag.throat_diameter_mm is not None and frag.nominal_size_mm is None:
+            frag.nominal_size_mm = frag.throat_diameter_mm
+            frag.spec_source["nominal_size_mm"] = SpecSource.DERIVED
 
         return ParseResult(fragments=[frag])
