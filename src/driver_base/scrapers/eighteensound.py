@@ -311,12 +311,30 @@ class EighteenSoundScraper(Scraper):
             setattr(frag, field_name, parsed)
             frag.spec_source[field_name] = SpecSource.HTML_PROSE
 
-        # Fall back to the URL's size segment (`X-Y` → `X.Y` in inches) when the
-        # page doesn't publish a "Nominal Diameter" label. Applies to driver
-        # categories where the segment is the driver's size — LF/HF drivers,
-        # coax, line-array sources — and skipped for horns where the same
-        # segment is a throat diameter, not a "size" concept for the horn.
-        # For HF drivers, the size IS the throat — set both fields.
+        # 18Sound puts the driver's nominal size in a small header widget
+        # above the spec sections:
+        #   <div class="inchesWrapper"><p><span> 18.0 </span> In</p></div>
+        # This is the manufacturer's own labeled value (not URL / model
+        # inference), so prefer it over the URL-slug fallback below.
+        # For HF drivers, the "size" IS the throat diameter — populate both.
+        if frag.nominal_size_mm is None:
+            inches_el = soup.select_one("div.inchesWrapper span")
+            if inches_el is not None:
+                inches = parse_float(inches_el.get_text(strip=True))
+                if inches is not None and inches > 0:
+                    frag.nominal_size_mm = round(inches * _MM_PER_INCH, 1)
+                    frag.spec_source["nominal_size_mm"] = SpecSource.HTML_GRID
+                    if category_from_url == "hf-driver" and frag.throat_diameter_mm is None:
+                        frag.throat_diameter_mm = frag.nominal_size_mm
+                        frag.spec_source["throat_diameter_mm"] = SpecSource.HTML_GRID
+
+        # Fall back to the URL's size segment (`X-Y` → `X.Y` in inches) when
+        # neither the inchesWrapper widget nor a spec label populated the
+        # field. Applies to driver categories where the segment is the
+        # driver's size — LF/HF drivers, coax, line-array sources — and
+        # skipped for horns where the same segment is a throat diameter, not
+        # a "size" concept for the horn. For HF drivers, the size IS the
+        # throat — set both fields.
         if category_from_url in _URL_SIZE_CATEGORIES:
             path_match = _URL_PATH_RE.match(urlparse(raw.url).path)
             if path_match is not None:
