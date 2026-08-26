@@ -656,11 +656,18 @@ function app() {
       }
       if (col.key.endsWith("_ohm")) return `${v}&nbsp;Ω`;
       let base = typeof v === "number" ? fmtNumber(v) : String(v);
-      // A derived spec (sensitivity or power computed from another slot + Z or
-      // 2x-AES) is marked in spec_source; append a subtle dagger + tooltip.
+      // Values that aren't directly scraped from the manufacturer's own spec
+      // sheet get a subtle dagger: `derived` (computed from another slot),
+      // `inferred` (e.g. driver_kind from category slug), and `override`
+      // (hand-patched via data/overrides.yaml to correct an upstream error).
       const src = d.spec_source && d.spec_source[col.key];
-      if (src === "derived") {
-        base += '<sup class="derived-mark" title="derived from another spec (2.83V↔1W via impedance, or program↔AES ×2)">†</sup>';
+      const titleBySrc = {
+        derived: "derived from another spec (2.83V↔1W via impedance, or program↔AES ×2)",
+        inferred: "inferred (e.g. from category or model)",
+        override: "hand-patched in data/overrides.yaml to correct an upstream spec error",
+      };
+      if (titleBySrc[src]) {
+        base += `<sup class="derived-mark" title="${titleBySrc[src]}">†</sup>`;
       }
       return base;
     },
