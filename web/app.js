@@ -87,15 +87,6 @@ const DEFAULT_COLUMN_ORDER = [
   "freq_high_hz",
 ];
 
-// Default sort priority when the URL doesn't carry one — Manufacturer, then
-// Type, then Model, all ascending. Users can override; defaults reapply on a
-// fresh load if the URL hasn't overridden.
-const DEFAULT_SORTS = [
-  { field: "manufacturer", dir: "asc" },
-  { field: "driver_kind",  dir: "asc" },
-  { field: "model",        dir: "asc" },
-];
-
 const COLUMN_COOKIE = "db_cols";
 const UNITS_COOKIE = "db_units";
 const THEME_COOKIE = "db_theme";
@@ -311,7 +302,7 @@ function app() {
     async init() {
       const state = parseURLState();
       Object.assign(this.filters, state.filters);
-      this.sorts = state.sorts.length ? state.sorts : DEFAULT_SORTS.map((s) => ({ ...s }));
+      this.sorts = state.sorts;
       this.columns = reconcileColumns(readColumnsCookie());
       this.units = readUnitsCookie() || "metric";
       this.theme = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";

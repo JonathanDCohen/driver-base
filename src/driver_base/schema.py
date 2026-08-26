@@ -66,6 +66,16 @@ def _serialize(v: Any) -> Any:
     return v
 
 
+def _sorted_for_output(drivers: list[Driver]) -> list[Driver]:
+    """Baseline order for drivers.json: manufacturer, then driver_kind, then
+    model — all case-insensitive ascending. The web UI relies on this as the
+    implicit default so no client-side sort is applied on first load."""
+    return sorted(
+        drivers,
+        key=lambda d: (d.manufacturer.casefold(), d.driver_kind.value, d.model.casefold()),
+    )
+
+
 def write_drivers_json(
     *,
     path: Path,
@@ -95,7 +105,7 @@ def write_drivers_json(
             "blocked": blocked,
             "total_records": len(drivers),
         },
-        "drivers": [_serialize(d) for d in drivers],
+        "drivers": [_serialize(d) for d in _sorted_for_output(drivers)],
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, default=_json_default, indent=2))
