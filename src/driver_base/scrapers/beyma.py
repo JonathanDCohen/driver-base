@@ -107,6 +107,9 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     # physical
     "nominal diameter":            ("nominal_size_mm",        parse_length_mm),
     "voice coil diameter":         ("voice_coil_diameter_mm", parse_length_mm),
+    "throat diameter":             ("throat_diameter_mm",     parse_length_mm),
+    "external diameter":           ("overall_diameter_mm",    parse_length_mm),
+    "cutout diameter":             ("mounting_diameter_mm",   parse_length_mm),
     "depth":                       ("depth_mm",               parse_length_mm),
     "net weight":                  ("net_weight_kg",          _weight_kg),
     "magnet":                      ("magnet_type",            lambda s: normalize_magnet_type(s)),
@@ -226,5 +229,22 @@ class BeymaScraper(Scraper):
                 continue
             setattr(frag, field_name, parsed)
             frag.spec_source[field_name] = SpecSource.HTML_DIV_PAIRS
+
+        # Beyma HF compression drivers and tweeters don't publish a "Nominal
+        # Diameter". Fall back through: throat (HF compressions), then cutout
+        # (dome tweeters that publish it), then VC diameter (small dome tweeters
+        # where the VC equals the dome diameter). AMT tweeters (Beyma TPL-*)
+        # publish no diameters and stay size-less.
+        if frag.nominal_size_mm is None and frag.driver_kind in (
+            DriverKind.TWEETER, DriverKind.HF_COMPRESSION,
+        ):
+            derived = (
+                frag.throat_diameter_mm
+                or frag.mounting_diameter_mm
+                or frag.voice_coil_diameter_mm
+            )
+            if derived is not None:
+                frag.nominal_size_mm = derived
+                frag.spec_source["nominal_size_mm"] = SpecSource.DERIVED
 
         return ParseResult(fragments=[frag])
