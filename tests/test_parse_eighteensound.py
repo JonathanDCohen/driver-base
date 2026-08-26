@@ -94,3 +94,19 @@ def test_impedance_from_url_is_seeded_before_html(scraper: EighteenSoundScraper)
     raw = load_fixture("eighteensound", "products/18LW1400.html", url=_18LW1400_URL)
     res = scraper.parse_artifact(raw, SeedContext())
     assert res.fragments[0].impedance_nominal_ohm == pytest.approx(8.0)
+
+
+def test_size_from_inches_wrapper_beats_url_fallback(scraper: EighteenSoundScraper) -> None:
+    """The 18iD200 product page omits the 'Nominal Diameter' label but the
+    header carries the size in <div class="inchesWrapper"><span>18.0</span> In</div>.
+    That widget must populate nominal_size_mm with SpecSource.HTML_GRID —
+    otherwise the URL-slug fallback stamps SpecSource.INFERRED and the value
+    appears as 'inferred' in the UI when the page actually publishes it."""
+    url = "https://www.eighteensound.it/en/products/lf-driver/18-0/2/18ID200"
+    raw = load_fixture("eighteensound", "products/18ID200.html", url=url)
+    ctx = SeedContext(driver_kind_hint=DriverKind.LF_WOOFER, category_id="lf-driver")
+    res = scraper.parse_artifact(raw, ctx)
+    assert len(res.fragments) == 1
+    f = res.fragments[0]
+    assert f.nominal_size_mm == pytest.approx(457.2)
+    assert f.spec_source["nominal_size_mm"] == SpecSource.HTML_GRID
