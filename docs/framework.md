@@ -19,6 +19,7 @@ driver-base/
 ├── data/
 │   ├── drivers.json                       # THE artifact; consumed by SPA
 │   ├── aliases.yaml                       # canonical_id rewrites; human-edited
+│   ├── overrides.yaml                     # per-driver field overrides; human-edited
 │   ├── baselines.yaml                     # per-scraper expected_min_records overrides
 │   ├── collision_registry.yaml            # first-seen -v2 suffix persistence (v2)
 │   ├── cache/{scraper}/{sha}.body         # response cache (gitignored)
@@ -38,6 +39,7 @@ driver-base/
 │   ├── magnets.py                         # normalize_magnet_type(raw) -> MagnetType
 │   ├── id.py                              # canonical_id builder
 │   ├── aliases.py                         # load/apply aliases.yaml
+│   ├── overrides.py                       # load/apply overrides.yaml
 │   ├── merge.py                           # merge_fragments_by_id
 │   ├── consistency.py                     # cross-field REJECT gates
 │   ├── sanity.py                          # single-field REJECT + WARN gates
@@ -92,6 +94,8 @@ Every scraper implements three pure functions and the orchestrator wires them to
               enforce_consistency      (cross-field REJECT → ParseConsistencyFailure)
                      |
               sanity gates             (single-field REJECT / WARN; delta vs baseline)
+                     |
+              apply_overrides          (hand-patch field values from overrides.yaml; end-of-pipeline in __main__)
                      |
               per_scraper_status ok | preserved | blocked
 ```
@@ -718,6 +722,22 @@ model_aliases:
 ```
 
 `apply_aliases(fragments)` runs BEFORE `merge_fragments_by_id`, rewriting each fragment's `canonical_id` (or `model` for the pre-derivation form). Chains are transitive; a cycle fails hard on load.
+
+## Overrides
+
+`data/overrides.yaml` is human-edited, checked into git. Used sparingly — for cases where the manufacturer's own published spec is wrong (typo, obvious data-entry error) and we have high confidence in the correct value from another source on the same page (URL slug, product name, feature bullets, datasheet PDF).
+
+```yaml
+# overrides.yaml — hand-patched field values for individual drivers
+
+overrides:
+  dayton__ss18_22__2ohm:
+    reason: "Dayton spec-table typo lists 15\"; URL/model/feature-bullet all say 18\"."
+    fields:
+      nominal_size_mm: 457.2
+```
+
+Applied by `apply_overrides(drivers, overrides)` in `__main__.py` after all scraper runs and per-manufacturer regen preservation, so an override in this file takes effect regardless of which scraper is invoked. Each overridden field is stamped `spec_source: override` and rendered with the "inferred or derived" sigil in the web UI. Unknown field names fail loudly on load. Overrides for canonical_ids not present in the current dataset are silently skipped (a manufacturer might have been dropped by a gate this run).
 
 ## Merge
 

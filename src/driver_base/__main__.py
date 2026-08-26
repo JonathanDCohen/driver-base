@@ -2,9 +2,10 @@
 
     uv run driver-base [--output PATH] [--cache-root PATH] [--scraper NAME]
                        [--refetch] [--rejections-dir PATH] [--aliases PATH]
+                       [--overrides PATH]
 
 Runs every registered scraper (or a single filtered one via --scraper), applies
-all gates, and writes the merged drivers.json.
+all gates, applies hand-patched overrides, and writes the merged drivers.json.
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ from pathlib import Path
 
 from driver_base import __version__
 from driver_base.orchestrator import rehydrate_drivers, run_all
+from driver_base.overrides import apply_overrides, load_overrides
 from driver_base.schema import read_prior_drivers_json, write_drivers_json
 from driver_base.scrapers import SCRAPERS, instantiate_all
 
@@ -29,6 +31,7 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     p.add_argument("--cache-root", type=Path, default=Path("data/cache"))
     p.add_argument("--rejections-dir", type=Path, default=Path("data/rejections"))
     p.add_argument("--aliases", type=Path, default=Path("data/aliases.yaml"))
+    p.add_argument("--overrides", type=Path, default=Path("data/overrides.yaml"))
     p.add_argument(
         "--scraper", action="append", default=None,
         help="Run only the named scraper(s); may be repeated. Default: all.",
@@ -83,6 +86,11 @@ async def _amain(args: argparse.Namespace) -> int:
             ]
             if belonging:
                 drivers.extend(rehydrate_drivers(belonging, now_iso=None))
+
+    overrides = load_overrides(args.overrides)
+    d_touched, f_touched = apply_overrides(drivers, overrides)
+    if f_touched:
+        print(f"applied overrides: {f_touched} field(s) across {d_touched} driver(s)")
 
     write_drivers_json(
         path=args.output,

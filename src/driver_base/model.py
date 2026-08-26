@@ -40,12 +40,14 @@ class SpecSource(str, Enum):
     XLSX = "xlsx"
     INFERRED = "inferred"          # driver_kind from category slug
     DERIVED = "derived"            # xmech doubled from labelled one-way
+    OVERRIDE = "override"          # hand-patched via data/overrides.yaml
 
 
 # Best-first ordering when a field appears in multiple fragments. INLINE_JS
 # is ranked ABOVE the HTML variants because it's typically the same
 # structured payload the HTML view is derived from server-side.
 SPEC_SOURCE_PRECEDENCE: list[SpecSource] = [
+    SpecSource.OVERRIDE,
     SpecSource.JSON_API,
     SpecSource.XLSX,
     SpecSource.INLINE_JS,

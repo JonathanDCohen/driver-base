@@ -113716,7 +113716,7 @@
       "model": "SS18-22",
       "spec_source": {
         "net_weight_kg": "html_table",
-        "nominal_size_mm": "html_table",
+        "nominal_size_mm": "override",
         "power_aes_watts": "html_table",
         "power_peak_watts": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -113789,7 +113789,7 @@
       "sensitivity_db_2_83v_1m": 90.8,
       "msrp_currency": null,
       "msrp_amount": null,
-      "nominal_size_mm": 381.0,
+      "nominal_size_mm": 457.2,
       "throat_diameter_mm": null,
       "diaphragm_material": null,
       "diaphragm_shape": null,

@@ -13,6 +13,8 @@ JSON for use by simulation tools, DIY builders, and research.
 - `data/cache/` — scraped source pages (scraper input, not published).
 - `data/rejections/` — records dropped during normalization, with reasons.
 - `data/aliases.yaml` — manual canonical_id rewrites.
+- `data/overrides.yaml` — manual per-driver field overrides (used sparingly
+  to patch upstream spec-sheet errors).
 - `docs/` — design notes and field reference.
 
 ## Using the dataset
