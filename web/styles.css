@@ -104,6 +104,10 @@ table.compact-table > tbody > tr.row-hover { background-color: rgba(0, 137, 123,
 .picker-btn i.material-icons.left { margin-right: 6px; line-height: 32px; height: 32px; }
 .picker-btn[disabled] { color: #b0bec5; cursor: not-allowed; }
 .units-toggle { min-width: 120px; text-align: left; }
+/* Materialize btn-flat:focus paints a grey background that sticks after click.
+   On picker buttons it doubles as "menu is open" feedback so we leave it; on
+   the units toggle it's just visual noise. */
+.units-toggle:focus { background-color: transparent; }
 .picker-popover {
   position: absolute; left: 0; top: calc(100% + 4px);
   z-index: 20;
