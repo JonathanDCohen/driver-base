@@ -44,9 +44,9 @@
             <ul class="chip-list">
               <template x-for="opt in group.options" :key="opt.value">
                 <li>
-                  <a href="#" class="chip"
-                     :class="filters[group.key].includes(opt.value) ? 'teal white-text' : ''"
-                     @click.prevent="toggleFilter(group.key, opt.value); $event.currentTarget.blur()"
+                  <a href="#" class="chip waves-effect"
+                     :class="filters[group.key].includes(opt.value) ? 'teal white-text waves-light' : ''"
+                     @click.prevent="(el => { toggleFilter(group.key, opt.value); setTimeout(() => el.blur(), 350) })($event.currentTarget)"
                      x-text="`${opt.label} (${opt.count})`"></a>
                 </li>
               </template>
