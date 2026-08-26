@@ -15,7 +15,7 @@ The selectors below are the ones the validator's script actually used. Substitut
 | Celestion | celestion.com | `product-sitemap.xml` (213 URLs) | static HTML | `div.product-detail-spec-col-line` (div pairs) | 213 | 10-second `Crawl-delay`; guitar-bass drivers exempt from T/S REJECT |
 | Dayton Audio | daytonaudio.com | 14 subcategory pages with `?pagenum=N` | static HTML | `#collapseTwo table.table tbody tr` (table) | ~370 | Silent pagination wrap; extensive imperial units; `--` = null |
 | Eminence | eminence.com | `/products.json?limit=250` (Shopify) | static HTML | `table#em-detail tr` (table) | 155 active / 201 with archived | No category on product → `classify_driver_kind()` from `product_type` |
-| Faital Pro | faitalpro.com | 4 category listings — POST `<cat>/search.php` for LF+HF-drivers, static GET for coax+HF-horns | static HTML | `table.tbl_data tr` (table) | 158 URLs enumerated (104 LF + 35 HF + 14 coax + 5 horn) | Footnote suffixes on labels; `÷` frequency separator; POST bodies dropped on 301 → use no-www host |
+| Faital Pro | faitalpro.com | 3 category listings — POST `<cat>/search.php` for LF+HF-drivers, static GET for coax (HF_Horns excluded) | static HTML | `table.tbl_data`/`tbl_datasheet tr` (table) | 153 URLs enumerated (104 LF + 35 HF + 14 coax) | Footnote suffixes on labels; `÷` frequency separator; POST bodies dropped on 301 → use no-www host |
 | HOQS | hoqs.org | `/products.json?limit=250` (Shopify) | static HTML | `var speakerData = ({...});` (inline JS object) | 13 | **Sensitivity is `2.83V/1m`, not `1W/1m`** |
 | RCF | rcf.it | 6 category pages via `?serieId=` | static HTML | `div.specifications div.row > div.col-md-6:first-child + div.col-md-6.font-family-semibold` (div pairs) | 137 (103 excl. Custom Designs) | No usable sitemap; Liferay OAuth endpoints 403 without token |
 | Beyma | beyma.com | 12 English category pages (10 kept, 2 dropped) | static HTML | `div.block-product-features div.items div.item` (div pairs) | ~194 active | `passive-filter` + `accesories` slugs dropped at enumeration |
@@ -273,9 +273,11 @@ For discontinued/archived coverage, `https://eminence.com/sitemap_products_1.xml
 
 **Homepage:** https://www.faitalpro.com (Italy). `robots.txt` allows product pages and the sitemap; disallows utility paths like `/tech_spec/`, `/where_to_buy/`, form submitters.
 
-**Enumeration.** Seed the four category listing pages. The two large categories (`LF_Loudspeakers`, `HF_Drivers`) render their product tables via an XHR — the browser POSTs to `<category>/search.php` with the listing page's JS default filter and injects the response into `#main_content`. The scraper does the same POST directly. The two small categories (`Coaxial_Loudspeakers`, `HF_Horns`) ship their tables inline in the initial HTML — plain GET.
+**Enumeration.** Seed three of the four category listing pages. The two large categories (`LF_Loudspeakers`, `HF_Drivers`) render their product tables via an XHR — the browser POSTs to `<category>/search.php` with the listing page's JS default filter and injects the response into `#main_content`. The scraper does the same POST directly. `Coaxial_Loudspeakers` ships its table inline in the initial HTML — plain GET.
 
-Either way, `enumerate` scrapes `product_details/index.php?id=<N>` occurrences from the response body and derives DriverKind from the seed URL. Recon (2026-08-25): **104 LF + 35 HF-drivers + 14 coax + 5 horns = 158 URLs**. (`sitemap.xml` was tried first — it only lists 18 non-archived English URLs, a fraction of the real catalog — and is now abandoned.)
+`HF_Horns` is intentionally excluded from the scraper. Passive horns don't share the driver schema meaningfully (no T/S, no impedance/power the way transducers have them) and horn domain expertise isn't in near-term scope. If we bring horns back later, add the seed and a horn-specific schema/mapping — see `docs/tasks.md`.
+
+`enumerate` scrapes `product_details/index.php?id=<N>` occurrences from the response body and derives DriverKind from the seed URL. Recon (2026-08-25): **104 LF + 35 HF-drivers + 14 coax = 153 URLs**. (`sitemap.xml` was tried first — it only lists 18 non-archived English URLs, a fraction of the real catalog — and is now abandoned.)
 
 **Sample product page:** https://faitalpro.com/en/products/LF_Loudspeakers/product_details/index.php?id=101050135 (`12PR320`, 8Ω)
 
@@ -319,14 +321,14 @@ Detail pages themselves are static HTML.
 LF_Loudspeakers        → LF_WOOFER
 HF_Drivers             → HF_COMPRESSION
 Coaxial_Loudspeakers   → COAX
-HF_Horns               → HORN
 ```
+(`HF_Horns` excluded — see Enumeration above.)
 
 **Quirks:**
 - `Shipping Box` label case varies: `Shipping Box(Single Carton Box)` (LF) vs `Shipping Box(Single carton box)` (HF, lowercase c). Compare case-insensitively.
 - Some products have `Push Terminals`/`Recone Kit` fields that vary by impedance version (`- 8 Ohm Version`, `- 4 Ohm Version`). Not scraped as Driver fields; ignored or stored as sidecar SKU refs.
 
-**Recon count:** 158 product URLs across 4 categories (2026-08-25 fetch). `expected_min_records = 120` declared inline in `scrapers/faital.py`. Live run 2026-08-25: 158 fragments parsed → 158 final drivers (0 dropped) matching site totals per category exactly.
+**Recon count:** 153 product URLs across 3 categories (2026-08-25 fetch). `expected_min_records = 120` declared inline in `scrapers/faital.py`. Live run 2026-08-25: 153 fragments parsed → 153 final drivers (0 dropped) matching site totals per category exactly. HF_Horns (5 additional passive-horn products) intentionally excluded.
 
 ---
 

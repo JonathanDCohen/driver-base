@@ -1,5 +1,26 @@
 # Follow-up tasks
 
+---
+
+## Bring HF_Horns back for Faital (and design horn-kind fields)
+
+**Added:** 2026-08-25
+
+We currently skip Faital's `HF_Horns` category (5 products) because passive
+horns don't map to the transducer-shaped driver schema — no T/S, no impedance,
+no AES power in the usual sense. When we're ready to represent them:
+
+- Add the `HF_Horns` seed back in `scrapers/faital.py::discover_seeds` (page
+  is static HTML — plain GET, same shape as coax).
+- Design horn-appropriate fields (probably: throat diameter, mouth diameter,
+  cutoff frequency, horizontal + vertical dispersion, coverage pattern, gain).
+  Populate for kind `HORN` only; existing `DriverKind.HORN` enum is already
+  in place and used by other scrapers.
+- Reinstate the enumerate test for horns; add a parse test with an
+  `HF_Horns/*` fixture.
+
+
+
 Backlog items surfaced during work but not landed in the same commit.
 Newest at the top; date each entry with when it was written.
 

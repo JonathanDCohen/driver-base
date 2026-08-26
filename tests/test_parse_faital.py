@@ -38,20 +38,17 @@ def test_enumerate_all_categories(scraper: FaitalScraper) -> None:
             "seeds/Coaxial_Loudspeakers.html",
             "https://www.faitalpro.com/en/products/Coaxial_Loudspeakers/",
         ),
-        _seed(
-            "seeds/HF_Horns.html",
-            "https://www.faitalpro.com/en/products/HF_Horns/",
-        ),
     ]
     res = scraper.enumerate(seeds)
 
-    # Recon counts (captured 2026-08-25): 104 LF + 35 HF + 14 coax + 5 horns = 158.
+    # Recon counts (captured 2026-08-25): 104 LF + 35 HF + 14 coax = 153.
     # Assert floors, not exact counts — Faital adds/retires SKUs over time.
+    # HF_Horns intentionally excluded from the scraper.
     kinds = Counter(p.context.driver_kind_hint for p in res.product_urls)
     assert kinds[DriverKind.LF_WOOFER] >= 90
     assert kinds[DriverKind.HF_COMPRESSION] >= 30
     assert kinds[DriverKind.COAX] >= 12
-    assert kinds[DriverKind.HORN] >= 4
+    assert kinds[DriverKind.HORN] == 0
     assert len(res.product_urls) >= 130
 
     # All URLs are the canonical mixed-case English form.

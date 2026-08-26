@@ -1,13 +1,18 @@
 """Faital Pro (faitalpro.com) scraper.
 
-Enumeration: seed each of the four category listing pages. The two large
-categories (LF_Loudspeakers, HF_Drivers) render their product tables via
-XHR — the browser POSTs to `<category>/search.php` with the default filter
-and injects the response into `#main_content`. We POST directly instead of
-running JS. The two small categories (Coaxial_Loudspeakers, HF_Horns) ship
-their tables inline in the listing HTML. Either way, enumerate scrapes
-`product_details/index.php?id=<N>` occurrences from the response body and
-tags each product with the DriverKind derived from the seed URL.
+Enumeration: seed the three product-carrying category listing pages
+(LF_Loudspeakers, HF_Drivers, Coaxial_Loudspeakers). LF and HF-drivers
+render their product tables via XHR — the browser POSTs to
+`<category>/search.php` with the default filter and injects the response
+into `#main_content`; we POST directly instead of running JS. Coax ships
+its table inline in the listing HTML (plain GET). Either way, enumerate
+scrapes `product_details/index.php?id=<N>` occurrences from the response
+body and tags each product with the DriverKind derived from the seed URL.
+
+HF_Horns is intentionally excluded — passive horns don't share the driver
+schema meaningfully (no T/S, no impedance/power the way transducers have
+them) and horn expertise isn't in the near-term scope. See docs/tasks.md
+if we want to bring them back.
 
 The sitemap is NOT used — it lists only a handful of the ~158 active
 English products.
@@ -70,7 +75,6 @@ _CATEGORY_TO_KIND: dict[str, DriverKind] = {
     "LF_Loudspeakers":      DriverKind.LF_WOOFER,
     "HF_Drivers":           DriverKind.HF_COMPRESSION,
     "Coaxial_Loudspeakers": DriverKind.COAX,
-    "HF_Horns":             DriverKind.HORN,
 }
 
 # Default filter payloads copied verbatim from each listing page's
@@ -99,10 +103,10 @@ _HF_SEARCH_POST: tuple[tuple[str, str], ...] = (
 )
 
 # Match the URL segment naming the category, in either a seed URL
-# (`.../en/products/LF_Loudspeakers/search.php` or `.../en/products/HF_Horns/`)
+# (`.../en/products/LF_Loudspeakers/search.php` or `.../en/products/Coaxial_Loudspeakers/`)
 # or a discovered product URL.
 _SEED_CATEGORY_RE = re.compile(
-    r"/en/products/(?P<category>LF_Loudspeakers|HF_Drivers|Coaxial_Loudspeakers|HF_Horns)/"
+    r"/en/products/(?P<category>LF_Loudspeakers|HF_Drivers|Coaxial_Loudspeakers)/"
 )
 # `product_details/index.php?id=101050135` — id is the only capture we need;
 # category comes from the seed URL that yielded this body. search.php responses
@@ -240,13 +244,7 @@ class FaitalScraper(Scraper):
                     category_id="Coaxial_Loudspeakers",
                 ),
             ),
-            SeedRef(
-                url=f"{_BASE}/en/products/HF_Horns/",
-                context=SeedContext(
-                    driver_kind_hint=DriverKind.HORN,
-                    category_id="HF_Horns",
-                ),
-            ),
+            # HF_Horns intentionally omitted — see module docstring.
         ]
 
     def enumerate(self, seed_artifacts: list[RawArtifact]) -> EnumerateResult:
