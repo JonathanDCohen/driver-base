@@ -118,7 +118,7 @@
           </ul>
         </div>
 
-        <div class="table-split">
+        <div class="table-split" @scroll="scrolled = $event.target.scrollLeft > 0">
           <table class="striped compact-table fixed-table" :class="scrolled ? 'is-scrolled' : ''">
             <thead>
               <tr>
@@ -139,7 +139,7 @@
             </tbody>
           </table>
 
-          <div class="scroll-table-wrap" @scroll="scrolled = $event.target.scrollLeft > 0">
+          <div class="scroll-table-wrap">
             <table class="striped compact-table">
               <thead>
                 <tr>

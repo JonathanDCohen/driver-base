@@ -48,26 +48,36 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
   display: flex;
   align-items: flex-start;
   max-height: calc(100vh - 260px);
-  overflow-y: auto;
+  overflow: auto;                 /* BOTH axes on the parent so the horizontal
+                                     scrollbar sits at the visible bottom edge
+                                     instead of trailing far below the fold */
   background: #fff;
   border-radius: 4px;
   box-shadow: 0 1px 2px rgba(0,0,0,.08);
 }
-/* Materialize sets `table { width: 100% }` globally — override for the
- * fixed table so it sizes to its (short) content rather than eating the
- * whole flex row. */
+/* Materialize sets `table { width: 100% }` globally — override for both halves
+ * so widths follow content and horizontal overflow surfaces at .table-split. */
 .fixed-table {
   flex: 0 0 auto; width: auto;
   border-right: 1px solid #cfd8dc;
-  /* Material elevation: raise the fixed table above the scrolling table
-   * whenever the right side has been scrolled off its origin. Parent
-   * .table-split already clips both axes so leftward bleed is contained. */
-  position: relative; z-index: 2;
+  /* Sticky-left keeps the Manufacturer/Model pane visible while the rest of
+   * the columns scroll horizontally. z-index above the scrollable table so
+   * cells scrolling under it don't peek through. Background is required — a
+   * sticky cell without one is transparent to what's behind. */
+  position: sticky; left: 0; z-index: 2;
+  background: #fff;
   transition: box-shadow .35s ease;
 }
 .fixed-table.is-scrolled { box-shadow: 6px 0 8px -3px rgba(0,0,0,.22); }
-.scroll-table-wrap { flex: 1 1 auto; min-width: 0; overflow-x: auto; }
-.scroll-table-wrap > table { width: 100%; }
+/* Sticky-left carries the fixed-table over the scrolling table during horizontal
+ * scroll. Materialize's .striped applies alternating backgrounds to <tr>, but
+ * even rows are transparent by default — that transparency would let the
+ * scrolling table's cells peek through the fixed pane. Give every row an
+ * explicit opaque background so nothing shows through. */
+.fixed-table.striped > tbody > tr:nth-child(even) { background: #fff; }
+.fixed-table.striped > tbody > tr:nth-child(odd) { background: #f2f2f2; }
+.scroll-table-wrap { flex: 0 0 auto; min-width: 0; }
+.scroll-table-wrap > table { width: auto; }
 .compact-table { margin: 0; font-size: 13px; }
 .compact-table th, .compact-table td { padding: 6px 10px; white-space: nowrap; }
 .compact-table thead th { position: sticky; top: 0; background: #eceff1; z-index: 1; }
