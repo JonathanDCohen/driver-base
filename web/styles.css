@@ -23,20 +23,6 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
 .filter-group h6 { font-size: 13px; font-weight: 500; color: #616161; margin: 4px 0 8px; text-transform: uppercase; letter-spacing: .5px; }
 .chip-list { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px; }
 .chip-list .chip { margin: 0; font-size: 12px; height: 28px; line-height: 28px; padding: 0 12px; cursor: pointer; }
-/* Materialize's <a class="chip"> retains a tinted :focus background AND the
- * inherited color of its last state after click; on the filter chips that looks
- * like a half-selected chip (grey-teal bg + white text) after deselect. Clear
- * both — the teal / white-text classes we toggle in Alpine are the only signal
- * we want. */
-.chip-list .chip:focus, .chip-list .chip:focus-visible {
-  background-color: #e4e4e4;
-  color: rgba(0, 0, 0, 0.6);
-  outline: none;
-}
-.chip-list .chip.teal:focus, .chip-list .chip.teal:focus-visible {
-  background-color: #009688;
-  color: #fff;
-}
 
 /* Main */
 .main { padding: 12px 16px; }

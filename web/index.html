@@ -46,7 +46,7 @@
                 <li>
                   <a href="#" class="chip"
                      :class="filters[group.key].includes(opt.value) ? 'teal white-text' : ''"
-                     @click.prevent="toggleFilter(group.key, opt.value)"
+                     @click.prevent="toggleFilter(group.key, opt.value); $event.currentTarget.blur()"
                      x-text="`${opt.label} (${opt.count})`"></a>
                 </li>
               </template>
