@@ -1,9 +1,67 @@
 [x-cloak] { display: none !important; }
 
-body { background: #fafafa; }
-nav .nav-wrapper { text-align: center; }
+:root {
+  --bg: #fafafa;
+  --surface: #fff;
+  --surface-alt: #f2f2f2;
+  --surface-header: #eceff1;
+  --surface-hover: #dde3e6;
+  --border: #cfd8dc;
+  --text: #263238;
+  --text-muted: #616161;
+  --text-faint: #b0bec5;
+  --link: #00695c;
+  --shadow: rgba(0,0,0,.08);
+  --shadow-popover: rgba(0,0,0,.18);
+  --shadow-scroll: rgba(0,0,0,.22);
+  --nav-bg: #00796b;      /* materialize teal darken-2 */
+  --nav-fg: #ffffff;
+  --chip-active-bg: #009688;  /* materialize teal — active filter + sort chips share this */
+  --chip-active-fg: #ffffff;
+}
+
+html[data-theme="dark"] {
+  --bg: #14181c;
+  --surface: #1e232a;
+  --surface-alt: #262c34;
+  --surface-header: #262c34;
+  --surface-hover: #303842;
+  --border: #37414a;
+  --text: #eceff1;
+  --text-muted: #90a4ae;
+  --text-faint: #607d8b;
+  --link: #4db6ac;
+  --shadow: rgba(0,0,0,.4);
+  --shadow-popover: rgba(0,0,0,.55);
+  --shadow-scroll: rgba(0,0,0,.6);
+  --nav-bg: #14181c;        /* header goes truly dark, not just darker teal */
+  --nav-fg: #4db6ac;         /* teal-300 — brand text/logo/toggle in accent */
+  --chip-active-bg: #00695c;   /* matches the "normal green" accent */
+  --chip-active-fg: #eceff1;
+}
+
+body { background: var(--bg); color: var(--text); }
+
+/* Materialize's nav uses .teal.darken-2 as a fixed class — swap the paint via
+ * the variable so dark mode can dim it without editing the markup. Same for
+ * the foreground: light mode keeps the usual white; dark mode paints the
+ * brand text/logo/toggle in the accent teal. */
+nav.teal.darken-2 { background-color: var(--nav-bg) !important; color: var(--nav-fg); }
+nav.teal.darken-2 a.brand-logo { color: var(--nav-fg); }
+nav .nav-wrapper { text-align: center; position: relative; }
 nav .brand-logo { position: static; font-family: 'Roboto Mono', monospace; font-weight: 500; display: inline-flex; align-items: center; gap: 10px; transform: none; }
-nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
+nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; color: var(--nav-fg); }
+.theme-toggle {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  background: transparent; border: none; color: var(--nav-fg); cursor: pointer;
+  width: 40px; height: 40px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background-color .15s;
+}
+.theme-toggle:hover, .theme-toggle:focus { background: rgba(255,255,255,.12); outline: none; }
+.theme-toggle .material-icons { font-size: 22px; }
+html[data-theme="dark"] .theme-toggle:hover,
+html[data-theme="dark"] .theme-toggle:focus { background: rgba(77,182,172,.14); }
 
 .app-body { padding: 12px 24px 48px; }
 .no-margin { margin: 0; }
@@ -11,18 +69,30 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
 /* Sidebar */
 .sidebar {
   padding: 12px 16px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  box-shadow: 0 1px 2px var(--shadow);
   max-height: calc(100vh - 96px);
   overflow-y: auto;
   position: sticky;
   top: 76px;
 }
 .filter-group { margin-bottom: 18px; }
-.filter-group h6 { font-size: 13px; font-weight: 500; color: #616161; margin: 4px 0 8px; text-transform: uppercase; letter-spacing: .5px; }
+.filter-group h6 { font-size: 13px; font-weight: 500; color: var(--text-muted); margin: 4px 0 8px; text-transform: uppercase; letter-spacing: .5px; }
 .chip-list { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px; }
 .chip-list .chip { margin: 0; font-size: 12px; height: 28px; line-height: 28px; padding: 0 12px; cursor: pointer; }
+
+/* Materialize's default .chip is a light grey pill with dark text — invisible
+ * against dark surfaces. Override the neutral state; active chips keep their
+ * .teal.white-text classes and are unaffected. */
+html[data-theme="dark"] .chip:not(.teal) { background-color: #37414a; color: #eceff1; }
+
+/* Search input in the sidebar — Materialize inherits body color for input
+ * text, but the label and underline are hardcoded greys that need help. */
+html[data-theme="dark"] .input-field input[type=text] { color: var(--text); }
+html[data-theme="dark"] .input-field label { color: var(--text-muted); }
+html[data-theme="dark"] .input-field .prefix { color: var(--text-muted); }
+html[data-theme="dark"] .input-field input[type=text]:not(.browser-default) { border-bottom-color: var(--border); box-shadow: none; }
 
 /* Main */
 .main { padding: 12px 16px; }
@@ -30,10 +100,16 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
 .sort-bar {
   display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
   padding: 8px 12px; margin-bottom: 12px;
-  background: #fff; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  background: var(--surface); border-radius: 4px; box-shadow: 0 1px 2px var(--shadow);
 }
 .sort-bar > span { font-size: 13px; }
 .sort-chip-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; min-height: 32px; }
+/* Both active filter chips and sort chips carry Materialize's .teal class in
+ * the markup (plus .lighten-4 or .white-text modifiers). Route them through
+ * shared variables so filter + sort share one paint per theme. Applies to
+ * .chip.teal anywhere — currently just these two lists. */
+.chip.teal { background-color: var(--chip-active-bg) !important; color: var(--chip-active-fg) !important; }
+.chip.teal .material-icons { color: var(--chip-active-fg); }
 .sort-chip-list .chip { display: inline-flex; align-items: center; gap: 4px; cursor: grab; margin: 0; user-select: none; }
 .sort-chip-list .chip:active { cursor: grabbing; }
 .sort-chip-list .chip a { display: inline-flex; align-items: center; color: inherit; cursor: pointer; }
@@ -51,41 +127,45 @@ nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; }
   overflow: auto;                 /* BOTH axes on the parent so the horizontal
                                      scrollbar sits at the visible bottom edge
                                      instead of trailing far below the fold */
-  background: #fff;
+  background: var(--surface);
   border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  box-shadow: 0 1px 2px var(--shadow);
 }
 /* Materialize sets `table { width: 100% }` globally — override for both halves
  * so widths follow content and horizontal overflow surfaces at .table-split. */
 .fixed-table {
   flex: 0 0 auto; width: auto;
-  border-right: 1px solid #cfd8dc;
+  border-right: 1px solid var(--border);
   /* Sticky-left keeps the Manufacturer/Model pane visible while the rest of
    * the columns scroll horizontally. z-index above the scrollable table so
    * cells scrolling under it don't peek through. Background is required — a
    * sticky cell without one is transparent to what's behind. */
   position: sticky; left: 0; z-index: 2;
-  background: #fff;
+  background: var(--surface);
   transition: box-shadow .35s ease;
 }
-.fixed-table.is-scrolled { box-shadow: 6px 0 8px -3px rgba(0,0,0,.22); }
+.fixed-table.is-scrolled { box-shadow: 6px 0 8px -3px var(--shadow-scroll); }
 /* Sticky-left carries the fixed-table over the scrolling table during horizontal
  * scroll. Materialize's .striped applies alternating backgrounds to <tr>, but
  * even rows are transparent by default — that transparency would let the
  * scrolling table's cells peek through the fixed pane. Give every row an
  * explicit opaque background so nothing shows through. */
-.fixed-table.striped > tbody > tr:nth-child(even) { background: #fff; }
-.fixed-table.striped > tbody > tr:nth-child(odd) { background: #f2f2f2; }
+.fixed-table.striped > tbody > tr:nth-child(even) { background: var(--surface); }
+.fixed-table.striped > tbody > tr:nth-child(odd)  { background: var(--surface-alt); }
+/* Materialize's .striped applies its odd-row tint to the scrolling table too;
+ * override to our theme's alt surface so both halves stay in sync. */
+.compact-table.striped > tbody > tr:nth-child(odd)  { background: var(--surface-alt); }
+.compact-table.striped > tbody > tr:nth-child(even) { background: var(--surface); }
 .scroll-table-wrap { flex: 0 0 auto; min-width: 0; }
 .scroll-table-wrap > table { width: auto; }
-.compact-table { margin: 0; font-size: 13px; }
+.compact-table { margin: 0; font-size: 13px; color: var(--text); }
 .compact-table th, .compact-table td { padding: 6px 10px; white-space: nowrap; }
-.compact-table thead th { position: sticky; top: 0; background: #eceff1; z-index: 1; }
+.compact-table thead th { position: sticky; top: 0; background: var(--surface-header); z-index: 1; color: var(--text); }
 .compact-table .mono { font-family: 'Roboto Mono', ui-monospace, Menlo, monospace; }
-.compact-table td a { color: #00695c; }
+.compact-table td a { color: var(--link); }
 table.compact-table > tbody > tr.row-hover { background-color: rgba(0, 137, 123, 0.22); }
-.null { color: #b0bec5; }
-.derived-mark { color: #90a4ae; font-size: 10px; padding-left: 1px; cursor: help; font-weight: bold; }
+.null { color: var(--text-faint); }
+.derived-mark { color: var(--text-faint); font-size: 10px; padding-left: 1px; cursor: help; font-weight: bold; }
 
 /* Reorderable column headers — grab cursor + hover highlights signal the
  * drag affordance; drop-indicator inset shadow shows the insertion side
@@ -99,7 +179,7 @@ table.compact-table > tbody > tr.row-hover { background-color: rgba(0, 137, 123,
   transition: background-color .12s, border-color .12s;
 }
 .compact-table th.reorderable:hover {
-  background: #dde3e6;
+  background: var(--surface-hover);
   border-left-color: #90a4ae;
   border-right-color: #90a4ae;
 }
@@ -114,32 +194,33 @@ table.compact-table > tbody > tr.row-hover { background-color: rgba(0, 137, 123,
 
 /* Columns picker */
 .picker { position: relative; }
-.picker-btn { padding: 0 10px; height: 32px; line-height: 32px; }
+.picker-btn { padding: 0 10px; height: 32px; line-height: 32px; color: var(--text); }
 .picker-btn i.material-icons.left { margin-right: 6px; line-height: 32px; height: 32px; }
-.picker-btn[disabled] { color: #b0bec5; cursor: not-allowed; }
+.picker-btn[disabled] { color: var(--text-faint); cursor: not-allowed; }
 .units-toggle { min-width: 120px; text-align: left; }
 /* Materialize btn-flat:focus paints a grey background that sticks after click.
    On picker buttons it doubles as "menu is open" feedback so we leave it; on
    the units toggle it's just visual noise. */
 .units-toggle:focus { background-color: transparent; }
+html[data-theme="dark"] .btn-flat:focus:not(.units-toggle) { background-color: rgba(255,255,255,.08); }
 .picker-popover {
   position: absolute; left: 0; top: calc(100% + 4px);
   z-index: 20;
   min-width: 280px; max-height: 60vh; overflow-y: auto;
   white-space: nowrap;
-  background: #fff; border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  background: var(--surface); border-radius: 4px;
+  box-shadow: 0 2px 8px var(--shadow-popover);
   padding: 8px 0;
 }
-.picker-hint { font-size: 11px; padding: 0 14px 6px; }
+.picker-hint { font-size: 11px; padding: 0 14px 6px; color: var(--text-muted); }
 .picker-popover ul { list-style: none; margin: 0; padding: 0; }
 .picker-popover li { padding: 2px 14px; }
-.picker-popover label { display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #263238; min-height: 24px; }
+.picker-popover label { display: flex; align-items: center; cursor: pointer; font-size: 13px; color: var(--text); min-height: 24px; }
 .picker-popover label span { padding-left: 28px; }
-.picker-item { display: block; padding: 4px 0; font-size: 13px; color: #263238; }
-.picker-item:hover { color: #00695c; }
-.picker-item-active { color: #00695c; font-weight: 500; }
-.col-picker-reset { display: block; padding: 8px 14px 2px; font-size: 12px; color: #00695c; }
+.picker-item { display: block; padding: 4px 0; font-size: 13px; color: var(--text); }
+.picker-item:hover { color: var(--link); }
+.picker-item-active { color: var(--link); font-weight: 500; }
+.col-picker-reset { display: block; padding: 8px 14px 2px; font-size: 12px; color: var(--link); }
 
 .table-footer {
   padding: 8px 4px;
@@ -148,8 +229,12 @@ table.compact-table > tbody > tr.row-hover { background-color: rgba(0, 137, 123,
   gap: 8px;
   text-align: left;
 }
-.table-footer .sep { color: #b0bec5; }
+.table-footer .sep { color: var(--text-faint); }
 .padded { padding: 32px 16px; }
+
+/* Materialize's .grey-text is a hardcoded #9e9e9e that reads as low-contrast
+ * mud on dark surfaces. Bump it to our muted token in dark mode. */
+html[data-theme="dark"] .grey-text { color: var(--text-muted) !important; }
 
 @media (max-width: 992px) {
   .sidebar { position: static; max-height: none; }

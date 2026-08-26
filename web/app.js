@@ -98,6 +98,7 @@ const DEFAULT_SORTS = [
 
 const COLUMN_COOKIE = "db_cols";
 const UNITS_COOKIE = "db_units";
+const THEME_COOKIE = "db_theme";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 const MM_PER_INCH = 25.4;
@@ -243,6 +244,10 @@ function writeUnitsCookie(units) {
   document.cookie = `${UNITS_COOKIE}=${units}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
 }
 
+function writeThemeCookie(theme) {
+  document.cookie = `${THEME_COOKIE}=${theme}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+}
+
 function defaultColumns() {
   const inDefault = new Set(DEFAULT_COLUMN_ORDER);
   const rest = Object.keys(COLUMN_META).filter((k) => !inDefault.has(k));
@@ -287,6 +292,9 @@ function app() {
     sortableFields: SORTABLE_FIELDS,
     columns: [],           // ordered { key, visible } — includes fixed keys at [0..1]
     units: "metric",       // "metric" | "imperial" — affects Size, Weight, Vas display + labels
+    theme: "light",        // "light" | "dark" — pre-hydration script in index.html sets the
+                           // actual data-theme attribute before styles load; init() reads it
+                           // back so Alpine's toggle icon starts in sync.
     pickerOpen: false,
     sortPickerOpen: false,
     scrolled: false,       // right table has scrollLeft > 0 — drives shadow on fixed table
@@ -306,6 +314,7 @@ function app() {
       this.sorts = state.sorts.length ? state.sorts : DEFAULT_SORTS.map((s) => ({ ...s }));
       this.columns = reconcileColumns(readColumnsCookie());
       this.units = readUnitsCookie() || "metric";
+      this.theme = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
 
       try {
         const resp = await fetch("drivers.json", { cache: "no-store" });
@@ -463,6 +472,12 @@ function app() {
       if (u !== "metric" && u !== "imperial") return;
       this.units = u;
       writeUnitsCookie(u);
+    },
+
+    toggleTheme() {
+      this.theme = this.theme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", this.theme);
+      writeThemeCookie(this.theme);
     },
 
     toggleSortDir(i) {

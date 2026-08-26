@@ -8,6 +8,16 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script>
+    // Applied before styles.css takes effect to avoid a light-mode flash on
+    // dark-mode loads. Reads the same db_theme cookie app.js writes; falls
+    // back to prefers-color-scheme when the user hasn't chosen yet.
+    (function () {
+      var m = document.cookie.match(/(?:^|; )db_theme=(dark|light)/);
+      var t = m ? m[1] : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body x-data="app()" x-init="init()" x-cloak>
 
@@ -24,6 +34,12 @@
         </svg>
         driver-base
       </a>
+      <button type="button" class="theme-toggle"
+              @click="(el => { toggleTheme(); setTimeout(() => el.blur(), 200) })($event.currentTarget)"
+              :title="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+              :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
+        <i class="material-icons" x-text="theme === 'dark' ? 'light_mode' : 'dark_mode'"></i>
+      </button>
     </div>
   </nav>
 
