@@ -161,6 +161,11 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     "depth":                       ("depth_mm",               parse_length_mm),
     "net weight":                  ("net_weight_kg",          _weight_kg),
     "magnet":                      ("magnet_type",            lambda s: normalize_magnet_type(s)),
+    # Compression-driver fields (HF pages have no Nominal Diameter; the throat
+    # is used to derive `nominal_size_mm` in a post-parse step below).
+    "throat diameter":             ("throat_diameter_mm",     parse_length_mm),
+    "diaphragm material":          ("diaphragm_material",     lambda s: s or None),
+    "diaphragm shape":             ("diaphragm_shape",        lambda s: s or None),
     # Coax pages use abbreviated forms of the same labels — keep original entries
     # above (for LF/HF pages) and add abbreviated aliases here.
     "nom. diameter":               ("nominal_size_mm",        parse_length_mm),
@@ -184,6 +189,11 @@ _LABEL_MAP_COAX_HF: dict[str, tuple[Optional[str], Optional[Callable[[Optional[s
     "sensitivity (1w/1m)":         ("coax_hf_sensitivity_db_1w_1m",  parse_float),
     "frequency range":             ("__coax_hf_freq_range__",        parse_range),
     "voice coil diameter":         ("coax_hf_voice_coil_diameter_mm", parse_length_mm),
+    # Diaphragm fields — on coax, LF cell is `-` and HF has the real value; the
+    # HF value routes into the GENERIC field (the HF section IS the compression
+    # driver, and there's no LF competitor for the diaphragm slot).
+    "diaphragm material":          ("diaphragm_material",     lambda s: s or None),
+    "diaphragm shape":             ("diaphragm_shape",        lambda s: s or None),
 }
 
 
@@ -376,5 +386,15 @@ class FaitalScraper(Scraper):
                 continue
             setattr(frag, field_name, parsed)
             frag.spec_source[field_name] = SpecSource.HTML_TABLE
+
+        # HF compression drivers have no "Nominal Diameter" label — the throat
+        # is what the product is sized by ("2\" driver", "1.4\" driver"). Use
+        # it as `nominal_size_mm` when nothing else set the field; tagged
+        # DERIVED so the UI can indicate the transform. A few older-style HF
+        # drivers (e.g. FD371/FD375) report `Throat Diameter: N/A` — those
+        # legitimately have no throat and stay size-less.
+        if frag.throat_diameter_mm is not None and frag.nominal_size_mm is None:
+            frag.nominal_size_mm = frag.throat_diameter_mm
+            frag.spec_source["nominal_size_mm"] = SpecSource.DERIVED
 
         return ParseResult(fragments=[frag])

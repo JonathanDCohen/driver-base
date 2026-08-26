@@ -144,6 +144,12 @@ class DriverFragment:
     # Nominal size
     nominal_size_mm: Optional[float] = None
 
+    # Compression-driver-specific (also populated on coax HF section for the
+    # diaphragm fields, since the coax HF section IS a compression driver).
+    throat_diameter_mm: Optional[float] = None
+    diaphragm_material: Optional[str] = None    # e.g. "Titanium", "Ketone Polymer"
+    diaphragm_shape: Optional[str] = None       # e.g. "Dome", "Annular"
+
     # Coax HF-section fields — populated only for `driver_kind = COAX`. The
     # generic fields above hold the coax LF-section values (that's the primary
     # usable range); these carry the HF section's rating. Same pattern will be
@@ -237,6 +243,10 @@ class Driver:
     msrp_amount: Optional[float] = None
 
     nominal_size_mm: Optional[float] = None
+
+    throat_diameter_mm: Optional[float] = None
+    diaphragm_material: Optional[str] = None
+    diaphragm_shape: Optional[str] = None
 
     # Coax HF section — see DriverFragment for docstring.
     coax_hf_impedance_nominal_ohm: Optional[float] = None

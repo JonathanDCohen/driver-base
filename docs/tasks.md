@@ -60,8 +60,6 @@ and might be worth capturing:
 - `Flux Density` (e.g. `1.2 T`) — motor magnetic flux
 - `Cone Surround` — surround material (Faital hides value in footnote text)
 - `Mmd` — moving mass without air load (Mms minus air load)
-- `Diaphragm Shape` (e.g. `Dome`, `Annular`, `Double Edge Cone`) — HF driver diaphragm profile
-- `Diaphragm Material` (e.g. `Titanium`, `Ketone Polymer`, `Paper`, `Carbon Fiber`) — HF driver diaphragm material
 - `AES/Max power at aggressive crossover` — HF drivers publish a second AES rating at a lower crossover (e.g. `AES above 0.65 kHz` alongside `AES above 0.9 kHz`); currently we drop the lower-crossover rating on the floor. Could live in a new `power_aes_aggressive_watts` field alongside a `power_aes_crossover_hz` for the crossover it's rated at.
 
 Also present but probably not worth adding: `Bolt Circle Diameter`,

@@ -30,6 +30,10 @@ const COLUMN_META = {
   freq_low_hz:               { label: "Freq low",           numeric: true,  sortable: true  },
   freq_high_hz:              { label: "Freq high",          numeric: true,  sortable: true  },
   net_weight_kg:             { label: "Weight (kg)",        numeric: true,  sortable: true  },
+  // Compression-driver fields (also populate for coax records).
+  throat_diameter_mm:        { label: "Throat ⌀",           numeric: true,  sortable: true  },
+  diaphragm_material:        { label: "Diaphragm material", numeric: false, sortable: true  },
+  diaphragm_shape:           { label: "Diaphragm shape",    numeric: false, sortable: true  },
   // Coax HF-section fields — populated only for coaxial drivers. The generic
   // fields above hold the coax LF-section values; these carry the HF section.
   // Hidden by default (relevant to a small subset of records).

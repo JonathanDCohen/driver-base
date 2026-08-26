@@ -304,6 +304,8 @@ Detail pages themselves are static HTML.
 - Frequency range separator is `÷` (division sign), not `-`: `45÷5000 Hz`. `parse_range` handles.
 - `NET Air Volume filled by Loudspeaker` for LF → `air_volume_l` (custom field, low priority); HF uses `NET Air Volume filled by HF Driver` — normalize.
 - `Push Terminals - 8 Ohm Version` (impedance in label) → part number sidecar, not a Driver field.
+- `Throat Diameter` → `throat_diameter_mm` (HF compression drivers). HF pages have no `Nominal Diameter` label, so the throat is also copied into `nominal_size_mm` (tagged `DERIVED`) so the Size column populates for HF records. Older-style HF drivers (FD371/FD375) report `Throat Diameter: N/A` and legitimately have no throat — `nominal_size_mm` stays null for those.
+- `Diaphragm Material` / `Diaphragm Shape` → `diaphragm_material` / `diaphragm_shape` (HF drivers and coax records). On coax 3-column rows the LF cell is `-` and the HF cell holds the real value; the parser routes the HF value into the generic (non-`coax_hf_*`) field because the HF section IS the compression driver and there's no LF competitor for the diaphragm slot.
 
 **Coax pages (Coaxial_Loudspeakers)** have a distinct layout:
 - The "Technical Parameters" block is a 3-column table — `label | LF value | HF value` — for impedance, power, sensitivity, frequency range, VC diameter, magnet, winding/former material, flux density, min. crossover freq, dispersion angle, diaphragm material/shape. This block lives only in `<table class="tbl_datasheet">`, not in the mini `tbl_data` tables that most other labels appear in. The parser must select both classes and use `find_all(recursive=False)` on cells to avoid picking up nested-table content.
