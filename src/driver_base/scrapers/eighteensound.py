@@ -114,6 +114,28 @@ def _parse_magnet(s: Optional[str]):  # noqa: ANN202 - Optional[MagnetType]
 _FREQ_RANGE_MARKER = "__freq_range__"
 
 # Label (post normalize_label) → (Driver field | marker, parser)
+# Coax pages label the LF-side of the coaxial's shared specs with `LF ` and the
+# HF-side with `HF ` (e.g. `LF Sensitivity` / `HF Sensitivity`). Also, minimum
+# impedance for the woofer is labelled `Minimum Impedance LF`. Strip / rewrite
+# these when parsing a coax page so the LF values feed the generic fields and
+# the HF values feed the coax_hf_* fields.
+_COAX_LF_LABEL_REWRITES: dict[str, str] = {
+    "lf sensitivity":              "sensitivity",
+    "lf nominal power handling":   "nominal power handling",
+    "lf continuous power handling":"continuous power handling",
+    "lf voice coil diameter":      "voice coil diameter",
+    "lf winding material":         "__drop__",
+    "minimum impedance lf":        "minimum impedance",
+}
+# HF-side labels on a coax page → coax_hf_* fields.
+_COAX_HF_LABEL_MAP: dict[str, tuple[str, Callable[[Optional[str]], object]]] = {
+    "hf sensitivity":              ("coax_hf_sensitivity_db_1w_1m",  lambda s: parse_float(s)),
+    "hf nominal power handling":   ("coax_hf_power_aes_watts",       lambda s: parse_power(s)),
+    "hf continuous power handling":("coax_hf_power_long_term_watts", lambda s: parse_power(s)),
+    "hf voice coil diameter":      ("coax_hf_voice_coil_diameter_mm",lambda s: parse_length_mm(s)),
+}
+
+
 _LABEL_MAP: dict[str, tuple[str, Callable[[Optional[str]], object]]] = {
     "resonance frequency": ("fs_hz", parse_frequency),
     "re": ("re_ohm", parse_impedance),
@@ -141,6 +163,7 @@ _LABEL_MAP: dict[str, tuple[str, Callable[[Optional[str]], object]]] = {
     "depth": ("depth_mm", parse_length_mm),
     "net weight": ("net_weight_kg", _parse_kg),
     "magnet material": ("magnet_type", _parse_magnet),
+    "diaphragm material": ("diaphragm_material", lambda s: (s or "").strip() or None),
 }
 
 
@@ -207,7 +230,9 @@ class EighteenSoundScraper(Scraper):
         model = (h1_match.group(1).strip() if h1_match else "") or model_from_url
 
         soup = BeautifulSoup(raw.body, "lxml")
+        is_coax = category_from_url == "coaxial"
         specs: dict[str, str] = {}
+        specs_coax_hf: dict[str, str] = {}
         for li in soup.select("li.float30"):
             label_el = li.select_one("span")
             val_el = li.select_one("b")
@@ -218,6 +243,19 @@ class EighteenSoundScraper(Scraper):
             if not label or not val:
                 continue
             normalized = normalize_label(label)
+            if is_coax:
+                # HF-side labels on a coax page get their own bucket so they
+                # route to coax_hf_* fields; LF-side labels are rewritten to
+                # the generic form so they feed the primary fields.
+                if normalized in _COAX_HF_LABEL_MAP:
+                    if normalized not in specs_coax_hf:
+                        specs_coax_hf[normalized] = val
+                    continue
+                rewritten = _COAX_LF_LABEL_REWRITES.get(normalized)
+                if rewritten == "__drop__":
+                    continue
+                if rewritten is not None:
+                    normalized = rewritten
             # First-wins if a label repeats across the 4 spec sections.
             if normalized not in specs:
                 specs[normalized] = val
@@ -248,6 +286,18 @@ class EighteenSoundScraper(Scraper):
                 frag.freq_high_hz = high
                 frag.spec_source["freq_low_hz"] = SpecSource.HTML_PROSE
                 frag.spec_source["freq_high_hz"] = SpecSource.HTML_PROSE
+                continue
+            setattr(frag, field_name, parsed)
+            frag.spec_source[field_name] = SpecSource.HTML_PROSE
+
+        # Coax HF-section fields (only labels observed on coax pages route here).
+        for label, raw_val in specs_coax_hf.items():
+            mapping = _COAX_HF_LABEL_MAP.get(label)
+            if mapping is None:
+                continue
+            field_name, parser = mapping
+            parsed = parser(raw_val)
+            if parsed is None:
                 continue
             setattr(frag, field_name, parsed)
             frag.spec_source[field_name] = SpecSource.HTML_PROSE

@@ -39,8 +39,9 @@ const COLUMN_META = {
   // Hidden by default (relevant to a small subset of records).
   coax_hf_impedance_nominal_ohm: { label: "(Coax) HF Impedance", numeric: true,  sortable: true  },
   coax_hf_impedance_min_ohm:     { label: "(Coax) HF Imp min",   numeric: true,  sortable: true  },
-  coax_hf_power_aes_watts:       { label: "(Coax) HF AES (W)",   numeric: true,  sortable: true  },
-  coax_hf_power_peak_watts:      { label: "(Coax) HF Peak (W)",  numeric: true,  sortable: true  },
+  coax_hf_power_aes_watts:       { label: "(Coax) HF AES (W)",        numeric: true,  sortable: true  },
+  coax_hf_power_long_term_watts: { label: "(Coax) HF Continuous (W)", numeric: true,  sortable: true  },
+  coax_hf_power_peak_watts:      { label: "(Coax) HF Peak (W)",       numeric: true,  sortable: true  },
   coax_hf_sensitivity_db_1w_1m:  { label: "(Coax) HF SPL 1W/1m", numeric: true,  sortable: true  },
   coax_hf_freq_low_hz:           { label: "(Coax) HF Freq low",  numeric: true,  sortable: true  },
   coax_hf_freq_high_hz:          { label: "(Coax) HF Freq high", numeric: true,  sortable: true  },

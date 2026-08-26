@@ -157,6 +157,7 @@ class DriverFragment:
     coax_hf_impedance_nominal_ohm: Optional[float] = None
     coax_hf_impedance_min_ohm: Optional[float] = None
     coax_hf_power_aes_watts: Optional[float] = None
+    coax_hf_power_long_term_watts: Optional[float] = None
     coax_hf_power_peak_watts: Optional[float] = None
     coax_hf_sensitivity_db_1w_1m: Optional[float] = None
     coax_hf_freq_low_hz: Optional[float] = None
@@ -252,6 +253,7 @@ class Driver:
     coax_hf_impedance_nominal_ohm: Optional[float] = None
     coax_hf_impedance_min_ohm: Optional[float] = None
     coax_hf_power_aes_watts: Optional[float] = None
+    coax_hf_power_long_term_watts: Optional[float] = None
     coax_hf_power_peak_watts: Optional[float] = None
     coax_hf_sensitivity_db_1w_1m: Optional[float] = None
     coax_hf_freq_low_hz: Optional[float] = None
