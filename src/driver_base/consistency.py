@@ -43,7 +43,6 @@ _MIN_BANDWIDTH_HZ: dict[DriverKind, float] = {
     DriverKind.PASSIVE: 10.0,
     DriverKind.SHAKER: 10.0,
     DriverKind.GUITAR_BASS: 100.0,
-    DriverKind.AMT: 500.0,
 }
 
 

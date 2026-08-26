@@ -236,4 +236,12 @@ class DaytonScraper(Scraper):
             setattr(frag, field_name, parsed)
             frag.spec_source[field_name] = SpecSource.HTML_TABLE
 
+        # Dayton's AMT tweeters are shelved under `tweeter` category with an
+        # `AMT…` model prefix (AMT3-4, AMTPRO-4, AMT Mini-8, etc.). Capture the
+        # AMT topology as diaphragm_shape so users can find them without a
+        # separate driver_kind.
+        if frag.model and frag.model.upper().startswith("AMT"):
+            frag.diaphragm_shape = "AMT"
+            frag.spec_source["diaphragm_shape"] = SpecSource.INFERRED
+
         return ParseResult(fragments=[frag])

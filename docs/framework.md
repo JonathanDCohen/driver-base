@@ -117,7 +117,6 @@ class DriverKind(str, Enum):
     SHAKER = "shaker"
     FULLRANGE = "fullrange"
     GUITAR_BASS = "guitar_bass"    # Celestion; exempt from T/S REJECT (WARN only)
-    AMT = "amt"                    # Beyma amt-driver
 
 class FetcherKind(str, Enum):
     HTTPX = "httpx"

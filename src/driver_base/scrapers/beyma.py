@@ -59,7 +59,9 @@ _CATEGORIES: list[tuple[str, DriverKind]] = [
     ("coaxial",                        DriverKind.COAX),
     ("compression-driver",             DriverKind.HF_COMPRESSION),
     ("compression-driver-wave-guide",  DriverKind.HF_COMPRESSION),
-    ("amt-driver",                     DriverKind.AMT),
+    # AMT drivers classified as tweeters — the "AMT-ness" is captured in
+    # `diaphragm_shape` at parse time so users can filter/search for them.
+    ("amt-driver",                     DriverKind.TWEETER),
     ("compression-tweeter",            DriverKind.TWEETER),
     ("dome-tweeter",                   DriverKind.TWEETER),
     ("full-range",                     DriverKind.FULLRANGE),
@@ -203,6 +205,9 @@ class BeymaScraper(Scraper):
             driver_kind=seed_context.driver_kind_hint,
             model=model,
         )
+        if seed_context.category_id == "amt-driver":
+            frag.diaphragm_shape = "AMT"
+            frag.spec_source["diaphragm_shape"] = SpecSource.INFERRED
 
         for norm_label, raw_val in specs.items():
             mapping = _LABEL_MAP.get(norm_label)

@@ -33,7 +33,6 @@ class DriverKind(str, Enum):
     SHAKER = "shaker"
     FULLRANGE = "fullrange"
     GUITAR_BASS = "guitar_bass"
-    AMT = "amt"
 
 
 class FetcherKind(str, Enum):

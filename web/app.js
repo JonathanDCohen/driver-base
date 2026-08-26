@@ -97,7 +97,6 @@ const DRIVER_KIND_LABEL = {
   shaker: "Shaker",
   fullrange: "Fullrange",
   guitar_bass: "Guitar/bass",
-  amt: "AMT",
 };
 
 const SIZE_BUCKETS_MM = [

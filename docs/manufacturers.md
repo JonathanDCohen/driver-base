@@ -472,7 +472,7 @@ Six labelled sections: `General specifications`, `Thiele - small parameters`, `M
 /en/products/c/coaxial/
 /en/products/c/compression-driver/
 /en/products/c/compression-driver-wave-guide/
-/en/products/c/amt-driver/           ← use DriverKind.AMT
+/en/products/c/amt-driver/           ← use DriverKind.TWEETER + diaphragm_shape="AMT"
 /en/products/c/compression-tweeter/
 /en/products/c/dome-tweeter/
 /en/products/c/full-range/
@@ -523,7 +523,7 @@ low-mid-frequency         → LF_WOOFER
 coaxial                   → COAX
 compression-driver        → HF_COMPRESSION
 compression-driver-wave-guide → HF_COMPRESSION
-amt-driver                → AMT
+amt-driver                → TWEETER (with diaphragm_shape="AMT")
 compression-tweeter       → TWEETER
 dome-tweeter              → TWEETER
 full-range                → FULLRANGE
