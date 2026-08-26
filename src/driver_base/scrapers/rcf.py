@@ -74,7 +74,12 @@ def _weight_kg(s: Optional[str]) -> Optional[float]:
 _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]] = {
     # electrical / commercial
     "rated impedance":                       ("impedance_nominal_ohm",  parse_impedance),
+    # HF drivers + coax pages use "Related Impedance" (RCF phrasing) instead of
+    # "Rated Impedance". On coax the LF section is listed first, so first-wins
+    # keeps the LF value for the generic field.
+    "related impedance":                     ("impedance_nominal_ohm",  parse_impedance),
     "minimum impedance":                     ("impedance_min_ohm",      parse_impedance),
+    "cut-off frequency":                     ("recommended_crossover_hz", parse_frequency),
     "program power":                         ("power_program_watts",    parse_power),
     "power handling capacity":               ("power_aes_watts",        parse_power),
     "sensitivity":                           ("sensitivity_db_1w_1m",   parse_float),
@@ -99,8 +104,13 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     "voice coil diameter":                   ("voice_coil_diameter_mm", parse_length_mm),
     "overall diameter":                      ("overall_diameter_mm",    parse_length_mm),
     "front mount baffle cut-out":            ("mounting_diameter_mm",   parse_length_mm),
+    # HF driver pages publish `Exit Throat Diameter`; used as size fallback below.
+    "exit throat diameter":                  ("throat_diameter_mm",     parse_length_mm),
     "weight":                                ("net_weight_kg",          _weight_kg),
     "magnets":                               ("magnet_type",            lambda s: normalize_magnet_type(s)),
+    # HF/coax pages label the magnet field "Magnetics" (plural, without 's').
+    "magnetics":                             ("magnet_type",            lambda s: normalize_magnet_type(s)),
+    "diaphragm material":                    ("diaphragm_material",     lambda s: (s or "").strip() or None),
 }
 
 
@@ -199,6 +209,15 @@ class RcfScraper(Scraper):
                 continue
             setattr(frag, field_name, parsed)
             frag.spec_source[field_name] = SpecSource.HTML_DIV_PAIRS
+
+        # HF driver pages publish `Exit Throat Diameter` but no `Nominal
+        # Diameter`. Use throat → size (Faital/18Sound/Beyma/B&C/Celestion
+        # pattern). Only HF drivers publish "Exit Throat Diameter"; on coax
+        # pages the LF section already sets nominal_size_mm, so this fallback
+        # doesn't fire.
+        if frag.throat_diameter_mm is not None and frag.nominal_size_mm is None:
+            frag.nominal_size_mm = frag.throat_diameter_mm
+            frag.spec_source["nominal_size_mm"] = SpecSource.DERIVED
 
         return ParseResult(fragments=[frag])
 
