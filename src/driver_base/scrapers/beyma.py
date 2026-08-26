@@ -74,9 +74,12 @@ _PRODUCT_URL_RE = re.compile(
     re.IGNORECASE,
 )
 
-# Title pattern: '{TYPE} {MODEL} {N} Ohm' — extract MODEL.
+# Title pattern: '{TYPE} {MODEL} {impedance}[ Oh[m]]' — extract MODEL. Beyma
+# truncates titles inconsistently: seen `... 8 Ohm`, `... 8 Oh`, `... 8`, and
+# `... 8/16 ohm` (multi-impedance). The trailing "Oh"/"Ohm" is optional and the
+# impedance may include `/` and `.`.
 _TITLE_MODEL_WITH_OHM_RE = re.compile(
-    r"\s(\S+)\s+\d+(?:\.\d+)?\s*Ohm\s*$", re.IGNORECASE
+    r"\s(\S+)\s+[\d/.]+\s*(?:Oh|Ohm)?\s*$", re.IGNORECASE
 )
 
 
