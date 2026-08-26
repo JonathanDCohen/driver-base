@@ -83,6 +83,13 @@ _PRODUCT_URL_RE = re.compile(
 _URL_PATH_RE = re.compile(
     r'^/en/products/(?P<category>[^/]+)/[0-9]+-[0-9]+/(?P<impedance>[0-9]+)/(?P<model>[^/?#]+)/?$'
 )
+# Product pages display the model as the first `<h1 class="darkGrey">…</h1>`.
+# URL slugs are inconsistently cased (some lowercase, some canonical) — prefer
+# the h1 as the authoritative model name; slug is only a fallback.
+_H1_MODEL_RE = re.compile(
+    r'<h1\b[^>]*\bclass="[^"]*\bdarkGrey\b[^"]*"[^>]*>\s*([^<]+?)\s*</h1>',
+    re.IGNORECASE,
+)
 
 
 def _parse_kg(s: Optional[str]) -> Optional[float]:
@@ -182,9 +189,15 @@ class EighteenSoundScraper(Scraper):
         model_and_impedance = _extract_model_and_impedance_from_url(raw.url)
         if model_and_impedance is None:
             return ParseResult(fragments=[])
-        model, impedance_from_url, category_from_url = model_and_impedance
+        model_from_url, impedance_from_url, category_from_url = model_and_impedance
 
         kind = seed_context.driver_kind_hint or _CAT_TO_KIND.get(category_from_url or "")
+
+        # Prefer the page's own display heading — URL slugs are inconsistently
+        # cased across 18Sound's catalog (some `15NTLW3500`, some `15ntlw2500`).
+        text = raw.body.decode("utf-8", errors="ignore")
+        h1_match = _H1_MODEL_RE.search(text)
+        model = (h1_match.group(1).strip() if h1_match else "") or model_from_url
 
         soup = BeautifulSoup(raw.body, "lxml")
         specs: dict[str, str] = {}
