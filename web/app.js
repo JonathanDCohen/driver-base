@@ -30,6 +30,18 @@ const COLUMN_META = {
   freq_low_hz:               { label: "Freq low",           numeric: true,  sortable: true  },
   freq_high_hz:              { label: "Freq high",          numeric: true,  sortable: true  },
   net_weight_kg:             { label: "Weight (kg)",        numeric: true,  sortable: true  },
+  // Coax HF-section fields — populated only for coaxial drivers. The generic
+  // fields above hold the coax LF-section values; these carry the HF section.
+  // Hidden by default (relevant to a small subset of records).
+  coax_hf_impedance_nominal_ohm: { label: "HF Impedance",    numeric: true,  sortable: true  },
+  coax_hf_impedance_min_ohm:     { label: "HF Imp min",      numeric: true,  sortable: true  },
+  coax_hf_power_aes_watts:       { label: "HF AES (W)",      numeric: true,  sortable: true  },
+  coax_hf_power_peak_watts:      { label: "HF Peak (W)",     numeric: true,  sortable: true  },
+  coax_hf_sensitivity_db_1w_1m:  { label: "HF SPL 1W/1m",    numeric: true,  sortable: true  },
+  coax_hf_freq_low_hz:           { label: "HF Freq low",     numeric: true,  sortable: true  },
+  coax_hf_freq_high_hz:          { label: "HF Freq high",    numeric: true,  sortable: true  },
+  coax_hf_voice_coil_diameter_mm:{ label: "HF VC ⌀",         numeric: true,  sortable: true  },
+  coax_hf_re_ohm:                { label: "HF Re",           numeric: true,  sortable: true  },
 };
 
 const SORTABLE_FIELDS = Object.entries(COLUMN_META)
@@ -553,7 +565,7 @@ function app() {
       if (col.key === "vas_liters") {
         return this.units === "imperial" ? fmtNumber(v * CUFT_PER_LITER) : fmtNumber(v);
       }
-      if (col.key === "impedance_nominal_ohm") return `${v}&nbsp;Ω`;
+      if (col.key.endsWith("_ohm")) return `${v}&nbsp;Ω`;
       let base = typeof v === "number" ? fmtNumber(v) : String(v);
       // A derived spec (sensitivity or power computed from another slot + Z or
       // 2x-AES) is marked in spec_source; append a subtle dagger + tooltip.
