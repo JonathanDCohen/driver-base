@@ -46,22 +46,45 @@ body { background: var(--bg); color: var(--text); }
  * the variable so dark mode can dim it without editing the markup. Same for
  * the foreground: light mode keeps the usual white; dark mode paints the
  * brand text/logo/toggle in the accent teal. */
-nav.teal.darken-2 { background-color: var(--nav-bg) !important; color: var(--nav-fg); }
+nav.teal.darken-2 { background-color: var(--nav-bg) !important; color: var(--nav-fg); position: relative; }
 nav.teal.darken-2 a.brand-logo { color: var(--nav-fg); }
-nav .nav-wrapper { text-align: center; position: relative; }
+nav .nav-wrapper { text-align: center; }
 nav .brand-logo { position: static; font-family: 'Roboto Mono', monospace; font-weight: 500; display: inline-flex; align-items: center; gap: 10px; transform: none; }
 nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; color: var(--nav-fg); }
-.theme-toggle {
-  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+
+/* Nav actions sit against the nav bar's actual edges (not the centered
+ * container's edges), so they follow the viewport padding rather than the
+ * container's max-width. Default anchors right; .nav-actions-left flips. */
+.nav-actions {
+  position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.nav-actions-left { right: auto; left: 16px; }
+.nav-icon-btn {
   background: transparent; border: none; color: var(--nav-fg); cursor: pointer;
-  width: 40px; height: 40px; border-radius: 50%;
+  width: 40px; height: 40px; border-radius: 50%; padding: 0;
   display: inline-flex; align-items: center; justify-content: center;
   transition: background-color .15s;
+  text-decoration: none;
 }
-.theme-toggle:hover, .theme-toggle:focus { background: rgba(255,255,255,.12); outline: none; }
-.theme-toggle .material-icons { font-size: 22px; }
-html[data-theme="dark"] .theme-toggle:hover,
-html[data-theme="dark"] .theme-toggle:focus { background: rgba(77,182,172,.14); }
+.nav-icon-btn:hover, .nav-icon-btn:focus { background: rgba(255,255,255,.12); outline: none; color: var(--nav-fg); }
+.nav-icon-btn .material-icons { font-size: 22px; }
+.nav-icon-btn svg { display: block; }
+html[data-theme="dark"] .nav-icon-btn:hover,
+html[data-theme="dark"] .nav-icon-btn:focus { background: rgba(77,182,172,.14); }
+
+/* Theme switch — visually distinct from the GitHub link so it reads as a
+ * stateful toggle rather than another nav action. Uses Materialize's .switch
+ * scaffold; overrides colors so it sits legibly on the nav paint. */
+.theme-switch { display: inline-flex; align-items: center; margin: 0; }
+.theme-switch label { display: inline-flex; align-items: center; gap: 4px; color: var(--nav-fg); }
+.theme-switch label .material-icons { font-size: 18px; color: var(--nav-fg); opacity: .75; }
+.theme-switch label .lever { margin: 0 6px; background-color: rgba(255,255,255,.35); }
+.theme-switch label .lever:after { background-color: #fafafa; }
+.theme-switch label input[type=checkbox]:checked + .lever { background-color: rgba(77,182,172,.55); }
+.theme-switch label input[type=checkbox]:checked + .lever:after { background-color: var(--nav-fg); }
+html[data-theme="dark"] .theme-switch label .lever { background-color: rgba(77,182,172,.35); }
+html[data-theme="dark"] .theme-switch label .lever:after { background-color: var(--nav-fg); }
 
 .app-body { padding: 12px 24px 48px; }
 .no-margin { margin: 0; }
