@@ -1,6 +1,9 @@
 [x-cloak] { display: none !important; }
 
 :root {
+  --app-max-width: 2000px;
+  --app-pad-x: 32px;
+
   --bg: #fafafa;
   --surface: #fff;
   --surface-alt: #f2f2f2;
@@ -52,14 +55,21 @@ nav .nav-wrapper { text-align: center; }
 nav .brand-logo { position: static; font-family: 'Roboto Mono', monospace; font-weight: 500; display: inline-flex; align-items: center; gap: 10px; transform: none; }
 nav .brand-logo .brand-mark { height: 40px; width: 40px; display: block; color: var(--nav-fg); }
 
-/* Nav actions sit against the nav bar's actual edges (not the centered
- * container's edges), so they follow the viewport padding rather than the
- * container's max-width. Default anchors right; .nav-actions-left flips. */
+/* Nav actions align with the app content's left/right edges so the icons
+ * track the same visual bounds as the sidebar/table below. On viewports
+ * narrower than --app-max-width the calc collapses to the app padding
+ * (nav icons at --app-pad-x from each edge); on wider viewports the calc
+ * pushes them inward to match the centered app-body's edges. */
 .nav-actions {
-  position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+  position: absolute;
+  right: max(var(--app-pad-x), calc(50vw - var(--app-max-width) / 2 + var(--app-pad-x)));
+  top: 50%; transform: translateY(-50%);
   display: inline-flex; align-items: center; gap: 8px;
 }
-.nav-actions-left { right: auto; left: 16px; }
+.nav-actions-left {
+  right: auto;
+  left: max(var(--app-pad-x), calc(50vw - var(--app-max-width) / 2 + var(--app-pad-x)));
+}
 .nav-icon-btn {
   background: transparent; border: none; color: var(--nav-fg); cursor: pointer;
   width: 40px; height: 40px; border-radius: 50%; padding: 0;
@@ -86,7 +96,15 @@ html[data-theme="dark"] .nav-icon-btn:focus { background: rgba(77,182,172,.14); 
 html[data-theme="dark"] .theme-switch label .lever { background-color: rgba(77,182,172,.35); }
 html[data-theme="dark"] .theme-switch label .lever:after { background-color: var(--nav-fg); }
 
-.app-body { padding: 12px 24px 48px; }
+/* Cap the app content on ultrawide monitors so the sidebar + table panel
+ * don't stretch to the viewport edges. Below --app-max-width this is a no-op
+ * — the container fills naturally with --app-pad-x lateral padding. Above
+ * it, auto margins keep the app centered with a comfortable gutter. */
+.app-body {
+  padding: 12px var(--app-pad-x) 48px;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+}
 .no-margin { margin: 0; }
 
 /* Sidebar */
@@ -119,6 +137,20 @@ html[data-theme="dark"] .input-field input[type=text]:not(.browser-default) { bo
 
 /* Main */
 .main { padding: 12px 16px; }
+
+/* .table-panel wraps sort-bar + table-split + table-footer so all three share
+ * one width. fit-content makes that width follow the table's natural column
+ * total on wide screens (no empty gutter to the right of the data); the
+ * max-width caps it at .main's width so wider datasets fall back to the
+ * internal horizontal scroll inside .table-split. align-items: stretch is
+ * the flex default — it's what makes the sort bar and footer track the
+ * table's width without an explicit width on each. */
+.table-panel {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  max-width: 100%;
+}
 
 .sort-bar {
   display: flex; flex-wrap: wrap; align-items: center; gap: 12px;

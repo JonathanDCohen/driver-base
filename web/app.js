@@ -73,6 +73,7 @@ const DEFAULT_COLUMN_ORDER = [
   ...FIXED_KEYS,
   "driver_kind",
   "nominal_size_mm",
+  "surround_material",
   "net_weight_kg",
   "impedance_nominal_ohm",
   "fs_hz",
