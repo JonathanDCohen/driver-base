@@ -23,7 +23,7 @@ driver-base/
 │   ├── collision_registry.yaml            # first-seen -v2 suffix persistence (v2)
 │   ├── cache/{scraper}/{sha}.body         # response cache (gitignored)
 │   ├── cache/{scraper}/{sha}.meta.json    # cache sidecar
-│   └── rejections/{scraper}-{run_id}.json # dropped fragments for debugging
+│   └── rejections/{scraper}.json          # dropped fragments — overwritten each run
 ├── src/driver_base/
 │   ├── interface.py                       # Scraper ABC + types
 │   ├── model.py                           # DriverFragment, Driver, SpecSource
@@ -424,7 +424,7 @@ class Driver:
       "records_this_run": null,
       "records_prior_run": 213,
       "reason": "rate_limited_530_persistent",
-      "rejection_sidecar": "data/rejections/celestion-20260822143000.json"
+      "rejection_sidecar": "data/rejections/celestion.json"
     }
   },
 
@@ -554,7 +554,7 @@ async def _run_isolated(scraper: Scraper, prior: dict | None) -> ScraperResult:
         elif n < 0.70 * prior_records:
             raise ScraperLevelFailure(f"records_dropped_more_than_30pct ({n} vs {prior_records})")
 
-        _write_rejection_sidecar(scraper.name, run_id, rejected)
+        _write_rejection_sidecar(scraper.name, rejected)
         return ScraperResult(status="ok", drivers=drivers, ...)
 
     except Exception as e:
@@ -564,7 +564,7 @@ async def _run_isolated(scraper: Scraper, prior: dict | None) -> ScraperResult:
         prev = (prior or {}).get("per_scraper_status", {}).get(scraper.name, {})
         consecutive = prev.get("consecutive_failures", 0) + 1
         status = "blocked" if consecutive >= 3 else "preserved"
-        _write_rejection_sidecar(scraper.name, run_id, [], reason=str(e))
+        _write_rejection_sidecar(scraper.name, [], reason=str(e))
         return ScraperResult(status=status, reason=str(e),
                              consecutive_failures=consecutive,
                              preserved_drivers=prior_belonging)

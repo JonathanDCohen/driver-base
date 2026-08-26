@@ -12,7 +12,6 @@ __pycache__/
 
 # Runtime data
 data/cache/
-data/rejections/
 
 # Editor
 .vscode/

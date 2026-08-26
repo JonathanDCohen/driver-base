@@ -16,7 +16,6 @@ Per-scraper isolation: any exception preserves the prior run's records with
 from __future__ import annotations
 
 import asyncio
-import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -86,7 +85,6 @@ async def run_all(
 ) -> tuple[list[Driver], dict[str, dict[str, Any]]]:
     """Run all scrapers concurrently. Returns (all_drivers, per_scraper_status)."""
     now_iso = now or _iso_now()
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S") + "-" + uuid.uuid4().hex[:6]
     aliases = load_aliases(aliases_path) if aliases_path else Aliases({}, {})
     cache = Cache(cache_root)
     sem = asyncio.Semaphore(MAX_SCRAPER_CONCURRENCY)
@@ -102,7 +100,6 @@ async def run_all(
                 force_refresh=force_refresh,
                 fetcher_factory=fetcher_factory,
                 now_iso=now_iso,
-                run_id=run_id,
             )
 
     results = await asyncio.gather(*[_bounded(s) for s in scrapers])
@@ -197,7 +194,6 @@ async def _run_isolated(
     force_refresh: bool,
     fetcher_factory: Optional[FetcherFactory],
     now_iso: str,
-    run_id: str,
 ) -> ScraperResult:
     prior_status = _prior_status(prior, scraper.name)
     consec_failures_prior = int(prior_status.get("consecutive_failures", 0) or 0)
@@ -247,7 +243,6 @@ async def _run_isolated(
         if decision == "preserve":
             sidecar = write_rejections_sidecar(
                 scraper_name=scraper.name,
-                run_id=run_id,
                 rejected=list(dropped[:20]),
                 reason=gate_reason or "",
                 out_dir=rejections_dir,
@@ -285,7 +280,6 @@ async def _run_isolated(
     except Exception as e:
         sidecar = write_rejections_sidecar(
             scraper_name=scraper.name,
-            run_id=run_id,
             rejected=[],
             reason=f"exception:{type(e).__name__}:{e}",
             out_dir=rejections_dir,
