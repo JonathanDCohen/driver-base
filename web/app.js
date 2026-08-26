@@ -31,7 +31,7 @@ const COLUMN_META = {
   freq_high_hz:              { label: "Freq high",          numeric: true,  sortable: true  },
   net_weight_kg:             { label: "Weight (kg)",        numeric: true,  sortable: true  },
   // Compression-driver fields (also populate for coax records).
-  throat_diameter_mm:        { label: "Throat ⌀",           numeric: true,  sortable: true  },
+  throat_diameter_mm:        { label: "Throat",             numeric: true,  sortable: true  },
   diaphragm_material:        { label: "Diaphragm material", numeric: false, sortable: true  },
   diaphragm_shape:           { label: "Diaphragm shape",    numeric: false, sortable: true  },
   recommended_crossover_hz:  { label: "Rec. crossover",     numeric: true,  sortable: true  },
@@ -46,7 +46,7 @@ const COLUMN_META = {
   coax_hf_sensitivity_db_1w_1m:  { label: "(Coax) HF SPL 1W/1m", numeric: true,  sortable: true  },
   coax_hf_freq_low_hz:           { label: "(Coax) HF Freq low",  numeric: true,  sortable: true  },
   coax_hf_freq_high_hz:          { label: "(Coax) HF Freq high", numeric: true,  sortable: true  },
-  coax_hf_voice_coil_diameter_mm:{ label: "(Coax) HF VC ⌀",      numeric: true,  sortable: true  },
+  coax_hf_voice_coil_diameter_mm:{ label: "(Coax) HF VC",         numeric: true,  sortable: true  },
   coax_hf_re_ohm:                { label: "(Coax) HF Re",        numeric: true,  sortable: true  },
 };
 
@@ -587,6 +587,11 @@ function app() {
       if (col.key === "driver_kind") return d._kind_label || v;
       if (col.key === "nominal_size_mm") {
         return this.units === "imperial" ? `${(v / MM_PER_INCH).toFixed(1)}″` : `${Math.round(v)}`;
+      }
+      // Other diameters — throat, VC (coax HF). Same convention as Size: value
+      // only, unit is implied by the current units toggle (mm metric / ″ imperial).
+      if (col.key.endsWith("_diameter_mm")) {
+        return this.units === "imperial" ? `${(v / MM_PER_INCH).toFixed(2)}″` : `${Math.round(v)}`;
       }
       if (col.key === "net_weight_kg") {
         return this.units === "imperial" ? fmtNumber(v * LB_PER_KG) : fmtNumber(v);
