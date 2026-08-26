@@ -64,6 +64,13 @@ _PRODUCT_URL_RE = re.compile(
     r'/en/products/(?P<category>lf-driver|hf-driver)/[\d.]+/\d+/[A-Za-z0-9._-]+',
     re.IGNORECASE,
 )
+# Parse the `<inches>/<ohms>/<model>` tail — the inches segment is the LF cone
+# diameter for lf-driver URLs, or the HF throat diameter for hf-driver URLs.
+_URL_PATH_RE = re.compile(
+    r'/en/products/(?P<category>lf-driver|hf-driver)/(?P<size>[\d.]+)/\d+/[A-Za-z0-9._-]+',
+    re.IGNORECASE,
+)
+_MM_PER_INCH = 25.4
 
 
 def _weight_kg(s: Optional[str]) -> Optional[float]:
@@ -194,6 +201,28 @@ class BcSpeakersScraper(Scraper):
                 continue
             setattr(frag, field_name, parsed)
             frag.spec_source[field_name] = SpecSource.HTML_GRID
+
+        # B&C HF drivers don't publish a "Nominal Diameter" label — the URL
+        # carries the throat inches (e.g. `/hf-driver/1.4/8/DE900TN`). Use it
+        # as nominal_size_mm AND throat_diameter_mm, matching Faital/18Sound.
+        # For LF drivers the label is authoritative; skip the URL fallback if
+        # nominal_size_mm was already set.
+        url_match = _URL_PATH_RE.search(raw.url)
+        if url_match is not None:
+            try:
+                size_mm = float(url_match.group("size")) * _MM_PER_INCH
+            except ValueError:
+                size_mm = None
+            if size_mm is not None:
+                if frag.nominal_size_mm is None:
+                    frag.nominal_size_mm = size_mm
+                    frag.spec_source["nominal_size_mm"] = SpecSource.INFERRED
+                if (
+                    url_match.group("category").lower() == "hf-driver"
+                    and frag.throat_diameter_mm is None
+                ):
+                    frag.throat_diameter_mm = size_mm
+                    frag.spec_source["throat_diameter_mm"] = SpecSource.INFERRED
 
         return ParseResult(fragments=[frag])
 
