@@ -142,6 +142,34 @@ function fmtNumber(v, decimals = 2) {
   return v.toFixed(decimals);
 }
 
+// Escape a string for embedding in an HTML attribute value ("..."). Cell
+// content is injected via x-html, so any user-supplied note text has to be
+// safe against attribute-context injection.
+function escapeAttr(s) {
+  return String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+// Short explanation for the spec-source dagger. Overrides carry a specific
+// note from data/overrides.yaml (surfaced as driver.override_notes[key]);
+// derived/inferred fall back to a generic phrase.
+const GENERIC_SPEC_NOTE = {
+  derived: "Derived from another spec (SPL 2.83 V ↔ 1 W via impedance, or program ↔ AES ×2).",
+  inferred: "Inferred from context — e.g. driver kind from the category slug.",
+  override: "Manually corrected; upstream spec was wrong.",
+};
+function specSourceNote(d, key) {
+  const src = d.spec_source && d.spec_source[key];
+  if (!GENERIC_SPEC_NOTE[src]) return null;
+  if (src === "override" && d.override_notes && d.override_notes[key]) {
+    return d.override_notes[key];
+  }
+  return GENERIC_SPEC_NOTE[src];
+}
+
 function sizeBucketOf(mm) {
   if (mm == null) return null;
   for (const b of SIZE_BUCKETS_MM) if (mm >= b.min && mm <= b.max) return b.label;
@@ -299,6 +327,10 @@ function app() {
     sortDragField: null,   // sort chip field currently being dragged
     sortDragOverField: null,
     sortDragSide: null,
+
+    // Spec-source popover, opened by clicking a dagger in a cell.
+    // `top`/`left` are viewport-relative px; the popover uses position:fixed.
+    specPopover: { open: false, text: "", top: 0, left: 0 },
 
     async init() {
       const state = parseURLState();
@@ -631,46 +663,59 @@ function app() {
     formatCell(d, col) {
       const v = d[col.key];
       if (v == null || v === "") return '<span class="null">–</span>';
-      if (col.key === "manufacturer") {
+      // Manufacturer + model link to the source page and never carry a sigil.
+      if (col.key === "manufacturer" || col.key === "model") {
         const u = d.source_urls && d.source_urls[0];
         return u ? `<a href="${u}" target="_blank" rel="noopener">${v}</a>` : v;
       }
-      if (col.key === "model") {
-        const u = d.source_urls && d.source_urls[0];
-        return u ? `<a href="${u}" target="_blank" rel="noopener">${v}</a>` : v;
+      // All other columns share a common tail: format the value, then append
+      // the spec-source dagger (if any) uniformly. Prior versions returned
+      // early for size/diameter/weight/vas/ohm, which meant those columns
+      // never got a sigil even when spec_source flagged the value.
+      let base;
+      if (col.key === "driver_kind") {
+        base = d._kind_label || String(v);
+      } else if (col.key === "nominal_size_mm") {
+        base = this.units === "imperial" ? (v / MM_PER_INCH).toFixed(1) : `${Math.round(v)}`;
+      } else if (col.key.endsWith("_diameter_mm")) {
+        base = this.units === "imperial" ? (v / MM_PER_INCH).toFixed(2) : `${Math.round(v)}`;
+      } else if (col.key === "net_weight_kg") {
+        base = this.units === "imperial" ? fmtNumber(v * LB_PER_KG) : fmtNumber(v);
+      } else if (col.key === "vas_liters") {
+        base = this.units === "imperial" ? fmtNumber(v * CUFT_PER_LITER) : fmtNumber(v);
+      } else if (col.key.endsWith("_ohm")) {
+        base = `${v}&nbsp;Ω`;
+      } else {
+        base = typeof v === "number" ? fmtNumber(v) : String(v);
       }
-      if (col.key === "driver_kind") return d._kind_label || v;
-      // Diameters (Size, Throat, VC) — unit lives in the header via columnLabel;
-      // cell shows plain value in the current unit family.
-      if (col.key === "nominal_size_mm") {
-        return this.units === "imperial" ? (v / MM_PER_INCH).toFixed(1) : `${Math.round(v)}`;
-      }
-      if (col.key.endsWith("_diameter_mm")) {
-        return this.units === "imperial" ? (v / MM_PER_INCH).toFixed(2) : `${Math.round(v)}`;
-      }
-      if (col.key === "net_weight_kg") {
-        return this.units === "imperial" ? fmtNumber(v * LB_PER_KG) : fmtNumber(v);
-      }
-      if (col.key === "vas_liters") {
-        return this.units === "imperial" ? fmtNumber(v * CUFT_PER_LITER) : fmtNumber(v);
-      }
-      if (col.key.endsWith("_ohm")) return `${v}&nbsp;Ω`;
-      let base = typeof v === "number" ? fmtNumber(v) : String(v);
-      // Values that aren't directly scraped from the manufacturer's own spec
-      // sheet get a subtle dagger: `derived` (computed from another slot),
-      // `inferred` (e.g. driver_kind from category slug), and `override`
-      // (hand-patched via data/overrides.yaml to correct an upstream error).
-      const src = d.spec_source && d.spec_source[col.key];
-      const titleBySrc = {
-        derived: "derived from another spec (2.83V↔1W via impedance, or program↔AES ×2)",
-        inferred: "inferred (e.g. from category or model)",
-        override: "hand-patched in data/overrides.yaml to correct an upstream spec error",
-      };
-      if (titleBySrc[src]) {
-        base += `<sup class="derived-mark" title="${titleBySrc[src]}">†</sup>`;
+      const note = specSourceNote(d, col.key);
+      if (note) {
+        // Rendered as a real <button> so keyboard focus + click both work,
+        // and Enter/Space activate it. Popover is opened by a delegated
+        // click handler on the table body (see openSpecPopover).
+        base += ` <button type="button" class="derived-mark" data-note="${escapeAttr(note)}" aria-label="spec-source explanation">†</button>`;
       }
       return base;
     },
+
+    // Delegated click handler bound on the table body. When a dagger button
+    // is clicked, position the popover above it and show the note.
+    openSpecPopover(event) {
+      const btn = event.target.closest(".derived-mark");
+      if (!btn) return;
+      event.stopPropagation();
+      const note = btn.getAttribute("data-note") || "";
+      const rect = btn.getBoundingClientRect();
+      // Position: above the button, horizontally centered. Popover is
+      // position:fixed so viewport coords are correct without scroll math.
+      this.specPopover = {
+        open: true,
+        text: note,
+        top: Math.round(rect.top),
+        left: Math.round(rect.left + rect.width / 2),
+      };
+    },
+    closeSpecPopover() { this.specPopover.open = false; },
 
     updateUrl() {
       writeURLState({ filters: this.filters, sorts: this.sorts });

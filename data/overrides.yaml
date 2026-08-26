@@ -15,8 +15,11 @@
 #     {canonical_id}:
 #       reason: "why this override exists — informational, not written to drivers.json"
 #       fields:
+#         {field_name}:
+#           value: {value}
+#           note: "short, user-facing sentence shown in the web UI popover"
+#         # or plain scalar shorthand when a UI note isn't needed:
 #         {field_name}: {value}
-#         ...
 #
 # Unknown field names raise on load; typos fail loudly.
 
@@ -29,4 +32,6 @@ overrides:
       "Nominal Diameter: 18\"", 470 mm overall outside diameter) confirms it
       is an 18" driver.
     fields:
-      nominal_size_mm: 457.2
+      nominal_size_mm:
+        value: 457.2
+        note: "Dayton's spec table lists 15\" — a typo; every other signal on the page (URL, model, feature-bullet, 470 mm frame) says 18\"."

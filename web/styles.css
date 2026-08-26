@@ -220,7 +220,51 @@ html[data-theme="dark"] .input-field input[type=text]:not(.browser-default) { bo
 .compact-table td a { color: var(--link); }
 table.compact-table > tbody > tr.row-hover { background-color: rgba(0, 137, 123, 0.22); }
 .null { color: var(--text-faint); }
-.derived-mark { color: var(--text-faint); font-size: 10px; padding-left: 1px; cursor: help; font-weight: bold; }
+/* Rendered as a real <button> so clicks + keyboard focus both work. Reset
+ * the browser button chrome so it reads as a tiny superscript dagger. */
+.derived-mark {
+  color: var(--text-faint);
+  font-size: 10px;
+  padding: 0 1px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-weight: bold;
+  line-height: 1;
+  vertical-align: super;
+}
+.derived-mark:hover, .derived-mark:focus-visible { color: var(--text); outline: none; }
+/* Legend rendering: same visual mark, but static (not a button). */
+.derived-mark.legend { cursor: default; }
+
+/* Click-triggered popover explaining a specific field's spec source. Anchored
+ * via inline top/left (viewport coords, position:fixed), then shifted up-left
+ * so the tip of the caret hangs over the clicked dagger. */
+.spec-popover {
+  position: fixed;
+  z-index: 200;
+  transform: translate(-50%, -100%);
+  max-width: 320px;
+  padding: 8px 10px;
+  background: var(--surface-header);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: normal;
+}
+.spec-popover::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--surface-header);
+}
 
 /* Reorderable column headers — grab cursor + hover highlights signal the
  * drag affordance; drop-indicator inset shadow shows the insertion side

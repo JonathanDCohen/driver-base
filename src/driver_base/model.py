@@ -181,6 +181,10 @@ class DriverFragment:
     coax_hf_voice_coil_diameter_mm: Optional[float] = None
     coax_hf_re_ohm: Optional[float] = None
 
+    # Populated by apply_overrides on the post-merge Driver, kept here on
+    # Fragment only for structural symmetry (Fragment never carries notes).
+    override_notes: dict[str, str] = field(default_factory=dict)
+
     status: DriverStatus = DriverStatus.ACTIVE
 
     # Diagnostics
@@ -284,3 +288,9 @@ class Driver:
     coax_hf_freq_high_hz: Optional[float] = None
     coax_hf_voice_coil_diameter_mm: Optional[float] = None
     coax_hf_re_ohm: Optional[float] = None
+
+    # Populated by apply_overrides. Maps field_name → short user-facing
+    # sentence explaining why that specific field was hand-patched. Only
+    # fields whose overrides.yaml entry declared a `note:` are present.
+    # Not a valid override target itself (see overrides.py).
+    override_notes: dict[str, str] = field(default_factory=dict)

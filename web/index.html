@@ -195,7 +195,7 @@
                   </template>
                 </tr>
               </thead>
-              <tbody>
+              <tbody @click="openSpecPopover($event)">
                 <template x-for="(d, i) in visibleRows" :key="d.canonical_id">
                   <tr :class="hoverIdx === i ? 'row-hover' : ''"
                       @mouseenter="hoverIdx = i" @mouseleave="hoverIdx = null">
@@ -211,6 +211,15 @@
           <div x-show="visibleRows.length === 0" class="grey-text center-align padded">
             No drivers match the current filters.
           </div>
+
+          <!-- Spec-source popover. position:fixed, positioned by openSpecPopover.
+               Closes on outside click or Escape. -->
+          <div class="spec-popover" x-show="specPopover.open" x-cloak
+               x-transition.opacity
+               @click.outside="closeSpecPopover()"
+               @keydown.escape.window="closeSpecPopover()"
+               :style="`top: ${specPopover.top - 12}px; left: ${specPopover.left}px;`"
+               role="tooltip" x-text="specPopover.text"></div>
         </div>
 
         <div class="table-footer grey-text">
@@ -220,7 +229,7 @@
           <span class="sep">·</span>
           <span x-text="`updated ${generatedAt.slice(0, 10)}`"></span>
           <span class="sep">·</span>
-          <span><sup class="derived-mark">&dagger;</sup> inferred or derived</span>
+          <span><sup class="derived-mark legend">&dagger;</sup> inferred or derived (click for details)</span>
         </div>
         </div><!-- /.table-panel -->
       </section>

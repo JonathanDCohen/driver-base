@@ -520,15 +520,19 @@ def rehydrate_drivers(
     the CLI's per-scraper regen path where an unrun scraper's records must
     pass through untouched. Passing an ISO timestamp bumps `last_scraped_at`
     (used by the preserve-on-failure branch)."""
-    from dataclasses import fields as dc_fields
+    from dataclasses import MISSING, fields as dc_fields
 
     driver_fields = {f.name: f for f in dc_fields(Driver)}
     out: list[Driver] = []
     for rec in prior_records:
         kwargs: dict[str, Any] = {}
-        for name in driver_fields:
+        for name, fspec in driver_fields.items():
             if name == "last_scraped_at" and now_iso is not None:
                 kwargs[name] = now_iso
+                continue
+            if name not in rec and fspec.default_factory is not MISSING:
+                # Older drivers.json may lack fields we've since added
+                # (e.g. override_notes). Let the default_factory fill in.
                 continue
             v = rec.get(name)
             kwargs[name] = _coerce_field(name, v)
