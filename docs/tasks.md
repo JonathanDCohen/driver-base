@@ -2,22 +2,29 @@
 
 ---
 
-## Bring HF_Horns back for Faital (and design horn-kind fields)
+## Bring horns back with a horn-appropriate schema
 
-**Added:** 2026-08-25
+**Added:** 2026-08-25 (globalized 2026-08-26)
 
-We currently skip Faital's `HF_Horns` category (5 products) because passive
-horns don't map to the transducer-shaped driver schema — no T/S, no impedance,
-no AES power in the usual sense. When we're ready to represent them:
+We currently drop every `DriverKind.HORN` record — Faital `HF_Horns` never
+enters the pipeline (skipped at enumerate), and every other scraper's horns
+get filtered out in `orchestrator._post_parse_pipeline`. Passive horns don't
+map to the transducer-shaped driver schema (no T/S, no impedance, no AES
+power in the usual sense), and treating them like drivers leaves ~54 records
+with mostly-null cells.
 
-- Add the `HF_Horns` seed back in `scrapers/faital.py::discover_seeds` (page
-  is static HTML — plain GET, same shape as coax).
-- Design horn-appropriate fields (probably: throat diameter, mouth diameter,
-  cutoff frequency, horizontal + vertical dispersion, coverage pattern, gain).
+When we're ready to represent them:
+
+- Design horn-appropriate fields — likely throat diameter, mouth diameter,
+  cutoff frequency, horizontal + vertical dispersion, coverage pattern, gain.
   Populate for kind `HORN` only; existing `DriverKind.HORN` enum is already
-  in place and used by other scrapers.
-- Reinstate the enumerate test for horns; add a parse test with an
-  `HF_Horns/*` fixture.
+  in place and used by every scraper.
+- Remove the `DriverKind.HORN` filter in `orchestrator._post_parse_pipeline`.
+- For Faital specifically: add the `HF_Horns` seed back in
+  `scrapers/faital.py::discover_seeds` (page is static HTML — plain GET, same
+  shape as coax) and reinstate the enumerate assertion.
+- Add per-scraper parse tests for at least one horn fixture per manufacturer
+  so the horn field mapping is regression-covered.
 
 
 

@@ -408,6 +408,11 @@ def _post_parse_pipeline(
             resolved = scraper.classify_driver_kind(f)
             f.driver_kind = resolved or DriverKind.LF_WOOFER
 
+    # Passive horns don't share the transducer-shaped driver schema meaningfully
+    # (no T/S, no impedance, no AES power in the usual sense). Drop them across
+    # every scraper until we design horn-appropriate fields — see docs/tasks.md.
+    fragments = [f for f in fragments if f.driver_kind is not DriverKind.HORN]
+
     assign_canonical_ids(fragments, scraper_name=scraper.name)
     fragments = apply_aliases(fragments, aliases)
     drivers, _dropped = merge_fragments_by_id(
