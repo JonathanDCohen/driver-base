@@ -109,6 +109,9 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
     # physical
     "magnet type":                 ("magnet_type",            lambda s: normalize_magnet_type(s)),
     "voice coil diameter":         ("voice_coil_diameter_mm", parse_length_mm),
+    # Celestion compression drivers publish `Throat exit` (not "Throat diameter")
+    # for the horn throat opening.
+    "throat exit":                 ("throat_diameter_mm",     parse_length_mm),
     "overall diameter":            ("overall_diameter_mm",    parse_length_mm),
     "overall depth":               ("depth_mm",               parse_length_mm),
     "cut-out diameter":            ("mounting_diameter_mm",   parse_length_mm),
@@ -236,5 +239,24 @@ class CelestionScraper(Scraper):
                 continue
             setattr(frag, field_name, parsed)
             frag.spec_source[field_name] = SpecSource.HTML_DIV_PAIRS
+
+        # Compression driver pages publish `Throat exit` but no `Nominal
+        # diameter`. Fall through: throat → VC diameter for the couple of
+        # WG-suffixed / supertweeter models that don't publish a throat.
+        # kind isn't known yet on Celestion (classify_driver_kind runs
+        # post-parse), so only apply this when the page has no size AND has
+        # a driver-shaped label — throat_diameter_mm or (as a weak proxy) a
+        # voice_coil_diameter_mm that's small enough to plausibly be a
+        # compression driver / tweeter (≤ 50 mm).
+        if frag.nominal_size_mm is None:
+            derived = frag.throat_diameter_mm
+            if derived is None and (
+                frag.voice_coil_diameter_mm is not None
+                and frag.voice_coil_diameter_mm <= 50.0
+            ):
+                derived = frag.voice_coil_diameter_mm
+            if derived is not None:
+                frag.nominal_size_mm = derived
+                frag.spec_source["nominal_size_mm"] = SpecSource.DERIVED
 
         return ParseResult(fragments=[frag])
