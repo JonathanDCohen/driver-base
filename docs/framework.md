@@ -771,9 +771,9 @@ CI runs `uv run pytest tests/ --ignore=tests/integration` on every PR. Integrati
 
 ## Deployment
 
-**GitHub Actions cron** (`.github/workflows/scrape.yml`): weekly on Sunday 00:00 UTC (plus `workflow_dispatch` for manual runs). Runs `uv run driver-base` which writes `web/drivers.json` and any `data/rejections/*.json`, validates the output with `jq`, then commits those changes directly to `main` with a `[skip ci]` message. Uses `concurrency: group: scrape-workflow` to prevent overlap. The push to `main` triggers a GitHub Pages redeploy.
+**GitHub Actions cron** (`.github/workflows/scrape.yml`): weekly on Sunday 00:00 UTC (plus `workflow_dispatch` for manual runs). Runs `uv run driver-base` which writes `web/drivers.json` and any `data/rejections/*.json`, validates the output with `jq`, commits those changes to `main`, then chains into `pages.yml` to redeploy. Uses `concurrency: group: scrape-workflow` to prevent overlap.
 
-**GitHub Pages**: enable in repo Settings → Pages, source = `main` branch, folder = `/web`. Serves the SPA and `web/drivers.json` from the same origin. GH Pages hard-codes a ~10-minute cache TTL for served assets, which is well inside the weekly scrape cadence — no `_headers` file needed.
+**GitHub Pages** (`.github/workflows/pages.yml`): enable in repo Settings → Pages with source = "GitHub Actions" (the modern deploy mode; the legacy "Deploy from a branch" mode only allows `/` or `/docs` as the folder, which doesn't fit our layout). The workflow uploads `web/` as the Pages artifact and deploys via `actions/deploy-pages`. Triggers: `push` to `main` (developer edits to the SPA), `workflow_dispatch` (manual), and `workflow_call` from `scrape.yml` (weekly). GH Pages hard-codes a ~10-minute cache TTL for served assets, which is well inside the weekly scrape cadence — no `_headers` file needed.
 
 ## Known risks
 
