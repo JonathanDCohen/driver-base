@@ -17,18 +17,22 @@ def scraper() -> CelestionScraper:
 
 def test_enumerate_product_sitemap(scraper: CelestionScraper) -> None:
     seed = load_fixture(
-        "celestion", "seeds/product-sitemap.xml",
+        "celestion",
+        "seeds/product-sitemap.xml",
         url="https://celestion.com/product-sitemap.xml",
     )
     res = scraper.enumerate([seed])
     # Sitemap has 213 /product/*/ URLs + 1 /products/ index (filtered out).
     assert len(res.product_urls) == 213
-    assert all("/product/" in p.url and "/products/" not in p.url for p in res.product_urls)
+    assert all(
+        "/product/" in p.url and "/products/" not in p.url for p in res.product_urls
+    )
 
 
 def test_parse_tf1525_pro_lf(scraper: CelestionScraper) -> None:
     raw = load_fixture(
-        "celestion", "products/tf1525.html",
+        "celestion",
+        "products/tf1525.html",
         url="https://celestion.com/product/tf1525/",
     )
     res = scraper.parse_artifact(raw, SeedContext())
@@ -37,7 +41,9 @@ def test_parse_tf1525_pro_lf(scraper: CelestionScraper) -> None:
 
     assert f.manufacturer == "Celestion"
     assert f.model == "TF1525"
-    assert f.driver_kind == DriverKind.LF_WOOFER   # from breadcrumb 'Pro Audio / LF Loudspeakers'
+    assert (
+        f.driver_kind == DriverKind.LF_WOOFER
+    )  # from breadcrumb 'Pro Audio / LF Loudspeakers'
 
     # T/S
     assert f.fs_hz == pytest.approx(47.6)
@@ -45,10 +51,10 @@ def test_parse_tf1525_pro_lf(scraper: CelestionScraper) -> None:
     assert f.qes == pytest.approx(0.565)
     assert f.qms == pytest.approx(3.835)
     assert f.vas_liters == pytest.approx(148.41)
-    assert f.sd_cm2 == pytest.approx(855.3, rel=1e-3)   # '855.30cm2' (sup-tag stripped)
+    assert f.sd_cm2 == pytest.approx(855.3, rel=1e-3)  # '855.30cm2' (sup-tag stripped)
     assert f.xmax_mm == pytest.approx(4.5)
     assert f.mms_g == pytest.approx(77.93)
-    assert f.bl_tm == pytest.approx(14.57)              # 'BI' typo variant maps to bl_tm
+    assert f.bl_tm == pytest.approx(14.57)  # 'BI' typo variant maps to bl_tm
     assert f.re_ohm == pytest.approx(5.15)
     assert f.le_mh == pytest.approx(0.9)
     assert f.cms_mm_per_n == pytest.approx(0.14)
@@ -83,7 +89,8 @@ def test_parse_vintage_30_guitar(scraper: CelestionScraper) -> None:
     """Guitar drivers use `Resonance frequency, Fs` labels and legitimately
     lack T/S params. GUITAR_BASS kind exempts them from the T/S REJECT."""
     raw = load_fixture(
-        "celestion", "products/vintage-30.html",
+        "celestion",
+        "products/vintage-30.html",
         url="https://celestion.com/product/vintage-30/",
     )
     res = scraper.parse_artifact(raw, SeedContext())
@@ -91,11 +98,13 @@ def test_parse_vintage_30_guitar(scraper: CelestionScraper) -> None:
     f = res.fragments[0]
 
     assert f.model == "Vintage 30"
-    assert f.driver_kind == DriverKind.GUITAR_BASS  # breadcrumb 'Guitar & Bass Speakers'
+    assert (
+        f.driver_kind == DriverKind.GUITAR_BASS
+    )  # breadcrumb 'Guitar & Bass Speakers'
 
     # Present via comma-suffix labels
-    assert f.fs_hz == pytest.approx(75.0)             # 'Resonance frequency, Fs' → fs_hz
-    assert f.re_ohm == pytest.approx(7.3)             # 'DC resistance, Re' → re_ohm
+    assert f.fs_hz == pytest.approx(75.0)  # 'Resonance frequency, Fs' → fs_hz
+    assert f.re_ohm == pytest.approx(7.3)  # 'DC resistance, Re' → re_ohm
 
     # T/S absent (expected for a guitar driver — no Qms/Qes/Qts/Vas/Xmax on page)
     assert f.qts is None
@@ -105,7 +114,7 @@ def test_parse_vintage_30_guitar(scraper: CelestionScraper) -> None:
     assert f.xmax_mm is None
 
     # Basic specs present
-    assert f.impedance_nominal_ohm == pytest.approx(8.0)   # from '8Ω or 16Ω' → first
+    assert f.impedance_nominal_ohm == pytest.approx(8.0)  # from '8Ω or 16Ω' → first
     assert f.sensitivity_db_1w_1m == pytest.approx(100.0)
     assert f.power_aes_watts == pytest.approx(60.0)
     assert f.freq_low_hz == pytest.approx(70.0)

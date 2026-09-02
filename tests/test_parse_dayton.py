@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from driver_base.interface import DriverKind, SeedContext
-from driver_base.model import MagnetType, SpecSource
+from driver_base.model import SpecSource
 from driver_base.scrapers.dayton import DaytonScraper
 from tests.conftest import load_fixture
 
@@ -20,18 +20,19 @@ def scraper() -> DaytonScraper:
 
 def test_discover_seeds_covers_12_categories(scraper: DaytonScraper) -> None:
     seeds = scraper.discover_seeds()
-    assert len(seeds) == 11    # 12 in _CATEGORIES minus replacement-diaphragms
+    assert len(seeds) == 11  # 12 in _CATEGORIES minus replacement-diaphragms
     assert all(s.url.startswith("https://www.daytonaudio.com/category/") for s in seeds)
     assert all(s.url.endswith("?pagenum=1") for s in seeds)
 
 
 def test_enumerate_yields_products_and_next_page(scraper: DaytonScraper) -> None:
     seed = load_fixture(
-        "dayton", "seeds/woofers-p1.html",
+        "dayton",
+        "seeds/woofers-p1.html",
         url="https://www.daytonaudio.com/category/118/woofers?pagenum=1",
     )
     res = scraper.enumerate([seed])
-    assert len(res.product_urls) == 20    # Dayton serves 20/page
+    assert len(res.product_urls) == 20  # Dayton serves 20/page
     # Full page → additional_seed_urls carries page 2
     assert any("pagenum=2" in s.url for s in res.additional_seed_urls)
     for p in res.product_urls:
@@ -42,7 +43,9 @@ def test_enumerate_yields_products_and_next_page(scraper: DaytonScraper) -> None
 
 def test_parse_dc160(scraper: DaytonScraper) -> None:
     raw = load_fixture("dayton", "products/dc160-8.html", url=_DC160_URL)
-    res = scraper.parse_artifact(raw, SeedContext(driver_kind_hint=DriverKind.LF_WOOFER, category_id="woofers"))
+    res = scraper.parse_artifact(
+        raw, SeedContext(driver_kind_hint=DriverKind.LF_WOOFER, category_id="woofers")
+    )
     assert len(res.fragments) == 1
     f = res.fragments[0]
 
@@ -78,7 +81,7 @@ def test_parse_dc160(scraper: DaytonScraper) -> None:
 
     # Physical
     assert f.impedance_nominal_ohm == pytest.approx(8.0)
-    assert f.nominal_size_mm == pytest.approx(165.1)   # 6.50" → 165.1 mm
+    assert f.nominal_size_mm == pytest.approx(165.1)  # 6.50" → 165.1 mm
     assert f.voice_coil_diameter_mm == pytest.approx(35.0)
     assert f.net_weight_kg == pytest.approx(3.3 * 0.453592, rel=1e-3)  # 3.3 lbs.
 

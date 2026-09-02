@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, fields as dc_fields, is_dataclass
+from dataclasses import fields as dc_fields, is_dataclass
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
@@ -72,7 +72,11 @@ def _sorted_for_output(drivers: list[Driver]) -> list[Driver]:
     implicit default so no client-side sort is applied on first load."""
     return sorted(
         drivers,
-        key=lambda d: (d.manufacturer.casefold(), d.driver_kind.value, d.model.casefold()),
+        key=lambda d: (
+            d.manufacturer.casefold(),
+            d.driver_kind.value,
+            d.model.casefold(),
+        ),
     )
 
 
@@ -87,11 +91,16 @@ def write_drivers_json(
 ) -> None:
     """Write the top-level drivers.json artifact."""
     ok = sum(1 for s in per_scraper_status.values() if s.get("status") == "ok")
-    preserved = sum(1 for s in per_scraper_status.values() if s.get("status") == "preserved")
-    blocked = sum(1 for s in per_scraper_status.values() if s.get("status") == "blocked")
+    preserved = sum(
+        1 for s in per_scraper_status.values() if s.get("status") == "preserved"
+    )
+    blocked = sum(
+        1 for s in per_scraper_status.values() if s.get("status") == "blocked"
+    )
     payload: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
-        "generated_at": generated_at or datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "generated_at": generated_at
+        or datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "generator": {
             "name": "driver-base",
             "version": generator_version,

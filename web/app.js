@@ -7,54 +7,126 @@
 // (`db_cols`, `db_units`).
 
 const COLUMN_META = {
-  manufacturer:              { label: "Manufacturer",       numeric: false, sortable: true  },
-  model:                     { label: "Model",              numeric: false, sortable: true  },
-  driver_kind:               { label: "Type",               numeric: false, sortable: true  },
-  nominal_size_mm:           { label: "Size",               numeric: true,  sortable: true  },
-  impedance_nominal_ohm:     { label: "Impedance",          numeric: true,  sortable: true  },
-  fs_hz:                     { label: "Fs",                 numeric: true,  sortable: true  },
-  qts:                       { label: "Qts",                numeric: true,  sortable: true  },
-  qes:                       { label: "Qes",                numeric: true,  sortable: true  },
-  qms:                       { label: "Qms",                numeric: true,  sortable: true  },
-  vas_liters:                { label: "Vas",                numeric: true,  sortable: true  },  // unit appended by columnLabel()
-  sd_cm2:                    { label: "Sd (cm²)",           numeric: true,  sortable: true  },
-  xmax_mm:                   { label: "Xmax",               numeric: true,  sortable: true  },
-  mms_g:                     { label: "Mms",                numeric: true,  sortable: true  },
-  bl_tm:                     { label: "Bl",                 numeric: true,  sortable: true  },
-  re_ohm:                    { label: "Re",                 numeric: true,  sortable: true  },
-  le_mh:                     { label: "Le",                 numeric: true,  sortable: true  },
-  sensitivity_db_1w_1m:      { label: "SPL 1W/1m",          numeric: true,  sortable: true  },
-  sensitivity_db_2_83v_1m:   { label: "SPL 2.83V/1m",       numeric: true,  sortable: true  },
-  power_aes_watts:           { label: "AES (W)",            numeric: true,  sortable: true  },
-  power_long_term_watts:     { label: "Continuous (W)",     numeric: true,  sortable: true  },
-  freq_low_hz:               { label: "Freq low",           numeric: true,  sortable: true  },
-  freq_high_hz:              { label: "Freq high",          numeric: true,  sortable: true  },
-  net_weight_kg:             { label: "Weight",             numeric: true,  sortable: true  },  // unit appended by columnLabel()
+  manufacturer: { label: "Manufacturer", numeric: false, sortable: true },
+  model: { label: "Model", numeric: false, sortable: true },
+  driver_kind: { label: "Type", numeric: false, sortable: true },
+  nominal_size_mm: { label: "Size", numeric: true, sortable: true },
+  impedance_nominal_ohm: { label: "Impedance", numeric: true, sortable: true },
+  fs_hz: { label: "Fs", numeric: true, sortable: true },
+  qts: { label: "Qts", numeric: true, sortable: true },
+  qes: { label: "Qes", numeric: true, sortable: true },
+  qms: { label: "Qms", numeric: true, sortable: true },
+  vas_liters: { label: "Vas", numeric: true, sortable: true }, // unit appended by columnLabel()
+  sd_cm2: { label: "Sd (cm²)", numeric: true, sortable: true },
+  xmax_mm: { label: "Xmax", numeric: true, sortable: true },
+  mms_g: { label: "Mms", numeric: true, sortable: true },
+  bl_tm: { label: "Bl", numeric: true, sortable: true },
+  re_ohm: { label: "Re", numeric: true, sortable: true },
+  le_mh: { label: "Le", numeric: true, sortable: true },
+  sensitivity_db_1w_1m: { label: "SPL 1W/1m", numeric: true, sortable: true },
+  sensitivity_db_2_83v_1m: {
+    label: "SPL 2.83V/1m",
+    numeric: true,
+    sortable: true,
+  },
+  power_aes_watts: { label: "AES (W)", numeric: true, sortable: true },
+  power_long_term_watts: {
+    label: "Continuous (W)",
+    numeric: true,
+    sortable: true,
+  },
+  freq_low_hz: { label: "Freq low", numeric: true, sortable: true },
+  freq_high_hz: { label: "Freq high", numeric: true, sortable: true },
+  net_weight_kg: { label: "Weight", numeric: true, sortable: true }, // unit appended by columnLabel()
   // Compression-driver fields (also populate for coax records).
-  throat_diameter_mm:        { label: "Throat",             numeric: true,  sortable: true  },
-  diaphragm_material:        { label: "Diaphragm material", numeric: false, sortable: true  },
-  diaphragm_shape:           { label: "Diaphragm shape",    numeric: false, sortable: true  },
-  recommended_crossover_hz:  { label: "Rec. crossover",     numeric: true,  sortable: true  },
-  winding_material:          { label: "VC winding material", numeric: false, sortable: true },
-  former_material:           { label: "VC former material",  numeric: false, sortable: true },
-  surround_material:         { label: "Surround material",   numeric: false, sortable: true },
-  phase_plug_design:         { label: "Phase plug design",   numeric: false, sortable: true },
-  flux_density_t:            { label: "Flux density (T)",    numeric: true,  sortable: true },
-  xvar_mm:                   { label: "Xvar",                numeric: true,  sortable: true },
-  recommended_enclosure_volume_liters: { label: "Rec. enclosure vol", numeric: true, sortable: true },
+  throat_diameter_mm: { label: "Throat", numeric: true, sortable: true },
+  diaphragm_material: {
+    label: "Diaphragm material",
+    numeric: false,
+    sortable: true,
+  },
+  diaphragm_shape: { label: "Diaphragm shape", numeric: false, sortable: true },
+  recommended_crossover_hz: {
+    label: "Rec. crossover",
+    numeric: true,
+    sortable: true,
+  },
+  winding_material: {
+    label: "VC winding material",
+    numeric: false,
+    sortable: true,
+  },
+  former_material: {
+    label: "VC former material",
+    numeric: false,
+    sortable: true,
+  },
+  surround_material: {
+    label: "Surround material",
+    numeric: false,
+    sortable: true,
+  },
+  phase_plug_design: {
+    label: "Phase plug design",
+    numeric: false,
+    sortable: true,
+  },
+  flux_density_t: { label: "Flux density (T)", numeric: true, sortable: true },
+  xvar_mm: { label: "Xvar", numeric: true, sortable: true },
+  recommended_enclosure_volume_liters: {
+    label: "Rec. enclosure vol",
+    numeric: true,
+    sortable: true,
+  },
   // Coax HF-section fields — populated only for coaxial drivers. The generic
   // fields above hold the coax LF-section values; these carry the HF section.
   // Hidden by default (relevant to a small subset of records).
-  coax_hf_impedance_nominal_ohm: { label: "(Coax) HF Impedance", numeric: true,  sortable: true  },
-  coax_hf_impedance_min_ohm:     { label: "(Coax) HF Imp min",   numeric: true,  sortable: true  },
-  coax_hf_power_aes_watts:       { label: "(Coax) HF AES (W)",        numeric: true,  sortable: true  },
-  coax_hf_power_long_term_watts: { label: "(Coax) HF Continuous (W)", numeric: true,  sortable: true  },
-  coax_hf_power_peak_watts:      { label: "(Coax) HF Peak (W)",       numeric: true,  sortable: true  },
-  coax_hf_sensitivity_db_1w_1m:  { label: "(Coax) HF SPL 1W/1m", numeric: true,  sortable: true  },
-  coax_hf_freq_low_hz:           { label: "(Coax) HF Freq low",  numeric: true,  sortable: true  },
-  coax_hf_freq_high_hz:          { label: "(Coax) HF Freq high", numeric: true,  sortable: true  },
-  coax_hf_voice_coil_diameter_mm:{ label: "(Coax) HF VC",         numeric: true,  sortable: true  },
-  coax_hf_re_ohm:                { label: "(Coax) HF Re",        numeric: true,  sortable: true  },
+  coax_hf_impedance_nominal_ohm: {
+    label: "(Coax) HF Impedance",
+    numeric: true,
+    sortable: true,
+  },
+  coax_hf_impedance_min_ohm: {
+    label: "(Coax) HF Imp min",
+    numeric: true,
+    sortable: true,
+  },
+  coax_hf_power_aes_watts: {
+    label: "(Coax) HF AES (W)",
+    numeric: true,
+    sortable: true,
+  },
+  coax_hf_power_long_term_watts: {
+    label: "(Coax) HF Continuous (W)",
+    numeric: true,
+    sortable: true,
+  },
+  coax_hf_power_peak_watts: {
+    label: "(Coax) HF Peak (W)",
+    numeric: true,
+    sortable: true,
+  },
+  coax_hf_sensitivity_db_1w_1m: {
+    label: "(Coax) HF SPL 1W/1m",
+    numeric: true,
+    sortable: true,
+  },
+  coax_hf_freq_low_hz: {
+    label: "(Coax) HF Freq low",
+    numeric: true,
+    sortable: true,
+  },
+  coax_hf_freq_high_hz: {
+    label: "(Coax) HF Freq high",
+    numeric: true,
+    sortable: true,
+  },
+  coax_hf_voice_coil_diameter_mm: {
+    label: "(Coax) HF VC",
+    numeric: true,
+    sortable: true,
+  },
+  coax_hf_re_ohm: { label: "(Coax) HF Re", numeric: true, sortable: true },
 };
 
 const SORTABLE_FIELDS = Object.entries(COLUMN_META)
@@ -110,10 +182,10 @@ const DRIVER_KIND_LABEL = {
 };
 
 const SIZE_BUCKETS_MM = [
-  { label: '4"',  min:  90, max: 110 },
-  { label: '5"',  min: 115, max: 140 },
-  { label: '6.5"',min: 155, max: 180 },
-  { label: '8"',  min: 195, max: 220 },
+  { label: '4"', min: 90, max: 110 },
+  { label: '5"', min: 115, max: 140 },
+  { label: '6.5"', min: 155, max: 180 },
+  { label: '8"', min: 195, max: 220 },
   { label: '10"', min: 245, max: 270 },
   { label: '12"', min: 295, max: 320 },
   { label: '15"', min: 375, max: 400 },
@@ -138,7 +210,7 @@ function sortPickerEntries(entries, keyOf, labelOf) {
 function fmtNumber(v, decimals = 2) {
   if (v == null || Number.isNaN(v)) return null;
   if (Math.abs(v) >= 100) return v.toFixed(0);
-  if (Math.abs(v) >= 10)  return v.toFixed(1);
+  if (Math.abs(v) >= 10) return v.toFixed(1);
   return v.toFixed(decimals);
 }
 
@@ -159,14 +231,14 @@ function escapeAttr(s) {
 //   3. GENERIC_SPEC_NOTE[src] — generic fallback for the source category
 // Returns null when the source doesn't warrant a dagger at all.
 const DERIVED_FIELD_NOTE = {
-  sensitivity_db_1w_1m:     "Derived from listed 2.83V/1m spec",
-  sensitivity_db_2_83v_1m:  "Derived from listed 1W/1m spec",
-  power_program_watts:      "Derived from listed AES spec",
-  power_aes_watts:          "Derived from listed program spec",
-  power_long_term_watts:    "Derived from listed AES spec",
+  sensitivity_db_1w_1m: "Derived from listed 2.83V/1m spec",
+  sensitivity_db_2_83v_1m: "Derived from listed 1W/1m spec",
+  power_program_watts: "Derived from listed AES spec",
+  power_aes_watts: "Derived from listed program spec",
+  power_long_term_watts: "Derived from listed AES spec",
 };
 const GENERIC_SPEC_NOTE = {
-  derived:  "Derived from another spec",
+  derived: "Derived from another spec",
   inferred: "Inferred from context",
   override: "Manually corrected; upstream spec was wrong",
 };
@@ -184,13 +256,14 @@ function specSourceNote(d, key) {
 
 function sizeBucketOf(mm) {
   if (mm == null) return null;
-  for (const b of SIZE_BUCKETS_MM) if (mm >= b.min && mm <= b.max) return b.label;
+  for (const b of SIZE_BUCKETS_MM)
+    if (mm >= b.min && mm <= b.max) return b.label;
   return null;
 }
 
 function cmpWithDir(a, b, dir) {
   if (a == null && b == null) return 0;
-  if (a == null) return 1;          // nulls last, regardless of direction
+  if (a == null) return 1; // nulls last, regardless of direction
   if (b == null) return -1;
   if (typeof a === "string" && typeof b === "string") {
     const cmp = a.localeCompare(b, undefined, { numeric: true });
@@ -237,12 +310,16 @@ function writeURLState(state) {
   if (state.filters.q) p.set("q", state.filters.q);
   if (state.filters.mfg.length) p.set("mfg", state.filters.mfg.join(","));
   if (state.filters.kind.length) p.set("kind", state.filters.kind.join(","));
-  if (state.filters.impedance.length) p.set("imp", state.filters.impedance.join(","));
-  if (state.filters.size_in.length) p.set("size", state.filters.size_in.join(","));
+  if (state.filters.impedance.length)
+    p.set("imp", state.filters.impedance.join(","));
+  if (state.filters.size_in.length)
+    p.set("size", state.filters.size_in.join(","));
   if (state.sorts.length)
     p.set("sort", state.sorts.map((s) => `${s.field}:${s.dir}`).join(","));
   const qs = p.toString();
-  const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+  const url = qs
+    ? `${window.location.pathname}?${qs}`
+    : window.location.pathname;
   window.history.replaceState(null, "", url);
 }
 
@@ -252,10 +329,13 @@ function writeURLState(state) {
 function readColumnsCookie() {
   const m = document.cookie.match(/(?:^|; )db_cols=([^;]*)/);
   if (!m) return null;
-  return m[1].split(",").filter(Boolean).map((tok) => {
-    const [key, flag] = tok.split(":");
-    return { key, visible: flag !== "h" };
-  });
+  return m[1]
+    .split(",")
+    .filter(Boolean)
+    .map((tok) => {
+      const [key, flag] = tok.split(":");
+      return { key, visible: flag !== "h" };
+    });
 }
 
 function writeColumnsCookie(columns) {
@@ -322,21 +402,21 @@ function app() {
     pageSize: 500,
 
     sortableFields: SORTABLE_FIELDS,
-    columns: [],           // ordered { key, visible } — includes fixed keys at [0..1]
-    units: "metric",       // "metric" | "imperial" — affects Size, Weight, Vas display + labels
-    theme: "light",        // "light" | "dark" — pre-hydration script in index.html sets the
-                           // actual data-theme attribute before styles load; init() reads it
-                           // back so Alpine's toggle icon starts in sync.
+    columns: [], // ordered { key, visible } — includes fixed keys at [0..1]
+    units: "metric", // "metric" | "imperial" — affects Size, Weight, Vas display + labels
+    theme: "light", // "light" | "dark" — pre-hydration script in index.html sets the
+    // actual data-theme attribute before styles load; init() reads it
+    // back so Alpine's toggle icon starts in sync.
     pickerOpen: false,
     sortPickerOpen: false,
-    scrolled: false,       // right table has scrollLeft > 0 — drives shadow on fixed table
-    hoverIdx: null,        // row index currently hovered in either table — drives shared highlight
+    scrolled: false, // right table has scrollLeft > 0 — drives shadow on fixed table
+    hoverIdx: null, // row index currently hovered in either table — drives shared highlight
 
-    dragKey: null,         // column key currently being dragged
-    dragOverKey: null,     // column key currently hovered as drop target
-    dragSide: null,        // 'left' | 'right' — which half of the hovered th we're over
+    dragKey: null, // column key currently being dragged
+    dragOverKey: null, // column key currently hovered as drop target
+    dragSide: null, // 'left' | 'right' — which half of the hovered th we're over
 
-    sortDragField: null,   // sort chip field currently being dragged
+    sortDragField: null, // sort chip field currently being dragged
     sortDragOverField: null,
     sortDragSide: null,
 
@@ -350,7 +430,10 @@ function app() {
       this.sorts = state.sorts;
       this.columns = reconcileColumns(readColumnsCookie());
       this.units = readUnitsCookie() || "metric";
-      this.theme = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+      this.theme =
+        document.documentElement.getAttribute("data-theme") === "dark"
+          ? "dark"
+          : "light";
 
       try {
         const resp = await fetch("drivers.json", { cache: "no-store" });
@@ -392,9 +475,11 @@ function app() {
       groups.push({
         key: "kind",
         label: "Type",
-        options: [...kCounts.entries()]
-          .sort()
-          .map(([value, count]) => ({ value, label: DRIVER_KIND_LABEL[value] || value, count })),
+        options: [...kCounts.entries()].sort().map(([value, count]) => ({
+          value,
+          label: DRIVER_KIND_LABEL[value] || value,
+          count,
+        })),
       });
       const impCounts = counts((d) => d.impedance_nominal_ohm);
       groups.push({
@@ -408,9 +493,11 @@ function app() {
       groups.push({
         key: "size_in",
         label: "Size",
-        options: SIZE_BUCKETS_MM
-          .map((b) => ({ value: b.label, label: b.label, count: sCounts.get(b.label) || 0 }))
-          .filter((o) => o.count > 0),
+        options: SIZE_BUCKETS_MM.map((b) => ({
+          value: b.label,
+          label: b.label,
+          count: sCounts.get(b.label) || 0,
+        })).filter((o) => o.count > 0),
       });
       return groups;
     },
@@ -421,9 +508,15 @@ function app() {
       return this.drivers.filter((d) => {
         if (f.mfg.length && !f.mfg.includes(d.manufacturer)) return false;
         if (f.kind.length && !f.kind.includes(d.driver_kind)) return false;
-        if (f.impedance.length && !f.impedance.includes(d.impedance_nominal_ohm)) return false;
-        if (f.size_in.length && !f.size_in.includes(d._size_bucket)) return false;
-        if (q && !(`${d.manufacturer} ${d.model}`.toLowerCase().includes(q))) return false;
+        if (
+          f.impedance.length &&
+          !f.impedance.includes(d.impedance_nominal_ohm)
+        )
+          return false;
+        if (f.size_in.length && !f.size_in.includes(d._size_bucket))
+          return false;
+        if (q && !`${d.manufacturer} ${d.model}`.toLowerCase().includes(q))
+          return false;
         return true;
       });
     },
@@ -482,7 +575,9 @@ function app() {
     },
 
     // --- actions ---
-    onFilterChange() { this.updateUrl(); },
+    onFilterChange() {
+      this.updateUrl();
+    },
 
     toggleFilter(group, value) {
       const arr = this.filters[group];
@@ -538,7 +633,8 @@ function app() {
       if (!this.sortDragField || field === this.sortDragField) return;
       ev.dataTransfer.dropEffect = "move";
       const rect = ev.currentTarget.getBoundingClientRect();
-      this.sortDragSide = ev.clientX < rect.left + rect.width / 2 ? "left" : "right";
+      this.sortDragSide =
+        ev.clientX < rect.left + rect.width / 2 ? "left" : "right";
       this.sortDragOverField = field;
     },
     onSortDragLeave(field) {
@@ -549,10 +645,16 @@ function app() {
     },
     onSortDrop(targetField) {
       const src = this.sortDragField;
-      if (!src || src === targetField) { this.onSortDragEnd(); return; }
+      if (!src || src === targetField) {
+        this.onSortDragEnd();
+        return;
+      }
       const srcIdx = this.sorts.findIndex((s) => s.field === src);
       const tgtIdx = this.sorts.findIndex((s) => s.field === targetField);
-      if (srcIdx < 0 || tgtIdx < 0) { this.onSortDragEnd(); return; }
+      if (srcIdx < 0 || tgtIdx < 0) {
+        this.onSortDragEnd();
+        return;
+      }
       let newPos = tgtIdx + (this.sortDragSide === "right" ? 1 : 0);
       if (srcIdx < newPos) newPos -= 1;
       const [moved] = this.sorts.splice(srcIdx, 1);
@@ -568,7 +670,8 @@ function app() {
     sortDragClass(field) {
       const parts = [];
       if (this.sortDragField === field) parts.push("dragging");
-      if (this.sortDragOverField === field && this.sortDragSide) parts.push(`drop-${this.sortDragSide}`);
+      if (this.sortDragOverField === field && this.sortDragSide)
+        parts.push(`drop-${this.sortDragSide}`);
       return parts.join(" ");
     },
 
@@ -585,7 +688,8 @@ function app() {
       if (!this.dragKey || key === this.dragKey) return;
       ev.dataTransfer.dropEffect = "move";
       const rect = ev.currentTarget.getBoundingClientRect();
-      this.dragSide = ev.clientX < rect.left + rect.width / 2 ? "left" : "right";
+      this.dragSide =
+        ev.clientX < rect.left + rect.width / 2 ? "left" : "right";
       this.dragOverKey = key;
     },
 
@@ -598,11 +702,19 @@ function app() {
 
     onColDrop(targetKey) {
       const src = this.dragKey;
-      if (!src || src === targetKey) { this.onColDragEnd(); return; }
-      const visible = this.columns.filter((c) => c.visible && !IS_FIXED.has(c.key));
+      if (!src || src === targetKey) {
+        this.onColDragEnd();
+        return;
+      }
+      const visible = this.columns.filter(
+        (c) => c.visible && !IS_FIXED.has(c.key),
+      );
       const targetVisIdx = visible.findIndex((c) => c.key === targetKey);
       const srcVisIdx = visible.findIndex((c) => c.key === src);
-      if (targetVisIdx < 0 || srcVisIdx < 0) { this.onColDragEnd(); return; }
+      if (targetVisIdx < 0 || srcVisIdx < 0) {
+        this.onColDragEnd();
+        return;
+      }
       // Insertion point in the visible sequence, before/after the target.
       let newPos = targetVisIdx + (this.dragSide === "right" ? 1 : 0);
       // Removing src first shifts positions past it left by one.
@@ -620,7 +732,8 @@ function app() {
     colDragClass(key) {
       const parts = [];
       if (this.dragKey === key) parts.push("dragging");
-      if (this.dragOverKey === key && this.dragSide) parts.push(`drop-${this.dragSide}`);
+      if (this.dragOverKey === key && this.dragSide)
+        parts.push(`drop-${this.dragSide}`);
       return parts.join(" ");
     },
 
@@ -637,7 +750,10 @@ function app() {
       for (let i = 0; i < this.columns.length; i++) {
         const c = this.columns[i];
         if (IS_FIXED.has(c.key) || !c.visible) continue;
-        if (visCount === newPos) { insertAt = i; break; }
+        if (visCount === newPos) {
+          insertAt = i;
+          break;
+        }
         visCount++;
       }
       this.columns.splice(insertAt, 0, moved);
@@ -663,8 +779,10 @@ function app() {
       if (key.endsWith("_diameter_mm") || key === "nominal_size_mm") {
         return `${meta.label} (${this.units === "imperial" ? "in" : "mm"})`;
       }
-      if (key === "net_weight_kg") return `${meta.label} (${this.units === "imperial" ? "lb" : "kg"})`;
-      if (key === "vas_liters")    return `${meta.label} (${this.units === "imperial" ? "ft³" : "L"})`;
+      if (key === "net_weight_kg")
+        return `${meta.label} (${this.units === "imperial" ? "lb" : "kg"})`;
+      if (key === "vas_liters")
+        return `${meta.label} (${this.units === "imperial" ? "ft³" : "L"})`;
       return meta.label;
     },
 
@@ -688,13 +806,23 @@ function app() {
       if (col.key === "driver_kind") {
         base = d._kind_label || String(v);
       } else if (col.key === "nominal_size_mm") {
-        base = this.units === "imperial" ? (v / MM_PER_INCH).toFixed(1) : `${Math.round(v)}`;
+        base =
+          this.units === "imperial"
+            ? (v / MM_PER_INCH).toFixed(1)
+            : `${Math.round(v)}`;
       } else if (col.key.endsWith("_diameter_mm")) {
-        base = this.units === "imperial" ? (v / MM_PER_INCH).toFixed(2) : `${Math.round(v)}`;
+        base =
+          this.units === "imperial"
+            ? (v / MM_PER_INCH).toFixed(2)
+            : `${Math.round(v)}`;
       } else if (col.key === "net_weight_kg") {
-        base = this.units === "imperial" ? fmtNumber(v * LB_PER_KG) : fmtNumber(v);
+        base =
+          this.units === "imperial" ? fmtNumber(v * LB_PER_KG) : fmtNumber(v);
       } else if (col.key === "vas_liters") {
-        base = this.units === "imperial" ? fmtNumber(v * CUFT_PER_LITER) : fmtNumber(v);
+        base =
+          this.units === "imperial"
+            ? fmtNumber(v * CUFT_PER_LITER)
+            : fmtNumber(v);
       } else if (col.key.endsWith("_ohm")) {
         base = `${v}&nbsp;Ω`;
       } else {
@@ -728,7 +856,9 @@ function app() {
         left: Math.round(rect.left + rect.width / 2),
       };
     },
-    closeSpecPopover() { this.specPopover.open = false; },
+    closeSpecPopover() {
+      this.specPopover.open = false;
+    },
 
     updateUrl() {
       writeURLState({ filters: this.filters, sorts: this.sorts });

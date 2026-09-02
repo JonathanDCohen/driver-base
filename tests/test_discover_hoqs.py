@@ -18,11 +18,14 @@ def test_enumerate_filters_non_drivers_and_tags_kind() -> None:
     Compression Driver/Speaker, and derive driver_kind_hint per entry."""
     s = HoqsScraper()
     seed = load_fixture(
-        "hoqs", "seeds/products.json",
+        "hoqs",
+        "seeds/products.json",
         url="https://hoqs.org/products.json?limit=250&page=1",
     )
     res = s.enumerate([seed])
-    urls_kinds = [(p.url.rsplit("/", 1)[-1], p.context.driver_kind_hint) for p in res.product_urls]
+    urls_kinds = [
+        (p.url.rsplit("/", 1)[-1], p.context.driver_kind_hint) for p in res.product_urls
+    ]
 
     # Sanity: at least the well-known drivers are present with correct kinds
     d = dict(urls_kinds)
@@ -45,7 +48,8 @@ def test_model_extracted_from_og_title_not_legacy_handle() -> None:
     come from the storefront's og:title, not the handle."""
     s = HoqsScraper()
     raw = load_fixture(
-        "hoqs", "products/f185c-legacy-slug.html",
+        "hoqs",
+        "products/f185c-legacy-slug.html",
         url="https://hoqs.org/products/hoqs-carbon-fiber-18",
     )
     res = s.parse_artifact(raw, SeedContext(driver_kind_hint=DriverKind.LF_WOOFER))

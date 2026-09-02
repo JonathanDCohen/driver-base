@@ -20,19 +20,25 @@ def scraper() -> BeymaScraper:
 
 def test_enumerate_low_mid_frequency(scraper: BeymaScraper) -> None:
     seed = load_fixture(
-        "beyma", "seeds/low-mid-frequency.html",
+        "beyma",
+        "seeds/low-mid-frequency.html",
         url="https://www.beyma.com/en/products/c/low-mid-frequency/",
     )
     res = scraper.enumerate([seed])
     assert len(res.product_urls) >= 60
-    assert all(p.context.driver_kind_hint == DriverKind.LF_WOOFER for p in res.product_urls)
+    assert all(
+        p.context.driver_kind_hint == DriverKind.LF_WOOFER for p in res.product_urls
+    )
     assert all("/low-mid-frequency/" in p.url for p in res.product_urls)
 
 
 def test_parse_18lex1600fe(scraper: BeymaScraper) -> None:
     raw = load_fixture("beyma", "products/18LEX1600Fe.html", url=_18LEX_URL)
     res = scraper.parse_artifact(
-        raw, SeedContext(driver_kind_hint=DriverKind.LF_WOOFER, category_id="low-mid-frequency"),
+        raw,
+        SeedContext(
+            driver_kind_hint=DriverKind.LF_WOOFER, category_id="low-mid-frequency"
+        ),
     )
     assert len(res.fragments) == 1
     f = res.fragments[0]
@@ -47,12 +53,12 @@ def test_parse_18lex1600fe(scraper: BeymaScraper) -> None:
     assert f.qes == pytest.approx(0.4)
     assert f.qms == pytest.approx(7.4)
     assert f.vas_liters == pytest.approx(188.0)
-    assert f.sd_cm2 == pytest.approx(1255.0)   # from '0.1255 m²'
+    assert f.sd_cm2 == pytest.approx(1255.0)  # from '0.1255 m²'
     assert f.xmax_mm == pytest.approx(13.0)
-    assert f.xmech_mm == pytest.approx(60.0)   # "Xdamage pp" AS-REPORTED
-    assert f.mms_g == pytest.approx(252.0)     # from '0.252 kg'
-    assert f.cms_mm_per_n == pytest.approx(0.085)   # from '85 µm/N'
-    assert f.bl_tm == pytest.approx(26.9)      # "26.9 N/A"
+    assert f.xmech_mm == pytest.approx(60.0)  # "Xdamage pp" AS-REPORTED
+    assert f.mms_g == pytest.approx(252.0)  # from '0.252 kg'
+    assert f.cms_mm_per_n == pytest.approx(0.085)  # from '85 µm/N'
+    assert f.bl_tm == pytest.approx(26.9)  # "26.9 N/A"
     assert f.re_ohm == pytest.approx(5.3)
     assert f.le_mh == pytest.approx(1.7)
     assert f.eta_zero_pct == pytest.approx(1.9)

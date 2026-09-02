@@ -96,7 +96,9 @@ class HttpxFetcher:
                     resp = await client.get(url)
             except httpx.TimeoutException:
                 if i == len(_BACKOFF_SCHEDULE):
-                    return FetchError(url=url, kind="transient", reason="timeout", attempts=attempts)
+                    return FetchError(
+                        url=url, kind="transient", reason="timeout", attempts=attempts
+                    )
                 continue
             except httpx.HTTPError as e:
                 reason_ = _classify_httpx_error(e)
@@ -126,7 +128,12 @@ class HttpxFetcher:
                 return artifact
 
             if status in _PERMANENT_STATUSES:
-                return FetchError(url=url, kind="permanent", reason=f"http_{status}", attempts=attempts)
+                return FetchError(
+                    url=url,
+                    kind="permanent",
+                    reason=f"http_{status}",
+                    attempts=attempts,
+                )
 
             if status in _TRANSIENT_STATUSES or 500 <= status < 600:
                 if status == 429:
@@ -136,13 +143,22 @@ class HttpxFetcher:
                         await asyncio.sleep(wait)
                         continue
                 if i == len(_BACKOFF_SCHEDULE):
-                    return FetchError(url=url, kind="transient", reason=f"http_{status}", attempts=attempts)
+                    return FetchError(
+                        url=url,
+                        kind="transient",
+                        reason=f"http_{status}",
+                        attempts=attempts,
+                    )
                 continue
 
             # any other status is treated as permanent
-            return FetchError(url=url, kind="permanent", reason=f"http_{status}", attempts=attempts)
+            return FetchError(
+                url=url, kind="permanent", reason=f"http_{status}", attempts=attempts
+            )
 
-        return FetchError(url=url, kind="transient", reason="retries_exhausted", attempts=attempts)
+        return FetchError(
+            url=url, kind="transient", reason="retries_exhausted", attempts=attempts
+        )
 
     async def fetch_many(
         self, urls: list[str], *, force_refresh: bool = False

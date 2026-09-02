@@ -59,23 +59,30 @@ _BASE = "https://eminence.com"
 
 # product_type → DriverKind. Unmapped types are dropped at enumerate.
 _TYPE_TO_KIND: dict[str, DriverKind] = {
-    "American Standard Series Replacement Speaker":  DriverKind.LF_WOOFER,
-    "Professional Series Replacement Speaker":       DriverKind.LF_WOOFER,
-    "Neodymium Series Replacement Speaker":          DriverKind.LF_WOOFER,
-    "Replacement Speaker":                           DriverKind.LF_WOOFER,
-    "Tour Grade Replacement Speaker":                DriverKind.LF_WOOFER,
-    "Signature Series Guitar Replacement Speaker":   DriverKind.GUITAR_BASS,
-    "Patriot Guitar Replacement Speaker":            DriverKind.GUITAR_BASS,
-    "Legend Guitar":                                 DriverKind.GUITAR_BASS,
-    "Redcoat Guitar Replacement Speaker":            DriverKind.GUITAR_BASS,
-    "Bass Guitar Replacement Speaker":               DriverKind.GUITAR_BASS,
-    "High Frequency":                                DriverKind.HF_COMPRESSION,
-    "Tweeter":                                       DriverKind.TWEETER,
-    "Waveguide":                                     DriverKind.HORN,
+    "American Standard Series Replacement Speaker": DriverKind.LF_WOOFER,
+    "Professional Series Replacement Speaker": DriverKind.LF_WOOFER,
+    "Neodymium Series Replacement Speaker": DriverKind.LF_WOOFER,
+    "Replacement Speaker": DriverKind.LF_WOOFER,
+    "Tour Grade Replacement Speaker": DriverKind.LF_WOOFER,
+    "Signature Series Guitar Replacement Speaker": DriverKind.GUITAR_BASS,
+    "Patriot Guitar Replacement Speaker": DriverKind.GUITAR_BASS,
+    "Legend Guitar": DriverKind.GUITAR_BASS,
+    "Redcoat Guitar Replacement Speaker": DriverKind.GUITAR_BASS,
+    "Bass Guitar Replacement Speaker": DriverKind.GUITAR_BASS,
+    "High Frequency": DriverKind.HF_COMPRESSION,
+    "Tweeter": DriverKind.TWEETER,
+    "Waveguide": DriverKind.HORN,
 }
-_SKIP_TYPES: frozenset[str] = frozenset({
-    "Crossover", "Speaker Cable", "Components", "Protection", "Hardware", "",
-})
+_SKIP_TYPES: frozenset[str] = frozenset(
+    {
+        "Crossover",
+        "Speaker Cable",
+        "Components",
+        "Protection",
+        "Hardware",
+        "",
+    }
+)
 
 
 def _weight_kg(s: Optional[str]) -> Optional[float]:
@@ -89,6 +96,7 @@ def _weight_kg(s: Optional[str]) -> Optional[float]:
 # by more than 5%, prefer inches × 25.4 — typos are almost always on the
 # metric side, and the inches value is the primary spec.
 _INCHES_RE = re.compile(r"([\d.]+)\s*(?:\"|″|in\b)", re.IGNORECASE)
+
 
 def _parse_diameter_mm(s: Optional[str]) -> Optional[float]:
     mm = parse_length_mm(s)
@@ -108,45 +116,53 @@ def _parse_diameter_mm(s: Optional[str]) -> Optional[float]:
     return mm
 
 
-_LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]] = {
+_LABEL_MAP: dict[
+    str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]
+] = {
     # T/S (verbose Eminence labels)
-    "resonant frequency":                      ("fs_hz",           parse_frequency),
-    "resonance":                               ("fs_hz",           parse_frequency),
-    "dc resistance":                           ("re_ohm",          parse_impedance),
-    "coil inductance":                         ("le_mh",           parse_le_mh),
-    "voice coil inductance":                   ("le_mh",           parse_le_mh),
-    "mechanical q":                            ("qms",             parse_float),
-    "electromagnetic q":                       ("qes",             parse_float),
-    "total q":                                 ("qts",             parse_float),
-    "compliance equivalent volume":            ("vas_liters",      parse_liters),
-    "mechanical compliance of suspension":     ("cms_mm_per_n",    parse_compliance_mm_per_n),
-    "bl product":                              ("bl_tm",           parse_bl_tm),
-    "diaphragm mass inc. airload":             ("mms_g",           parse_mass_g),
-    "efficiency bandwidth product":            ("ebp_hz",          parse_frequency),
-    "maximum linear excursion":                ("xmax_mm",         parse_length_mm),
-    "maximum mechanical limit":                ("xmech_mm",        parse_length_mm),
-    "surface area of cone":                    ("sd_cm2",          parse_sd_cm2),
+    "resonant frequency": ("fs_hz", parse_frequency),
+    "resonance": ("fs_hz", parse_frequency),
+    "dc resistance": ("re_ohm", parse_impedance),
+    "coil inductance": ("le_mh", parse_le_mh),
+    "voice coil inductance": ("le_mh", parse_le_mh),
+    "mechanical q": ("qms", parse_float),
+    "electromagnetic q": ("qes", parse_float),
+    "total q": ("qts", parse_float),
+    "compliance equivalent volume": ("vas_liters", parse_liters),
+    "mechanical compliance of suspension": ("cms_mm_per_n", parse_compliance_mm_per_n),
+    "bl product": ("bl_tm", parse_bl_tm),
+    "diaphragm mass inc. airload": ("mms_g", parse_mass_g),
+    "efficiency bandwidth product": ("ebp_hz", parse_frequency),
+    "maximum linear excursion": ("xmax_mm", parse_length_mm),
+    "maximum mechanical limit": ("xmech_mm", parse_length_mm),
+    "surface area of cone": ("sd_cm2", parse_sd_cm2),
     # electrical / commercial
-    "nominal impedance":                       ("impedance_nominal_ohm", parse_impedance),
-    "program power":                           ("power_program_watts",   parse_power),
-    "watts":                                   ("power_aes_watts",       parse_power),  # Eminence 'Watts' is the AES rating (2× → 'Program Power' matches AES convention)
-    "power rating":                            ("power_aes_watts",       parse_power),  # HF/tweeter pages use "Power Rating" instead of "Watts"
-    "sensitivity":                             ("sensitivity_db_1w_1m",  parse_float),
-    "usable frequency range":                  ("__freq_range__",        parse_range),
-    "recommended crossover":                   ("recommended_crossover_hz", parse_frequency),
-    "low rec. crossover":                      ("recommended_crossover_hz", parse_frequency),
+    "nominal impedance": ("impedance_nominal_ohm", parse_impedance),
+    "program power": ("power_program_watts", parse_power),
+    "watts": (
+        "power_aes_watts",
+        parse_power,
+    ),  # Eminence 'Watts' is the AES rating (2× → 'Program Power' matches AES convention)
+    "power rating": (
+        "power_aes_watts",
+        parse_power,
+    ),  # HF/tweeter pages use "Power Rating" instead of "Watts"
+    "sensitivity": ("sensitivity_db_1w_1m", parse_float),
+    "usable frequency range": ("__freq_range__", parse_range),
+    "recommended crossover": ("recommended_crossover_hz", parse_frequency),
+    "low rec. crossover": ("recommended_crossover_hz", parse_frequency),
     # physical
-    "nominal basket diameter":                 ("nominal_size_mm",       _parse_diameter_mm),
-    "voice coil diameter":                     ("voice_coil_diameter_mm", _parse_diameter_mm),
-    "overall diameter":                        ("overall_diameter_mm",   _parse_diameter_mm),
-    "baffle hole diameter":                    ("mounting_diameter_mm",  _parse_diameter_mm),
-    "depth":                                   ("depth_mm",              _parse_diameter_mm),
+    "nominal basket diameter": ("nominal_size_mm", _parse_diameter_mm),
+    "voice coil diameter": ("voice_coil_diameter_mm", _parse_diameter_mm),
+    "overall diameter": ("overall_diameter_mm", _parse_diameter_mm),
+    "baffle hole diameter": ("mounting_diameter_mm", _parse_diameter_mm),
+    "depth": ("depth_mm", _parse_diameter_mm),
     # HF compression drivers and tweeters publish `Throat Size` in place of
     # `Nominal basket diameter`; used as size fallback in the post-parse step.
-    "throat size":                             ("throat_diameter_mm",    _parse_diameter_mm),
-    "net weight":                              ("net_weight_kg",         _weight_kg),
-    "weight":                                  ("net_weight_kg",         _weight_kg),  # HF/tweeter pages use "Weight"
-    "magnet material":                         ("magnet_type",           lambda s: normalize_magnet_type(s)),
+    "throat size": ("throat_diameter_mm", _parse_diameter_mm),
+    "net weight": ("net_weight_kg", _weight_kg),
+    "weight": ("net_weight_kg", _weight_kg),  # HF/tweeter pages use "Weight"
+    "magnet material": ("magnet_type", lambda s: normalize_magnet_type(s)),
 }
 
 
@@ -161,14 +177,14 @@ def _model_from_handle(handle: str) -> str:
 # lines) — we get size / power / impedance / voice-coil-diameter / magnet from
 # tags rather than a full spec table.
 _TAGS_JSON_RE = re.compile(r'"tags"\s*:\s*(\[[^\]]*\])')
-_TAG_SIZE_RE   = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*Inch\s*$", re.IGNORECASE)
-_TAG_POWER_RE  = re.compile(r"^\s*(\d+)\s*W(?:atts?)?\s*$", re.IGNORECASE)
-_TAG_IMP_RE    = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*Ohm\s*$", re.IGNORECASE)
+_TAG_SIZE_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*Inch\s*$", re.IGNORECASE)
+_TAG_POWER_RE = re.compile(r"^\s*(\d+)\s*W(?:atts?)?\s*$", re.IGNORECASE)
+_TAG_IMP_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*Ohm\s*$", re.IGNORECASE)
 # Voice coil tag: `2" (51 mm) Voice Coil` — the mm value in parens is authoritative.
-_TAG_VC_RE     = re.compile(
+_TAG_VC_RE = re.compile(
     r'^\s*[\d.]+"\s*\(\s*(\d+(?:\.\d+)?)\s*mm\s*\)\s*Voice Coil\s*$', re.IGNORECASE
 )
-_TAG_MAG_RE    = re.compile(r"^\s*(Ferrite|Ceramic|Neodymium|Alnico)\s*$", re.IGNORECASE)
+_TAG_MAG_RE = re.compile(r"^\s*(Ferrite|Ceramic|Neodymium|Alnico)\s*$", re.IGNORECASE)
 
 
 def _apply_tags_fallback(frag: DriverFragment, html: str) -> None:
@@ -220,11 +236,15 @@ class EminenceScraper(Scraper):
     name = "eminence"
     manufacturer_display = "Eminence"
     schema_version = "1.0"
-    expected_min_records = 70     # recon enumerated ~139 driver types; live parse yields ~80 (many lack #em-detail)
-    max_seed_rounds = 2           # Shopify limit=250 → single page suffices
+    expected_min_records = 70  # recon enumerated ~139 driver types; live parse yields ~80 (many lack #em-detail)
+    max_seed_rounds = 2  # Shopify limit=250 → single page suffices
 
     def discover_seeds(self) -> list[SeedRef]:
-        return [SeedRef(url=f"{_BASE}/products.json?limit=250&page=1", context=SeedContext())]
+        return [
+            SeedRef(
+                url=f"{_BASE}/products.json?limit=250&page=1", context=SeedContext()
+            )
+        ]
 
     def enumerate(self, seed_artifacts: list[RawArtifact]) -> EnumerateResult:
         products: list[SeedRef] = []

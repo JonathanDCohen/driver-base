@@ -31,7 +31,9 @@ def _art(url: str, path: Path) -> RawArtifact:
 async def test_orchestrator_end_to_end_with_fake_fetcher(tmp_path: Path) -> None:
     fx = FIXTURES_ROOT / "eighteensound"
     lf_seed_url = "https://www.eighteensound.it/en/products/lf-driver"
-    lf_product_url = "https://www.eighteensound.it/en/products/lf-driver/18-0/8/18LW1400"
+    lf_product_url = (
+        "https://www.eighteensound.it/en/products/lf-driver/18-0/8/18LW1400"
+    )
 
     # FakeFetcher answers only these two URLs; every enumerated product URL other
     # than 18LW1400 becomes a permanent FetchError (fine — the test asserts on
@@ -47,6 +49,7 @@ async def test_orchestrator_end_to_end_with_fake_fetcher(tmp_path: Path) -> None
     # narrow for this smoke test).
     class Sanded(EighteenSoundScraper):
         expected_min_records = 1
+
     scraper = Sanded()
 
     drivers, per_status = await run_all(
@@ -81,7 +84,9 @@ async def test_orchestrator_preserves_prior_on_gate_failure(tmp_path: Path) -> N
     """If records_this_run < expected_min_records AND no baseline, preserve prior."""
     fx = FIXTURES_ROOT / "eighteensound"
     lf_seed_url = "https://www.eighteensound.it/en/products/lf-driver"
-    lf_product_url = "https://www.eighteensound.it/en/products/lf-driver/18-0/8/18LW1400"
+    lf_product_url = (
+        "https://www.eighteensound.it/en/products/lf-driver/18-0/8/18LW1400"
+    )
 
     url_map = {
         lf_seed_url: _art(lf_seed_url, fx / "seeds/lf-driver.html"),
@@ -89,14 +94,17 @@ async def test_orchestrator_preserves_prior_on_gate_failure(tmp_path: Path) -> N
     }
     factory = make_fetcher_factory(url_map)
 
-    scraper = EighteenSoundScraper()   # default expected_min_records=275 → will fail
+    scraper = EighteenSoundScraper()  # default expected_min_records=275 → will fail
 
     # Prior has NO 18Sound records (first-run branch), so the first-run
     # absolute-floor gate applies: 1 < 275 → preserve. We still record a
     # prior per_scraper_status so consecutive_failures increments from 0 → 1.
     prior = {
         "per_scraper_status": {
-            "eighteensound": {"consecutive_failures": 0, "last_success_at": "2026-08-15T00:00:00+00:00"}
+            "eighteensound": {
+                "consecutive_failures": 0,
+                "last_success_at": "2026-08-15T00:00:00+00:00",
+            }
         },
         "drivers": [
             {
@@ -112,7 +120,8 @@ async def test_orchestrator_preserves_prior_on_gate_failure(tmp_path: Path) -> N
                 "status": "active",
                 "warn_flags": [],
             }
-        ] * 400,   # 400 prior records: 1 new vs 400 prior = 99.75% drop → preserve
+        ]
+        * 400,  # 400 prior records: 1 new vs 400 prior = 99.75% drop → preserve
     }
 
     drivers, per_status = await run_all(

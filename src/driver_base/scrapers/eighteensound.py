@@ -81,14 +81,19 @@ _PRODUCT_URL_RE = re.compile(
     re.IGNORECASE,
 )
 _URL_PATH_RE = re.compile(
-    r'^/en/products/(?P<category>[^/]+)/(?P<size>[0-9]+-[0-9]+)/(?P<impedance>[0-9]+)/(?P<model>[^/?#]+)/?$'
+    r"^/en/products/(?P<category>[^/]+)/(?P<size>[0-9]+-[0-9]+)/(?P<impedance>[0-9]+)/(?P<model>[^/?#]+)/?$"
 )
 # Categories where the URL `size` segment is the driver's nominal diameter (in
 # inches; `X-Y` → `X.Y`). Horns use the same shape for their throat, but a
 # horn's "size" isn't a horn concept — leave nominal_size_mm null there.
-_URL_SIZE_CATEGORIES: frozenset[str] = frozenset({
-    "lf-driver", "hf-driver", "coaxial", "line-array-source",
-})
+_URL_SIZE_CATEGORIES: frozenset[str] = frozenset(
+    {
+        "lf-driver",
+        "hf-driver",
+        "coaxial",
+        "line-array-source",
+    }
+)
 _MM_PER_INCH = 25.4
 # Product pages display the model as the first `<h1 class="darkGrey">…</h1>`.
 # URL slugs are inconsistently cased (some lowercase, some canonical) — prefer
@@ -120,19 +125,25 @@ _FREQ_RANGE_MARKER = "__freq_range__"
 # these when parsing a coax page so the LF values feed the generic fields and
 # the HF values feed the coax_hf_* fields.
 _COAX_LF_LABEL_REWRITES: dict[str, str] = {
-    "lf sensitivity":              "sensitivity",
-    "lf nominal power handling":   "nominal power handling",
-    "lf continuous power handling":"continuous power handling",
-    "lf voice coil diameter":      "voice coil diameter",
-    "lf winding material":         "__drop__",
-    "minimum impedance lf":        "minimum impedance",
+    "lf sensitivity": "sensitivity",
+    "lf nominal power handling": "nominal power handling",
+    "lf continuous power handling": "continuous power handling",
+    "lf voice coil diameter": "voice coil diameter",
+    "lf winding material": "__drop__",
+    "minimum impedance lf": "minimum impedance",
 }
 # HF-side labels on a coax page → coax_hf_* fields.
 _COAX_HF_LABEL_MAP: dict[str, tuple[str, Callable[[Optional[str]], object]]] = {
-    "hf sensitivity":              ("coax_hf_sensitivity_db_1w_1m",  lambda s: parse_float(s)),
-    "hf nominal power handling":   ("coax_hf_power_aes_watts",       lambda s: parse_power(s)),
-    "hf continuous power handling":("coax_hf_power_long_term_watts", lambda s: parse_power(s)),
-    "hf voice coil diameter":      ("coax_hf_voice_coil_diameter_mm",lambda s: parse_length_mm(s)),
+    "hf sensitivity": ("coax_hf_sensitivity_db_1w_1m", lambda s: parse_float(s)),
+    "hf nominal power handling": ("coax_hf_power_aes_watts", lambda s: parse_power(s)),
+    "hf continuous power handling": (
+        "coax_hf_power_long_term_watts",
+        lambda s: parse_power(s),
+    ),
+    "hf voice coil diameter": (
+        "coax_hf_voice_coil_diameter_mm",
+        lambda s: parse_length_mm(s),
+    ),
 }
 
 
@@ -165,14 +176,17 @@ _LABEL_MAP: dict[str, tuple[str, Callable[[Optional[str]], object]]] = {
     "net weight": ("net_weight_kg", _parse_kg),
     "magnet material": ("magnet_type", _parse_magnet),
     "diaphragm material": ("diaphragm_material", lambda s: (s or "").strip() or None),
-    "winding material":   ("winding_material",   lambda s: (s or "").strip() or None),
-    "former material":    ("former_material",    lambda s: (s or "").strip() or None),
-    "surround shape":     ("surround_material",  lambda s: (s or "").strip() or None),
-    "phase plug design":  ("phase_plug_design",  lambda s: (s or "").strip() or None),
-    "flux density":       ("flux_density_t",     parse_float),
-    "xvar":               ("xvar_mm",            parse_length_mm),
+    "winding material": ("winding_material", lambda s: (s or "").strip() or None),
+    "former material": ("former_material", lambda s: (s or "").strip() or None),
+    "surround shape": ("surround_material", lambda s: (s or "").strip() or None),
+    "phase plug design": ("phase_plug_design", lambda s: (s or "").strip() or None),
+    "flux density": ("flux_density_t", parse_float),
+    "xvar": ("xvar_mm", parse_length_mm),
     "recommended enclosure": ("recommended_enclosure_volume_liters", parse_liters),
-    "recommended enclosure volume": ("recommended_enclosure_volume_liters", parse_liters),
+    "recommended enclosure volume": (
+        "recommended_enclosure_volume_liters",
+        parse_liters,
+    ),
 }
 
 
@@ -217,7 +231,9 @@ class EighteenSoundScraper(Scraper):
                 products.append(
                     SeedRef(
                         url=url,
-                        context=SeedContext(driver_kind_hint=kind, category_id=category_slug),
+                        context=SeedContext(
+                            driver_kind_hint=kind, category_id=category_slug
+                        ),
                     )
                 )
         return EnumerateResult(product_urls=products)
@@ -230,7 +246,9 @@ class EighteenSoundScraper(Scraper):
             return ParseResult(fragments=[])
         model_from_url, impedance_from_url, category_from_url = model_and_impedance
 
-        kind = seed_context.driver_kind_hint or _CAT_TO_KIND.get(category_from_url or "")
+        kind = seed_context.driver_kind_hint or _CAT_TO_KIND.get(
+            category_from_url or ""
+        )
 
         # Prefer the page's own display heading — URL slugs are inconsistently
         # cased across 18Sound's catalog (some `15NTLW3500`, some `15ntlw2500`).
@@ -324,7 +342,10 @@ class EighteenSoundScraper(Scraper):
                 if inches is not None and inches > 0:
                     frag.nominal_size_mm = round(inches * _MM_PER_INCH, 1)
                     frag.spec_source["nominal_size_mm"] = SpecSource.HTML_GRID
-                    if category_from_url == "hf-driver" and frag.throat_diameter_mm is None:
+                    if (
+                        category_from_url == "hf-driver"
+                        and frag.throat_diameter_mm is None
+                    ):
                         frag.throat_diameter_mm = frag.nominal_size_mm
                         frag.spec_source["throat_diameter_mm"] = SpecSource.HTML_GRID
 
@@ -343,7 +364,10 @@ class EighteenSoundScraper(Scraper):
                     if frag.nominal_size_mm is None:
                         frag.nominal_size_mm = size_mm
                         frag.spec_source["nominal_size_mm"] = SpecSource.INFERRED
-                    if category_from_url == "hf-driver" and frag.throat_diameter_mm is None:
+                    if (
+                        category_from_url == "hf-driver"
+                        and frag.throat_diameter_mm is None
+                    ):
                         frag.throat_diameter_mm = size_mm
                         frag.spec_source["throat_diameter_mm"] = SpecSource.INFERRED
 

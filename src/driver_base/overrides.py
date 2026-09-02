@@ -43,12 +43,22 @@ class OverrideError(Exception):
 _DRIVER_FIELD_TYPES: dict[str, Any] = {f.name: f.type for f in dc_fields(Driver)}
 
 # Bookkeeping fields — never a valid override target.
-_NON_OVERRIDABLE: frozenset[str] = frozenset({
-    "manufacturer", "canonical_id", "driver_kind", "model",
-    "spec_source", "source_urls",
-    "fetched_at", "scraped_at", "last_scraped_at",
-    "status", "warn_flags", "override_notes",
-})
+_NON_OVERRIDABLE: frozenset[str] = frozenset(
+    {
+        "manufacturer",
+        "canonical_id",
+        "driver_kind",
+        "model",
+        "spec_source",
+        "source_urls",
+        "fetched_at",
+        "scraped_at",
+        "last_scraped_at",
+        "status",
+        "warn_flags",
+        "override_notes",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -86,7 +96,7 @@ OVERRIDES: list[Override] = [
         canonical_id="dayton__ss18_22__2ohm",
         field="nominal_size_mm",
         value=457.2,
-        note='Dayton\'s spec table lists 15"',
+        note="Dayton's spec table lists 15\"",
         # Dayton's product-page spec table lists Nominal Diameter as 15"
         # (381 mm) — a typo; every other signal on the page (URL slug,
         # model number, feature-bullet, 470 mm overall diameter) says 18".
@@ -115,10 +125,14 @@ _validate()
 
 @dataclass
 class OverrideStats:
-    applied_fields: int = 0        # (canonical_id, field) pairs actually written
-    applied_drivers: int = 0       # distinct drivers touched
-    retired_entries: list[str] = field(default_factory=list)  # "cid.field" for each entry whose predicate returned False
-    missing_ids: list[str] = field(default_factory=list)      # canonical_ids in OVERRIDES not present in this run
+    applied_fields: int = 0  # (canonical_id, field) pairs actually written
+    applied_drivers: int = 0  # distinct drivers touched
+    retired_entries: list[str] = field(
+        default_factory=list
+    )  # "cid.field" for each entry whose predicate returned False
+    missing_ids: list[str] = field(
+        default_factory=list
+    )  # canonical_ids in OVERRIDES not present in this run
 
 
 def apply_overrides(drivers: list[Driver]) -> OverrideStats:

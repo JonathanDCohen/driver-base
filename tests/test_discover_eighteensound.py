@@ -12,7 +12,12 @@ def test_discover_seeds_has_six_categories() -> None:
     seeds = s.discover_seeds()
     assert len(seeds) == 6
     assert {seed.context.category_id for seed in seeds} == {
-        "lf-driver", "hf-driver", "coaxial", "line-array-source", "horn", "tweeter",
+        "lf-driver",
+        "hf-driver",
+        "coaxial",
+        "line-array-source",
+        "horn",
+        "tweeter",
     }
     tweeter = next(seed for seed in seeds if seed.context.category_id == "tweeter")
     assert tweeter.context.driver_kind_hint == DriverKind.TWEETER
@@ -20,18 +25,28 @@ def test_discover_seeds_has_six_categories() -> None:
 
 def test_preferred_fetcher_routes_tweeter_to_playwright() -> None:
     s = EighteenSoundScraper()
-    assert s.preferred_fetcher("https://www.eighteensound.it/en/products/tweeter") == FetcherKind.PLAYWRIGHT
-    assert s.preferred_fetcher("https://www.eighteensound.it/en/products/lf-driver") is None
+    assert (
+        s.preferred_fetcher("https://www.eighteensound.it/en/products/tweeter")
+        == FetcherKind.PLAYWRIGHT
+    )
+    assert (
+        s.preferred_fetcher("https://www.eighteensound.it/en/products/lf-driver")
+        is None
+    )
     # Product pages under tweeter are static; only the CATEGORY-listing seed is JS.
-    assert s.preferred_fetcher(
-        "https://www.eighteensound.it/en/products/tweeter/1-25/8/nsd1095n"
-    ) is None
+    assert (
+        s.preferred_fetcher(
+            "https://www.eighteensound.it/en/products/tweeter/1-25/8/nsd1095n"
+        )
+        is None
+    )
 
 
 def test_enumerate_lf_category_yields_all_products() -> None:
     s = EighteenSoundScraper()
     raw = load_fixture(
-        "eighteensound", "seeds/lf-driver.html",
+        "eighteensound",
+        "seeds/lf-driver.html",
         url="https://www.eighteensound.it/en/products/lf-driver",
     )
     res = s.enumerate([raw])
@@ -50,9 +65,10 @@ def test_enumerate_dedups_case_insensitively() -> None:
     dedup to one entry per unique URL (case-insensitive)."""
     s = EighteenSoundScraper()
     raw = load_fixture(
-        "eighteensound", "seeds/lf-driver.html",
+        "eighteensound",
+        "seeds/lf-driver.html",
         url="https://www.eighteensound.it/en/products/lf-driver",
     )
-    res = s.enumerate([raw, raw])   # same seed twice
+    res = s.enumerate([raw, raw])  # same seed twice
     urls = [p.url for p in res.product_urls]
     assert len(urls) == len(set(u.lower() for u in urls))

@@ -55,7 +55,7 @@ def test_parse_n185c(scraper: HoqsScraper) -> None:
     assert f.power_program_watts == pytest.approx(3400.0)
 
     # physical
-    assert f.nominal_size_mm == pytest.approx(457.2)   # 18" → 457.2mm
+    assert f.nominal_size_mm == pytest.approx(457.2)  # 18" → 457.2mm
     assert f.voice_coil_diameter_mm == pytest.approx(125.0)
     assert f.magnet_type == MagnetType.NEODYMIUM
 
@@ -64,15 +64,21 @@ def test_parse_n185c(scraper: HoqsScraper) -> None:
     assert f.spec_source["sensitivity_db_2_83v_1m"] == SpecSource.INLINE_JS
 
 
-def test_parse_emits_minimal_fragment_when_speaker_data_missing(scraper: HoqsScraper) -> None:
+def test_parse_emits_minimal_fragment_when_speaker_data_missing(
+    scraper: HoqsScraper,
+) -> None:
     """Some HOQS pages (e.g. N62C) ship `var speakerData = null;` — the T/S
     table lives in a downloadable CSV instead. We still emit a fragment carrying
     just the model + kind so the product appears in the catalog."""
     from driver_base.interface import RawArtifact
+
     raw = RawArtifact(
         url="https://hoqs.org/products/x",
-        body=b'<html><meta property="og:title" content="HOQS X 12\" Test" /></html>',
-        status=200, content_type="text/html", fetched_at="", body_sha="",
+        body=b'<html><meta property="og:title" content="HOQS X 12" Test" /></html>',
+        status=200,
+        content_type="text/html",
+        fetched_at="",
+        body_sha="",
     )
     res = scraper.parse_artifact(raw, SeedContext())
     assert len(res.fragments) == 1

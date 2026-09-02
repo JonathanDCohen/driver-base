@@ -20,25 +20,25 @@ import re
 # Multi-codepoint combined forms MUST precede their sub-tokens so the
 # in-order replace pass catches them first.
 _UNICODE_FOLD: dict[str, str] = {
-    "η₀": "eta0",   # η + subscript 0
-    "η°": "eta0",   # η + degree sign (defensive)
-    "Ω": "ohm",          # ohm sign
-    "Ω": "ohm",          # Greek capital omega
-    "η": "eta",          # Greek small eta
-    "μ": "u",            # Greek small mu
-    "µ": "u",            # micro sign
-    "÷": "-",            # division sign
-    "–": "-",             # en dash
-    "—": "-",             # em dash
-    "×": "x",            # multiplication sign
-    "³": "3",            # superscript 3
-    "²": "2",            # superscript 2
-    "₀": "0",            # subscript 0
+    "η₀": "eta0",  # η + subscript 0
+    "η°": "eta0",  # η + degree sign (defensive)
+    "Ω": "ohm",  # ohm sign
+    "Ω": "ohm",  # Greek capital omega
+    "η": "eta",  # Greek small eta
+    "μ": "u",  # Greek small mu
+    "µ": "u",  # micro sign
+    "÷": "-",  # division sign
+    "–": "-",  # en dash
+    "—": "-",  # em dash
+    "×": "x",  # multiplication sign
+    "³": "3",  # superscript 3
+    "²": "2",  # superscript 2
+    "₀": "0",  # subscript 0
     "₁": "1",
     "₂": "2",
     "₃": "3",
     "₄": "4",
-    " ": " ",            # non-breaking space
+    " ": " ",  # non-breaking space
 }
 
 # Parentheticals that must be PRESERVED because they route to a different field.

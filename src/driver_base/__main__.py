@@ -32,11 +32,17 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     p.add_argument("--rejections-dir", type=Path, default=Path("data/rejections"))
     p.add_argument("--aliases", type=Path, default=Path("data/aliases.yaml"))
     p.add_argument(
-        "--scraper", action="append", default=None,
+        "--scraper",
+        action="append",
+        default=None,
         help="Run only the named scraper(s); may be repeated. Default: all.",
     )
     p.add_argument("--refetch", action="store_true", help="Bypass HTTP cache reads.")
-    p.add_argument("--list-scrapers", action="store_true", help="Print registered scraper names and exit.")
+    p.add_argument(
+        "--list-scrapers",
+        action="store_true",
+        help="Print registered scraper names and exit.",
+    )
     return p.parse_args(argv)
 
 
@@ -86,7 +92,8 @@ async def _amain(args: argparse.Namespace) -> int:
             if s.name in prior_status:
                 per_status[s.name] = prior_status[s.name]
             belonging = [
-                r for r in prior_records
+                r
+                for r in prior_records
                 if r.get("manufacturer") == s.manufacturer_display
             ]
             if belonging:
@@ -95,7 +102,9 @@ async def _amain(args: argparse.Namespace) -> int:
     # Filter down to freshly-parsed drivers — see comment above. Mutation
     # is in-place on the underlying Driver objects, so the original
     # `drivers` list reflects the applied overrides.
-    ov_stats = apply_overrides([d for d in drivers if d.canonical_id in freshly_parsed_ids])
+    ov_stats = apply_overrides(
+        [d for d in drivers if d.canonical_id in freshly_parsed_ids]
+    )
     if ov_stats.applied_fields:
         print(
             f"applied overrides: {ov_stats.applied_fields} field(s) across "

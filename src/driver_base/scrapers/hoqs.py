@@ -77,7 +77,7 @@ _TS_SYMBOL_MAP: dict[str, tuple[str, Any]] = {
     "le": ("le_mh", parse_le_mh),
     "n0": ("eta_zero_pct", parse_float),
     "ebp": ("ebp_hz", parse_frequency),
-    "spl": ("sensitivity_db_2_83v_1m", parse_float),   # HOQS labels sensitivity as 2.83V
+    "spl": ("sensitivity_db_2_83v_1m", parse_float),  # HOQS labels sensitivity as 2.83V
     "cms": ("cms_mm_per_n", parse_float),
     "rms": ("rms_ns_per_m", parse_float),
 }
@@ -89,19 +89,22 @@ _GENERAL_KEY_MAP: dict[str, tuple[str, Any]] = {
     "Power Handling Nominal": ("power_aes_watts", parse_power),
     "Power Handling Program": ("power_program_watts", parse_power),
     "Voice Coil Diameter": ("voice_coil_diameter_mm", parse_length_mm),
-    "Cone Material": (None, None),                                  # kept for docs
+    "Cone Material": (None, None),  # kept for docs
     "Magnetic Material": ("magnet_type", lambda s: normalize_magnet_type(s)),
     "Winding Material": ("winding_material", lambda s: s or None),
-    "Former Material":  ("former_material",  lambda s: s or None),
-    "Flux Density":     ("flux_density_t",   parse_float),
-    "Throat Diameter":  ("throat_diameter_mm", parse_length_mm),
+    "Former Material": ("former_material", lambda s: s or None),
+    "Flux Density": ("flux_density_t", parse_float),
+    "Throat Diameter": ("throat_diameter_mm", parse_length_mm),
     "Diaphragm Material": ("diaphragm_material", lambda s: s or None),
     "Recommended Crossover Frequency": ("recommended_crossover_hz", parse_frequency),
     "Overall Diameter": ("overall_diameter_mm", parse_length_mm),
     "Bolt Circle Diameter": (None, None),
     "Cutout Diameter": ("mounting_diameter_mm", parse_length_mm),
     "Total Depth": ("depth_mm", parse_length_mm),
-    "Net Weight": ("net_weight_kg", lambda s: (parse_mass_g(s) or 0) / 1000.0 if parse_mass_g(s) else None),
+    "Net Weight": (
+        "net_weight_kg",
+        lambda s: (parse_mass_g(s) or 0) / 1000.0 if parse_mass_g(s) else None,
+    ),
 }
 
 _SPEAKER_DATA_RE = re.compile(r"var speakerData = (\{.*?\});", re.DOTALL)
@@ -146,6 +149,7 @@ def _model_from_og_title(html: str) -> Optional[str]:
     if not m:
         return None
     from html import unescape
+
     title = unescape(m.group(1)).strip()
     tokens = title.split()
     if len(tokens) < 2 or tokens[0].upper() != "HOQS":
@@ -158,11 +162,15 @@ class HoqsScraper(Scraper):
     name = "hoqs"
     manufacturer_display = "HOQS"
     schema_version = "1.0"
-    expected_min_records = 4         # recon: 13 total, ~9 drivers; not all publish speakerData
+    expected_min_records = 4  # recon: 13 total, ~9 drivers; not all publish speakerData
     max_seed_rounds = 2
 
     def discover_seeds(self) -> list[SeedRef]:
-        return [SeedRef(url=f"{_BASE}/products.json?limit=250&page=1", context=SeedContext())]
+        return [
+            SeedRef(
+                url=f"{_BASE}/products.json?limit=250&page=1", context=SeedContext()
+            )
+        ]
 
     def enumerate(self, seed_artifacts: list[RawArtifact]) -> EnumerateResult:
         products: list[SeedRef] = []

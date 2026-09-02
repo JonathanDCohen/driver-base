@@ -55,22 +55,22 @@ _BASE = "https://www.beyma.com"
 # Category slug → DriverKind. Excluded: passive-filter, accesories (not drivers),
 # discontinued (v2 archive scope).
 _CATEGORIES: list[tuple[str, DriverKind]] = [
-    ("low-mid-frequency",              DriverKind.LF_WOOFER),
-    ("coaxial",                        DriverKind.COAX),
-    ("compression-driver",             DriverKind.HF_COMPRESSION),
-    ("compression-driver-wave-guide",  DriverKind.HF_COMPRESSION),
+    ("low-mid-frequency", DriverKind.LF_WOOFER),
+    ("coaxial", DriverKind.COAX),
+    ("compression-driver", DriverKind.HF_COMPRESSION),
+    ("compression-driver-wave-guide", DriverKind.HF_COMPRESSION),
     # AMT drivers classified as tweeters — the "AMT-ness" is captured in
     # `diaphragm_shape` at parse time so users can filter/search for them.
-    ("amt-driver",                     DriverKind.TWEETER),
-    ("compression-tweeter",            DriverKind.TWEETER),
-    ("dome-tweeter",                   DriverKind.TWEETER),
-    ("full-range",                     DriverKind.FULLRANGE),
-    ("horns",                          DriverKind.HORN),
-    ("shaker",                         DriverKind.SHAKER),
+    ("amt-driver", DriverKind.TWEETER),
+    ("compression-tweeter", DriverKind.TWEETER),
+    ("dome-tweeter", DriverKind.TWEETER),
+    ("full-range", DriverKind.FULLRANGE),
+    ("horns", DriverKind.HORN),
+    ("shaker", DriverKind.SHAKER),
 ]
 
 _PRODUCT_URL_RE = re.compile(
-    r'https://www\.beyma\.com/en/products/c/([a-z0-9-]+)/[A-Z0-9]+/[a-z0-9-]+/?',
+    r"https://www\.beyma\.com/en/products/c/([a-z0-9-]+)/[A-Z0-9]+/[a-z0-9-]+/?",
     re.IGNORECASE,
 )
 
@@ -106,59 +106,70 @@ def _model_from_title(title: str) -> Optional[str]:
 _COAX_LF_HF_PAIR_RE = re.compile(r"^\s*([\d.]+)\s*/\s*([\d.]+)")
 # label → (LF-field, HF-field). None for either side means "don't route".
 _COAX_LFHF_LABELS: dict[str, tuple[Optional[str], Optional[str]]] = {
-    "nominal impedance lf/hf":   ("impedance_nominal_ohm",  "coax_hf_impedance_nominal_ohm"),
-    "minimum impedance lf/hf":   ("impedance_min_ohm",      "coax_hf_impedance_min_ohm"),
-    "power capacity lf/hf":      ("power_aes_watts",        "coax_hf_power_aes_watts"),
-    "sensitivity lf/hf":         ("sensitivity_db_1w_1m",   "coax_hf_sensitivity_db_1w_1m"),
-    "voice coil diameter lf/hf": ("voice_coil_diameter_mm", "coax_hf_voice_coil_diameter_mm"),
+    "nominal impedance lf/hf": (
+        "impedance_nominal_ohm",
+        "coax_hf_impedance_nominal_ohm",
+    ),
+    "minimum impedance lf/hf": ("impedance_min_ohm", "coax_hf_impedance_min_ohm"),
+    "power capacity lf/hf": ("power_aes_watts", "coax_hf_power_aes_watts"),
+    "sensitivity lf/hf": ("sensitivity_db_1w_1m", "coax_hf_sensitivity_db_1w_1m"),
+    "voice coil diameter lf/hf": (
+        "voice_coil_diameter_mm",
+        "coax_hf_voice_coil_diameter_mm",
+    ),
     # `program power lf/hf` = `700/180 w` — LF Program routes to
     # power_program_watts; there's no coax_hf_power_program_watts today.
-    "program power lf/hf":       ("power_program_watts",    None),
+    "program power lf/hf": ("power_program_watts", None),
 }
 
 
-_LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]] = {
+_LABEL_MAP: dict[
+    str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]
+] = {
     # electrical / commercial
-    "power capacity":              ("power_aes_watts",        parse_power),
-    "program power":               ("power_program_watts",    parse_power),
-    "nominal impedance":           ("impedance_nominal_ohm",  parse_impedance),
-    "minimum impedance":           ("impedance_min_ohm",      parse_impedance),
-    "sensitivity":                 ("sensitivity_db_1w_1m",   parse_float),
-    "frequency range":             ("__freq_range__",         parse_range),
+    "power capacity": ("power_aes_watts", parse_power),
+    "program power": ("power_program_watts", parse_power),
+    "nominal impedance": ("impedance_nominal_ohm", parse_impedance),
+    "minimum impedance": ("impedance_min_ohm", parse_impedance),
+    "sensitivity": ("sensitivity_db_1w_1m", parse_float),
+    "frequency range": ("__freq_range__", parse_range),
     # physical
-    "nominal diameter":            ("nominal_size_mm",        parse_length_mm),
-    "voice coil diameter":         ("voice_coil_diameter_mm", parse_length_mm),
-    "throat diameter":             ("throat_diameter_mm",     parse_length_mm),
-    "recom. crossover frequency":  ("recommended_crossover_hz", parse_frequency),
+    "nominal diameter": ("nominal_size_mm", parse_length_mm),
+    "voice coil diameter": ("voice_coil_diameter_mm", parse_length_mm),
+    "throat diameter": ("throat_diameter_mm", parse_length_mm),
+    "recom. crossover frequency": ("recommended_crossover_hz", parse_frequency),
     # Construction descriptors.
-    "surround material":           ("surround_material",      lambda s: s or None),
-    "voice coil material":         ("winding_material",       lambda s: s or None),
-    "former material":             ("former_material",        lambda s: s or None),
-    "flux density":                ("flux_density_t",         parse_float),
-    "recommended enclosure":       ("recommended_enclosure_volume_liters", parse_liters),
-    "recommended enclosure volume": ("recommended_enclosure_volume_liters", parse_liters),
-    "external diameter":           ("overall_diameter_mm",    parse_length_mm),
-    "cutout diameter":             ("mounting_diameter_mm",   parse_length_mm),
-    "depth":                       ("depth_mm",               parse_length_mm),
-    "net weight":                  ("net_weight_kg",          _weight_kg),
-    "magnet":                      ("magnet_type",            lambda s: normalize_magnet_type(s)),
+    "surround material": ("surround_material", lambda s: s or None),
+    "voice coil material": ("winding_material", lambda s: s or None),
+    "former material": ("former_material", lambda s: s or None),
+    "flux density": ("flux_density_t", parse_float),
+    "recommended enclosure": ("recommended_enclosure_volume_liters", parse_liters),
+    "recommended enclosure volume": (
+        "recommended_enclosure_volume_liters",
+        parse_liters,
+    ),
+    "external diameter": ("overall_diameter_mm", parse_length_mm),
+    "cutout diameter": ("mounting_diameter_mm", parse_length_mm),
+    "depth": ("depth_mm", parse_length_mm),
+    "net weight": ("net_weight_kg", _weight_kg),
+    "magnet": ("magnet_type", lambda s: normalize_magnet_type(s)),
     # T/S
-    "fs":                          ("fs_hz",                  parse_frequency),
-    "re":                          ("re_ohm",                 parse_impedance),
-    "qes":                         ("qes",                    parse_float),
-    "qms":                         ("qms",                    parse_float),
-    "qts":                         ("qts",                    parse_float),
-    "vas":                         ("vas_liters",             parse_liters),
-    "cms":                         ("cms_mm_per_n",           parse_compliance_mm_per_n),
-    "rms":                         ("rms_ns_per_m",           parse_float),   # kg/s = N·s/m
-    "efficiency %":                ("eta_zero_pct",           parse_float),
-    "sd":                          ("sd_cm2",                 parse_sd_cm2),
-    "xmax":                        ("xmax_mm",                parse_length_mm),
-    "xdamage pp":                  ("xmech_mm",               parse_length_mm),   # pp AS-REPORTED
-    "moving mass":                 ("mms_g",                  parse_mass_g),
-    "bl factor":                   ("bl_tm",                  parse_bl_tm),
-    "le @1 khz":                   ("le_mh",                  parse_le_mh),
-    "le":                          ("le_mh",                  parse_le_mh),
+    "fs": ("fs_hz", parse_frequency),
+    "re": ("re_ohm", parse_impedance),
+    "qes": ("qes", parse_float),
+    "qms": ("qms", parse_float),
+    "qts": ("qts", parse_float),
+    "vas": ("vas_liters", parse_liters),
+    "cms": ("cms_mm_per_n", parse_compliance_mm_per_n),
+    "rms": ("rms_ns_per_m", parse_float),  # kg/s = N·s/m
+    "efficiency %": ("eta_zero_pct", parse_float),
+    "sd": ("sd_cm2", parse_sd_cm2),
+    "xmax": ("xmax_mm", parse_length_mm),
+    "xdamage pp": ("xmech_mm", parse_length_mm),  # pp AS-REPORTED
+    "moving mass": ("mms_g", parse_mass_g),
+    "bl factor": ("bl_tm", parse_bl_tm),
+    "le @1 khz": ("le_mh", parse_le_mh),
+    "le": ("le_mh", parse_le_mh),
 }
 
 
@@ -167,7 +178,7 @@ class BeymaScraper(Scraper):
     name = "beyma"
     manufacturer_display = "Beyma"
     schema_version = "1.0"
-    expected_min_records = 160    # recon: ~194 active drivers across 10 kept categories
+    expected_min_records = 160  # recon: ~194 active drivers across 10 kept categories
     max_seed_rounds = 2
 
     def discover_seeds(self) -> list[SeedRef]:
@@ -201,7 +212,9 @@ class BeymaScraper(Scraper):
                 products.append(
                     SeedRef(
                         url=url,
-                        context=SeedContext(driver_kind_hint=seed_kind, category_id=seed_cat),
+                        context=SeedContext(
+                            driver_kind_hint=seed_kind, category_id=seed_cat
+                        ),
                     )
                 )
         return EnumerateResult(product_urls=products)
@@ -284,7 +297,8 @@ class BeymaScraper(Scraper):
         # where the VC equals the dome diameter). AMT tweeters (Beyma TPL-*)
         # publish no diameters and stay size-less.
         if frag.nominal_size_mm is None and frag.driver_kind in (
-            DriverKind.TWEETER, DriverKind.HF_COMPRESSION,
+            DriverKind.TWEETER,
+            DriverKind.HF_COMPRESSION,
         ):
             derived = (
                 frag.throat_diameter_mm

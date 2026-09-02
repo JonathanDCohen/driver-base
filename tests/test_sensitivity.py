@@ -50,7 +50,7 @@ def test_derive_283v_from_1w_at_4_ohm_adds_3db() -> None:
 
 
 def test_no_op_when_impedance_unknown() -> None:
-    f = _frag(sensitivity_db_2_83v_1m=97.0)   # impedance None
+    f = _frag(sensitivity_db_2_83v_1m=97.0)  # impedance None
     derive_missing_sensitivity(f)
     assert f.sensitivity_db_1w_1m is None
     assert "sensitivity_db_1w_1m" not in f.spec_source

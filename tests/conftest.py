@@ -4,18 +4,19 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import Callable, Iterable, Optional
+from typing import Callable, Optional
 
 import pytest
 
 from driver_base.cache import Cache
-from driver_base.fetch import HttpxFetcher
 from driver_base.interface import FetchError, RawArtifact, Scraper, SeedRef
 
 FIXTURES_ROOT = Path(__file__).parent / "fixtures"
 
 
-def load_fixture(scraper: str, relpath: str, *, url: Optional[str] = None) -> RawArtifact:
+def load_fixture(
+    scraper: str, relpath: str, *, url: Optional[str] = None
+) -> RawArtifact:
     """Load a fixture from tests/fixtures/{scraper}/{relpath} as a RawArtifact."""
     path = FIXTURES_ROOT / scraper / relpath
     body = path.read_bytes()

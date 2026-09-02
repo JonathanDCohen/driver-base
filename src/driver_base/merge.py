@@ -12,7 +12,6 @@ from __future__ import annotations
 from dataclasses import fields as dc_fields
 from typing import Optional
 
-from driver_base.aliases import Aliases, apply_aliases
 from driver_base.id import build_canonical_id, slugify
 from driver_base.interface import DriverKind
 from driver_base.model import Driver, DriverFragment, DriverStatus
@@ -64,7 +63,9 @@ def merge_fragments_by_id(
             f.warn_flags.append(f"duplicate_canonical_id_collision:{cid}")
             cid = new_cid
         seen.setdefault(cid, 1)
-        kept.append(_fragment_to_driver(f, cid, now_iso=now_iso, prior_scraped=prior_scraped))
+        kept.append(
+            _fragment_to_driver(f, cid, now_iso=now_iso, prior_scraped=prior_scraped)
+        )
 
     return kept, dropped
 
@@ -106,9 +107,19 @@ def _fragment_to_driver(
         warn_flags=list(f.warn_flags),
     )
     # Copy every other numeric/enum field by name.
-    _SKIP = {"manufacturer", "canonical_id", "driver_kind", "model", "spec_source",
-             "source_urls", "fetched_at", "scraped_at", "last_scraped_at",
-             "status", "warn_flags"}
+    _SKIP = {
+        "manufacturer",
+        "canonical_id",
+        "driver_kind",
+        "model",
+        "spec_source",
+        "source_urls",
+        "fetched_at",
+        "scraped_at",
+        "last_scraped_at",
+        "status",
+        "warn_flags",
+    }
     for name in _DRIVER_FIELD_NAMES:
         if name in _SKIP:
             continue

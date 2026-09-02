@@ -70,9 +70,15 @@ def test_parse_18lw1400_extracts_all_ts_fields(scraper: EighteenSoundScraper) ->
 
     # every populated field has a spec_source recorded
     for field_name in (
-        "fs_hz", "qts", "vas_liters", "xmax_mm",
-        "power_aes_watts", "power_long_term_watts",
-        "sensitivity_db_1w_1m", "freq_low_hz", "freq_high_hz",
+        "fs_hz",
+        "qts",
+        "vas_liters",
+        "xmax_mm",
+        "power_aes_watts",
+        "power_long_term_watts",
+        "sensitivity_db_1w_1m",
+        "freq_low_hz",
+        "freq_high_hz",
         "magnet_type",
     ):
         assert field_name in f.spec_source
@@ -81,14 +87,17 @@ def test_parse_18lw1400_extracts_all_ts_fields(scraper: EighteenSoundScraper) ->
 
 def test_parse_returns_empty_when_url_malformed(scraper: EighteenSoundScraper) -> None:
     raw = load_fixture(
-        "eighteensound", "products/18LW1400.html",
+        "eighteensound",
+        "products/18LW1400.html",
         url="https://www.eighteensound.it/some/other/path",
     )
     res = scraper.parse_artifact(raw, SeedContext())
     assert res.fragments == []
 
 
-def test_impedance_from_url_is_seeded_before_html(scraper: EighteenSoundScraper) -> None:
+def test_impedance_from_url_is_seeded_before_html(
+    scraper: EighteenSoundScraper,
+) -> None:
     """The scraper seeds impedance from URL then lets HTML override.
     Confirm impedance_nominal_ohm ends up at the HTML value (both are 8 here)."""
     raw = load_fixture("eighteensound", "products/18LW1400.html", url=_18LW1400_URL)
@@ -96,7 +105,9 @@ def test_impedance_from_url_is_seeded_before_html(scraper: EighteenSoundScraper)
     assert res.fragments[0].impedance_nominal_ohm == pytest.approx(8.0)
 
 
-def test_size_from_inches_wrapper_beats_url_fallback(scraper: EighteenSoundScraper) -> None:
+def test_size_from_inches_wrapper_beats_url_fallback(
+    scraper: EighteenSoundScraper,
+) -> None:
     """The 18iD200 product page omits the 'Nominal Diameter' label but the
     header carries the size in <div class="inchesWrapper"><span>18.0</span> In</div>.
     That widget must populate nominal_size_mm with SpecSource.HTML_GRID —

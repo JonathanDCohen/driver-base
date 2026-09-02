@@ -62,7 +62,10 @@ def test_enumerate_all_categories(scraper: FaitalScraper) -> None:
 def test_parse_12pr320(scraper: FaitalScraper) -> None:
     raw = load_fixture("faital", "products/12PR320.html", url=_12PR320_URL)
     res = scraper.parse_artifact(
-        raw, SeedContext(driver_kind_hint=DriverKind.LF_WOOFER, category_id="LF_Loudspeakers"),
+        raw,
+        SeedContext(
+            driver_kind_hint=DriverKind.LF_WOOFER, category_id="LF_Loudspeakers"
+        ),
     )
     assert len(res.fragments) == 1
     f = res.fragments[0]
@@ -76,13 +79,13 @@ def test_parse_12pr320(scraper: FaitalScraper) -> None:
     assert f.qts == pytest.approx(0.37)
     assert f.qes == pytest.approx(0.39)
     assert f.qms == pytest.approx(7.8)
-    assert f.vas_liters == pytest.approx(113.3)   # "113.3 dm^3" caret notation
-    assert f.sd_cm2 == pytest.approx(539.0)       # "539 cm^2" caret notation
+    assert f.vas_liters == pytest.approx(113.3)  # "113.3 dm^3" caret notation
+    assert f.sd_cm2 == pytest.approx(539.0)  # "539 cm^2" caret notation
     assert f.xmax_mm == pytest.approx(7.37)
-    assert f.xmech_mm == pytest.approx(17.0)      # "Xdamage" one-way AS-REPORTED
+    assert f.xmech_mm == pytest.approx(17.0)  # "Xdamage" one-way AS-REPORTED
     assert f.mms_g == pytest.approx(51.4)
     assert f.cms_mm_per_n == pytest.approx(0.28)
-    assert f.bl_tm == pytest.approx(13.5)         # "13.5 N/A" (Newton/Ampere = T·m)
+    assert f.bl_tm == pytest.approx(13.5)  # "13.5 N/A" (Newton/Ampere = T·m)
     assert f.re_ohm == pytest.approx(5.3)
     assert f.le_mh == pytest.approx(0.67)
     assert f.ebp_hz == pytest.approx(108.0)

@@ -44,11 +44,15 @@ def derive_missing_sensitivity(fragment: DriverFragment) -> None:
     have_1w = fragment.sensitivity_db_1w_1m is not None
     have_283 = fragment.sensitivity_db_2_83v_1m is not None
 
-    offset = 10.0 * math.log10(8.0 / Z)   # 2.83V − 1W
+    offset = 10.0 * math.log10(8.0 / Z)  # 2.83V − 1W
 
     if have_283 and not have_1w:
-        fragment.sensitivity_db_1w_1m = _round1(fragment.sensitivity_db_2_83v_1m - offset)
+        fragment.sensitivity_db_1w_1m = _round1(
+            fragment.sensitivity_db_2_83v_1m - offset
+        )
         fragment.spec_source["sensitivity_db_1w_1m"] = SpecSource.DERIVED
     elif have_1w and not have_283:
-        fragment.sensitivity_db_2_83v_1m = _round1(fragment.sensitivity_db_1w_1m + offset)
+        fragment.sensitivity_db_2_83v_1m = _round1(
+            fragment.sensitivity_db_1w_1m + offset
+        )
         fragment.spec_source["sensitivity_db_2_83v_1m"] = SpecSource.DERIVED

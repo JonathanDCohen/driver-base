@@ -1,243 +1,406 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Driver Base</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
-  <script>
-    // Applied before styles.css takes effect to avoid a light-mode flash on
-    // dark-mode loads. Reads the same db_theme cookie app.js writes; falls
-    // back to prefers-color-scheme when the user hasn't chosen yet.
-    (function () {
-      var m = document.cookie.match(/(?:^|; )db_theme=(dark|light)/);
-      var t = m ? m[1] : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', t);
-    })();
-  </script>
-</head>
-<body x-data="app()" x-init="init()" x-cloak>
-
-  <nav class="teal darken-2">
-    <div class="nav-wrapper container">
-      <a class="brand-logo" href="#">
-        <svg class="brand-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="12" y="22" width="12" height="20" rx="3" ry="3"/>
-          <path d="M 30 14 L 30 50 M 24 50 L 36 50"/>
-          <line x1="30" y1="14" x2="10" y2="44"/>
-          <path d="M 42 24 Q 46 32 42 40"/>
-          <path d="M 48 19 Q 55 32 48 45"/>
-          <path d="M 54 14 Q 62 32 54 50"/>
-        </svg>
-        driver-base
-      </a>
-    </div>
-    <div class="nav-actions nav-actions-left">
-      <div class="switch theme-switch"
-           :title="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
-        <label :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
-          <i class="material-icons" aria-hidden="true">light_mode</i>
-          <input type="checkbox" :checked="theme === 'dark'" @change="toggleTheme" />
-          <span class="lever"></span>
-          <i class="material-icons" aria-hidden="true">dark_mode</i>
-        </label>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Driver Base</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script>
+      // Applied before styles.css takes effect to avoid a light-mode flash on
+      // dark-mode loads. Reads the same db_theme cookie app.js writes; falls
+      // back to prefers-color-scheme when the user hasn't chosen yet.
+      (function () {
+        var m = document.cookie.match(/(?:^|; )db_theme=(dark|light)/);
+        var t = m
+          ? m[1]
+          : window.matchMedia &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      })();
+    </script>
+  </head>
+  <body x-data="app()" x-init="init()" x-cloak>
+    <nav class="teal darken-2">
+      <div class="nav-wrapper container">
+        <a class="brand-logo" href="#">
+          <svg
+            class="brand-mark"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 64 64"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="12" y="22" width="12" height="20" rx="3" ry="3" />
+            <path d="M 30 14 L 30 50 M 24 50 L 36 50" />
+            <line x1="30" y1="14" x2="10" y2="44" />
+            <path d="M 42 24 Q 46 32 42 40" />
+            <path d="M 48 19 Q 55 32 48 45" />
+            <path d="M 54 14 Q 62 32 54 50" />
+          </svg>
+          driver-base
+        </a>
       </div>
-    </div>
-    <div class="nav-actions">
-      <a class="nav-icon-btn" href="https://github.com/JonathanDCohen/driver-base"
-         target="_blank" rel="noopener noreferrer"
-         title="View source on GitHub" aria-label="View source on GitHub">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
-          <path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.34-1.28-1.7-1.28-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.73.8 1.18 1.83 1.18 3.09 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/>
-        </svg>
-      </a>
-    </div>
-  </nav>
-
-  <div class="container-fluid app-body">
-    <div class="row no-margin">
-
-      <!-- Filter sidebar -->
-      <aside class="col s12 m4 l3 sidebar">
-        <div class="input-field">
-          <i class="material-icons prefix">search</i>
-          <input id="q" type="text" x-model="filters.q" @input.debounce.150="onFilterChange" />
-          <label for="q">Model or manufacturer</label>
+      <div class="nav-actions nav-actions-left">
+        <div
+          class="switch theme-switch"
+          :title="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+        >
+          <label
+            :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+          >
+            <i class="material-icons" aria-hidden="true">light_mode</i>
+            <input
+              type="checkbox"
+              :checked="theme === 'dark'"
+              @change="toggleTheme"
+            />
+            <span class="lever"></span>
+            <i class="material-icons" aria-hidden="true">dark_mode</i>
+          </label>
         </div>
+      </div>
+      <div class="nav-actions">
+        <a
+          class="nav-icon-btn"
+          href="https://github.com/JonathanDCohen/driver-base"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="View source on GitHub"
+          aria-label="View source on GitHub"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="22"
+            height="22"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.34-1.28-1.7-1.28-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.73.8 1.18 1.83 1.18 3.09 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"
+            />
+          </svg>
+        </a>
+      </div>
+    </nav>
 
-        <template x-for="group in filterGroups" :key="group.key">
-          <div class="filter-group">
-            <h6 x-text="group.label"></h6>
-            <ul class="chip-list">
-              <template x-for="opt in group.options" :key="opt.value">
-                <li>
-                  <a href="#" class="chip waves-effect"
-                     :class="filters[group.key].includes(opt.value) ? 'teal white-text waves-light' : ''"
-                     @click.prevent="(el => { toggleFilter(group.key, opt.value); setTimeout(() => el.blur(), 350) })($event.currentTarget)"
-                     x-text="`${opt.label} (${opt.count})`"></a>
-                </li>
-              </template>
-            </ul>
+    <div class="container-fluid app-body">
+      <div class="row no-margin">
+        <!-- Filter sidebar -->
+        <aside class="col s12 m4 l3 sidebar">
+          <div class="input-field">
+            <i class="material-icons prefix">search</i>
+            <input
+              id="q"
+              type="text"
+              x-model="filters.q"
+              @input.debounce.150="onFilterChange"
+            />
+            <label for="q">Model or manufacturer</label>
           </div>
-        </template>
 
-        <button class="btn-flat waves-effect grey-text" @click="clearFilters" x-show="hasFilters">
-          <i class="material-icons left">clear_all</i> Clear filters
-        </button>
-      </aside>
+          <template x-for="group in filterGroups" :key="group.key">
+            <div class="filter-group">
+              <h6 x-text="group.label"></h6>
+              <ul class="chip-list">
+                <template x-for="opt in group.options" :key="opt.value">
+                  <li>
+                    <a
+                      href="#"
+                      class="chip waves-effect"
+                      :class="filters[group.key].includes(opt.value) ? 'teal white-text waves-light' : ''"
+                      @click.prevent="(el => { toggleFilter(group.key, opt.value); setTimeout(() => el.blur(), 350) })($event.currentTarget)"
+                      x-text="`${opt.label} (${opt.count})`"
+                    ></a>
+                  </li>
+                </template>
+              </ul>
+            </div>
+          </template>
 
-      <!-- Main -->
-      <section class="col s12 m8 l9 main">
-        <div class="table-panel">
-        <div class="sort-bar">
-          <button type="button" class="btn-flat waves-effect picker-btn units-toggle"
-                  :title="units === 'imperial' ? 'Switch to metric (mm, kg, L)' : 'Switch to imperial (in, lb, ft³)'"
-                  @click="setUnits(units === 'imperial' ? 'metric' : 'imperial')">
-            <i class="material-icons left">straighten</i><span x-text="units === 'imperial' ? 'Imperial' : 'Metric'"></span>
+          <button
+            class="btn-flat waves-effect grey-text"
+            @click="clearFilters"
+            x-show="hasFilters"
+          >
+            <i class="material-icons left">clear_all</i> Clear filters
           </button>
+        </aside>
 
-          <div class="picker col-picker" @click.outside="pickerOpen = false">
-            <button type="button" class="btn-flat waves-effect picker-btn" @click="pickerOpen = !pickerOpen">
-              <i class="material-icons left">view_column</i>Columns
-            </button>
-            <div class="picker-popover" x-show="pickerOpen" x-transition.opacity>
-              <div class="picker-hint grey-text">Drag column headers to reorder.</div>
-              <ul>
-                <template x-for="c in pickerColumns" :key="c.key">
-                  <li>
-                    <label>
-                      <input type="checkbox" class="filled-in" :checked="c.visible" @change="toggleColumn(c.key)" />
-                      <span x-text="columnLabel(c.key)"></span>
-                    </label>
+        <!-- Main -->
+        <section class="col s12 m8 l9 main">
+          <div class="table-panel">
+            <div class="sort-bar">
+              <button
+                type="button"
+                class="btn-flat waves-effect picker-btn units-toggle"
+                :title="units === 'imperial' ? 'Switch to metric (mm, kg, L)' : 'Switch to imperial (in, lb, ft³)'"
+                @click="setUnits(units === 'imperial' ? 'metric' : 'imperial')"
+              >
+                <i class="material-icons left">straighten</i
+                ><span
+                  x-text="units === 'imperial' ? 'Imperial' : 'Metric'"
+                ></span>
+              </button>
+
+              <div
+                class="picker col-picker"
+                @click.outside="pickerOpen = false"
+              >
+                <button
+                  type="button"
+                  class="btn-flat waves-effect picker-btn"
+                  @click="pickerOpen = !pickerOpen"
+                >
+                  <i class="material-icons left">view_column</i>Columns
+                </button>
+                <div
+                  class="picker-popover"
+                  x-show="pickerOpen"
+                  x-transition.opacity
+                >
+                  <div class="picker-hint grey-text">
+                    Drag column headers to reorder.
+                  </div>
+                  <ul>
+                    <template x-for="c in pickerColumns" :key="c.key">
+                      <li>
+                        <label>
+                          <input
+                            type="checkbox"
+                            class="filled-in"
+                            :checked="c.visible"
+                            @change="toggleColumn(c.key)"
+                          />
+                          <span x-text="columnLabel(c.key)"></span>
+                        </label>
+                      </li>
+                    </template>
+                  </ul>
+                  <a
+                    href="#"
+                    class="col-picker-reset"
+                    @click.prevent="resetColumns"
+                    >Reset to defaults</a
+                  >
+                </div>
+              </div>
+
+              <div
+                class="picker sort-picker"
+                @click.outside="sortPickerOpen = false"
+              >
+                <button
+                  type="button"
+                  class="btn-flat waves-effect picker-btn"
+                  :disabled="unusedSortableFields.length === 0"
+                  @click="sortPickerOpen = !sortPickerOpen"
+                >
+                  <i class="material-icons left">sort</i>Add sort
+                </button>
+                <div
+                  class="picker-popover"
+                  x-show="sortPickerOpen"
+                  x-transition.opacity
+                >
+                  <ul>
+                    <template x-for="f in unusedSortableFields" :key="f.key">
+                      <li>
+                        <a
+                          href="#"
+                          class="picker-item"
+                          @click.prevent="addSort(f.key); sortPickerOpen = false"
+                          x-text="f.label"
+                        ></a>
+                      </li>
+                    </template>
+                  </ul>
+                </div>
+              </div>
+
+              <ul id="sort-chips" class="sort-chip-list">
+                <template x-for="(s, i) in sorts" :key="s.field">
+                  <li
+                    class="chip teal lighten-4"
+                    draggable="true"
+                    :class="sortDragClass(s.field)"
+                    @dragstart="onSortDragStart($event, s.field)"
+                    @dragover.prevent="onSortDragOver($event, s.field)"
+                    @dragleave="onSortDragLeave(s.field)"
+                    @drop.prevent="onSortDrop(s.field)"
+                    @dragend="onSortDragEnd"
+                    :title="`Drag to reorder · ${s.dir === 'asc' ? 'ascending' : 'descending'}`"
+                  >
+                    <span x-text="fieldLabel(s.field)"></span>
+                    <a
+                      href="#"
+                      @click.prevent="toggleSortDir(i)"
+                      :title="s.dir === 'asc' ? 'ascending' : 'descending'"
+                    >
+                      <i
+                        class="material-icons"
+                        x-text="s.dir === 'asc' ? 'arrow_upward' : 'arrow_downward'"
+                      ></i>
+                    </a>
+                    <i class="close material-icons" @click="removeSort(i)"
+                      >close</i
+                    >
                   </li>
                 </template>
               </ul>
-              <a href="#" class="col-picker-reset" @click.prevent="resetColumns">Reset to defaults</a>
             </div>
-          </div>
 
-          <div class="picker sort-picker" @click.outside="sortPickerOpen = false">
-            <button type="button" class="btn-flat waves-effect picker-btn"
-                    :disabled="unusedSortableFields.length === 0"
-                    @click="sortPickerOpen = !sortPickerOpen">
-              <i class="material-icons left">sort</i>Add sort
-            </button>
-            <div class="picker-popover" x-show="sortPickerOpen" x-transition.opacity>
-              <ul>
-                <template x-for="f in unusedSortableFields" :key="f.key">
-                  <li>
-                    <a href="#" class="picker-item" @click.prevent="addSort(f.key); sortPickerOpen = false" x-text="f.label"></a>
-                  </li>
-                </template>
-              </ul>
-            </div>
-          </div>
-
-          <ul id="sort-chips" class="sort-chip-list">
-            <template x-for="(s, i) in sorts" :key="s.field">
-              <li class="chip teal lighten-4"
-                  draggable="true"
-                  :class="sortDragClass(s.field)"
-                  @dragstart="onSortDragStart($event, s.field)"
-                  @dragover.prevent="onSortDragOver($event, s.field)"
-                  @dragleave="onSortDragLeave(s.field)"
-                  @drop.prevent="onSortDrop(s.field)"
-                  @dragend="onSortDragEnd"
-                  :title="`Drag to reorder · ${s.dir === 'asc' ? 'ascending' : 'descending'}`">
-                <span x-text="fieldLabel(s.field)"></span>
-                <a href="#" @click.prevent="toggleSortDir(i)" :title="s.dir === 'asc' ? 'ascending' : 'descending'">
-                  <i class="material-icons" x-text="s.dir === 'asc' ? 'arrow_upward' : 'arrow_downward'"></i>
-                </a>
-                <i class="close material-icons" @click="removeSort(i)">close</i>
-              </li>
-            </template>
-          </ul>
-        </div>
-
-        <div class="table-split" @scroll="scrolled = $event.target.scrollLeft > 0">
-          <table class="striped compact-table fixed-table" :class="scrolled ? 'is-scrolled' : ''">
-            <thead>
-              <tr>
-                <template x-for="col in fixedColumns" :key="col.key">
-                  <th :data-key="col.key" x-text="columnLabel(col.key)"></th>
-                </template>
-              </tr>
-            </thead>
-            <tbody>
-              <template x-for="(d, i) in visibleRows" :key="d.canonical_id">
-                <tr :class="hoverIdx === i ? 'row-hover' : ''"
-                    @mouseenter="hoverIdx = i" @mouseleave="hoverIdx = null">
-                  <template x-for="col in fixedColumns" :key="col.key">
-                    <td :data-key="col.key" x-html="formatCell(d, col)"></td>
-                  </template>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-
-          <div class="scroll-table-wrap">
-            <table class="striped compact-table">
-              <thead>
-                <tr>
-                  <template x-for="col in reorderableColumns" :key="col.key">
-                    <th class="reorderable" :data-key="col.key"
-                        draggable="true"
-                        @dragstart="onColDragStart($event, col.key)"
-                        @dragover.prevent="onColDragOver($event, col.key)"
-                        @dragleave="onColDragLeave(col.key)"
-                        @drop.prevent="onColDrop(col.key)"
-                        @dragend="onColDragEnd"
-                        :class="[col.numeric ? 'right-align' : '', colDragClass(col.key)]"
-                        x-text="columnLabel(col.key)"></th>
-                  </template>
-                </tr>
-              </thead>
-              <tbody @click="openSpecPopover($event)">
-                <template x-for="(d, i) in visibleRows" :key="d.canonical_id">
-                  <tr :class="hoverIdx === i ? 'row-hover' : ''"
-                      @mouseenter="hoverIdx = i" @mouseleave="hoverIdx = null">
-                    <template x-for="col in reorderableColumns" :key="col.key">
-                      <td :data-key="col.key" :class="col.numeric ? 'right-align mono' : ''" x-html="formatCell(d, col)"></td>
+            <div
+              class="table-split"
+              @scroll="scrolled = $event.target.scrollLeft > 0"
+            >
+              <table
+                class="striped compact-table fixed-table"
+                :class="scrolled ? 'is-scrolled' : ''"
+              >
+                <thead>
+                  <tr>
+                    <template x-for="col in fixedColumns" :key="col.key">
+                      <th
+                        :data-key="col.key"
+                        x-text="columnLabel(col.key)"
+                      ></th>
                     </template>
                   </tr>
-                </template>
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  <template x-for="(d, i) in visibleRows" :key="d.canonical_id">
+                    <tr
+                      :class="hoverIdx === i ? 'row-hover' : ''"
+                      @mouseenter="hoverIdx = i"
+                      @mouseleave="hoverIdx = null"
+                    >
+                      <template x-for="col in fixedColumns" :key="col.key">
+                        <td
+                          :data-key="col.key"
+                          x-html="formatCell(d, col)"
+                        ></td>
+                      </template>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
 
-          <div x-show="visibleRows.length === 0" class="grey-text center-align padded">
-            No drivers match the current filters.
-          </div>
+              <div class="scroll-table-wrap">
+                <table class="striped compact-table">
+                  <thead>
+                    <tr>
+                      <template
+                        x-for="col in reorderableColumns"
+                        :key="col.key"
+                      >
+                        <th
+                          class="reorderable"
+                          :data-key="col.key"
+                          draggable="true"
+                          @dragstart="onColDragStart($event, col.key)"
+                          @dragover.prevent="onColDragOver($event, col.key)"
+                          @dragleave="onColDragLeave(col.key)"
+                          @drop.prevent="onColDrop(col.key)"
+                          @dragend="onColDragEnd"
+                          :class="[col.numeric ? 'right-align' : '', colDragClass(col.key)]"
+                          x-text="columnLabel(col.key)"
+                        ></th>
+                      </template>
+                    </tr>
+                  </thead>
+                  <tbody @click="openSpecPopover($event)">
+                    <template
+                      x-for="(d, i) in visibleRows"
+                      :key="d.canonical_id"
+                    >
+                      <tr
+                        :class="hoverIdx === i ? 'row-hover' : ''"
+                        @mouseenter="hoverIdx = i"
+                        @mouseleave="hoverIdx = null"
+                      >
+                        <template
+                          x-for="col in reorderableColumns"
+                          :key="col.key"
+                        >
+                          <td
+                            :data-key="col.key"
+                            :class="col.numeric ? 'right-align mono' : ''"
+                            x-html="formatCell(d, col)"
+                          ></td>
+                        </template>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
 
-          <!-- Spec-source popover. position:fixed, positioned by openSpecPopover.
+              <div
+                x-show="visibleRows.length === 0"
+                class="grey-text center-align padded"
+              >
+                No drivers match the current filters.
+              </div>
+
+              <!-- Spec-source popover. position:fixed, positioned by openSpecPopover.
                Closes on outside click or Escape. -->
-          <div class="spec-popover" x-show="specPopover.open" x-cloak
-               x-transition.opacity
-               @click.outside="closeSpecPopover()"
-               @keydown.escape.window="closeSpecPopover()"
-               :style="`top: ${specPopover.top - 12}px; left: ${specPopover.left}px;`"
-               role="tooltip" x-text="specPopover.text"></div>
-        </div>
+              <div
+                class="spec-popover"
+                x-show="specPopover.open"
+                x-cloak
+                x-transition.opacity
+                @click.outside="closeSpecPopover()"
+                @keydown.escape.window="closeSpecPopover()"
+                :style="`top: ${specPopover.top - 12}px; left: ${specPopover.left}px;`"
+                role="tooltip"
+                x-text="specPopover.text"
+              ></div>
+            </div>
 
-        <div class="table-footer grey-text">
-          <span>
-            <span x-text="`${visibleRows.length} / ${drivers.length} drivers`"></span><span x-show="paginated" x-text="` (showing first ${pageSize})`"></span>
-          </span>
-          <span class="sep">·</span>
-          <span x-text="`updated ${generatedAt.slice(0, 10)}`"></span>
-          <span class="sep">·</span>
-          <span><sup class="derived-mark legend">&dagger;</sup> inferred or derived (click for details)</span>
-        </div>
-        </div><!-- /.table-panel -->
-      </section>
+            <div class="table-footer grey-text">
+              <span>
+                <span
+                  x-text="`${visibleRows.length} / ${drivers.length} drivers`"
+                ></span
+                ><span
+                  x-show="paginated"
+                  x-text="` (showing first ${pageSize})`"
+                ></span>
+              </span>
+              <span class="sep">·</span>
+              <span x-text="`updated ${generatedAt.slice(0, 10)}`"></span>
+              <span class="sep">·</span>
+              <span
+                ><sup class="derived-mark legend">&dagger;</sup> inferred or
+                derived (click for details)</span
+              >
+            </div>
+          </div>
+          <!-- /.table-panel -->
+        </section>
+      </div>
     </div>
-  </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-  <script src="app.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
-</body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="app.js"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"
+    ></script>
+  </body>
 </html>

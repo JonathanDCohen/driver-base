@@ -20,7 +20,7 @@ def scraper() -> RcfScraper:
 
 def test_discover_seeds_covers_six_series(scraper: RcfScraper) -> None:
     seeds = scraper.discover_seeds()
-    assert len(seeds) == 6                # excludes serieId=14 (Custom Designs)
+    assert len(seeds) == 6  # excludes serieId=14 (Custom Designs)
     for s in seeds:
         assert "serieId=" in s.url
         assert s.context.driver_kind_hint is not None
@@ -28,19 +28,25 @@ def test_discover_seeds_covers_six_series(scraper: RcfScraper) -> None:
 
 def test_enumerate_serieid_51_neodymium_lf(scraper: RcfScraper) -> None:
     seed = load_fixture(
-        "rcf", "seeds/serieId-51.html",
+        "rcf",
+        "seeds/serieId-51.html",
         url="https://www.rcf.it/en/search-results?serieId=51",
     )
     res = scraper.enumerate([seed])
-    assert len(res.product_urls) >= 15    # 23 observed on 2026-08-22
-    assert all(p.context.driver_kind_hint == DriverKind.LF_WOOFER for p in res.product_urls)
+    assert len(res.product_urls) >= 15  # 23 observed on 2026-08-22
+    assert all(
+        p.context.driver_kind_hint == DriverKind.LF_WOOFER for p in res.product_urls
+    )
     assert all("/en/products/product-detail/" in p.url for p in res.product_urls)
 
 
 def test_parse_lf18n401(scraper: RcfScraper) -> None:
     raw = load_fixture("rcf", "products/lf18n401.html", url=_LF18N401_URL)
     res = scraper.parse_artifact(
-        raw, SeedContext(driver_kind_hint=DriverKind.LF_WOOFER, series="51", category_id="51"),
+        raw,
+        SeedContext(
+            driver_kind_hint=DriverKind.LF_WOOFER, series="51", category_id="51"
+        ),
     )
     assert len(res.fragments) == 1
     f = res.fragments[0]
@@ -55,11 +61,13 @@ def test_parse_lf18n401(scraper: RcfScraper) -> None:
     assert f.qes == pytest.approx(0.27)
     assert f.qts == pytest.approx(0.26)
     assert f.vas_liters == pytest.approx(257.0)
-    assert f.sd_cm2 == pytest.approx(1200.0)   # from '0.120 m2'
+    assert f.sd_cm2 == pytest.approx(1200.0)  # from '0.120 m2'
     assert f.xmax_mm == pytest.approx(9.0)
-    assert f.xmech_mm == pytest.approx(52.0)   # 'Max. Excursion Before Damage' PP as-reported
+    assert f.xmech_mm == pytest.approx(
+        52.0
+    )  # 'Max. Excursion Before Damage' PP as-reported
     assert f.mms_g == pytest.approx(201.0)
-    assert f.bl_tm == pytest.approx(27.8)      # '27.80 T x m'
+    assert f.bl_tm == pytest.approx(27.8)  # '27.80 T x m'
     assert f.re_ohm == pytest.approx(5.1)
     assert f.le_mh == pytest.approx(2.5)
     assert f.eta_zero_pct == pytest.approx(3.01)

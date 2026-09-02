@@ -68,7 +68,9 @@ _BASE = "https://celestion.com"
 _SITEMAP_URL = f"{_BASE}/product-sitemap.xml"
 
 _LOC_RE = re.compile(r"<loc>([^<]+)</loc>", re.IGNORECASE)
-_PRODUCT_URL_RE = re.compile(r"^https?://celestion\.com/product/[^/]+/?$", re.IGNORECASE)
+_PRODUCT_URL_RE = re.compile(
+    r"^https?://celestion\.com/product/[^/]+/?$", re.IGNORECASE
+)
 
 
 def _weight_kg(s: Optional[str]) -> Optional[float]:
@@ -76,52 +78,57 @@ def _weight_kg(s: Optional[str]) -> Optional[float]:
     return g / 1000.0 if g is not None else None
 
 
-_LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]] = {
+_LABEL_MAP: dict[
+    str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]
+] = {
     # T/S — both plain and guitar-driver comma-suffix variants
-    "fs":                          ("fs_hz",                  parse_frequency),
-    "resonance frequency, fs":     ("fs_hz",                  parse_frequency),
-    "re":                          ("re_ohm",                 parse_impedance),
-    "dc resistance, re":           ("re_ohm",                 parse_impedance),
-    "qms":                         ("qms",                    parse_float),
-    "qes":                         ("qes",                    parse_float),
-    "qts":                         ("qts",                    parse_float),
-    "vas":                         ("vas_liters",             parse_liters),
-    "sd":                          ("sd_cm2",                 parse_sd_cm2),
-    "xmax":                        ("xmax_mm",                parse_length_mm),
-    "mms":                         ("mms_g",                  parse_mass_g),
-    "cms":                         ("cms_mm_per_n",           parse_compliance_mm_per_n),
-    "rms":                         ("rms_ns_per_m",           parse_float),
-    "le":                          ("le_mh",                  parse_le_mh),   # "Le (at 1kHz)"→"le"
-    "bl":                          ("bl_tm",                  parse_bl_tm),
-    "bi":                          ("bl_tm",                  parse_bl_tm),   # Celestion typo
+    "fs": ("fs_hz", parse_frequency),
+    "resonance frequency, fs": ("fs_hz", parse_frequency),
+    "re": ("re_ohm", parse_impedance),
+    "dc resistance, re": ("re_ohm", parse_impedance),
+    "qms": ("qms", parse_float),
+    "qes": ("qes", parse_float),
+    "qts": ("qts", parse_float),
+    "vas": ("vas_liters", parse_liters),
+    "sd": ("sd_cm2", parse_sd_cm2),
+    "xmax": ("xmax_mm", parse_length_mm),
+    "mms": ("mms_g", parse_mass_g),
+    "cms": ("cms_mm_per_n", parse_compliance_mm_per_n),
+    "rms": ("rms_ns_per_m", parse_float),
+    "le": ("le_mh", parse_le_mh),  # "Le (at 1kHz)"→"le"
+    "bl": ("bl_tm", parse_bl_tm),
+    "bi": ("bl_tm", parse_bl_tm),  # Celestion typo
     # electrical / commercial
-    "nominal diameter":            ("nominal_size_mm",        parse_length_mm),
-    "rated impedance":             ("impedance_nominal_ohm",  parse_impedance),
-    "power rating":                ("power_aes_watts",        parse_power),
-    "continuous power rating":     ("power_long_term_watts",  parse_power),
-    "eia power rating":            ("power_eia_watts",        parse_power),
-    "sensitivity":                 ("sensitivity_db_1w_1m",   parse_float),
-    "frequency range":             ("__freq_range__",         parse_range),
+    "nominal diameter": ("nominal_size_mm", parse_length_mm),
+    "rated impedance": ("impedance_nominal_ohm", parse_impedance),
+    "power rating": ("power_aes_watts", parse_power),
+    "continuous power rating": ("power_long_term_watts", parse_power),
+    "eia power rating": ("power_eia_watts", parse_power),
+    "sensitivity": ("sensitivity_db_1w_1m", parse_float),
+    "frequency range": ("__freq_range__", parse_range),
     # Coax pages label this "Recommended min. crossover 12dB/oct" (slope info
     # is baked into the label); normalize_label doesn't strip it, so match the
     # full string.
-    "recommended min. crossover 12db/oct": ("recommended_crossover_hz", parse_frequency),
+    "recommended min. crossover 12db/oct": (
+        "recommended_crossover_hz",
+        parse_frequency,
+    ),
     # physical
-    "magnet type":                 ("magnet_type",            lambda s: normalize_magnet_type(s)),
-    "voice coil diameter":         ("voice_coil_diameter_mm", parse_length_mm),
+    "magnet type": ("magnet_type", lambda s: normalize_magnet_type(s)),
+    "voice coil diameter": ("voice_coil_diameter_mm", parse_length_mm),
     # Celestion compression drivers publish `Throat exit` (not "Throat diameter")
     # for the horn throat opening.
-    "throat exit":                 ("throat_diameter_mm",     parse_length_mm),
+    "throat exit": ("throat_diameter_mm", parse_length_mm),
     # Construction descriptors.
-    "voice coil material":         ("winding_material",       lambda s: s or None),
-    "former material":             ("former_material",        lambda s: s or None),
-    "surround material":           ("surround_material",      lambda s: s or None),
-    "phase plug":                  ("phase_plug_design",      lambda s: s or None),
-    "flux density":                ("flux_density_t",         parse_float),
-    "overall diameter":            ("overall_diameter_mm",    parse_length_mm),
-    "overall depth":               ("depth_mm",               parse_length_mm),
-    "cut-out diameter":            ("mounting_diameter_mm",   parse_length_mm),
-    "unit weight":                 ("net_weight_kg",          _weight_kg),
+    "voice coil material": ("winding_material", lambda s: s or None),
+    "former material": ("former_material", lambda s: s or None),
+    "surround material": ("surround_material", lambda s: s or None),
+    "phase plug": ("phase_plug_design", lambda s: s or None),
+    "flux density": ("flux_density_t", parse_float),
+    "overall diameter": ("overall_diameter_mm", parse_length_mm),
+    "overall depth": ("depth_mm", parse_length_mm),
+    "cut-out diameter": ("mounting_diameter_mm", parse_length_mm),
+    "unit weight": ("net_weight_kg", _weight_kg),
 }
 
 
@@ -169,7 +176,9 @@ class CelestionScraper(Scraper):
     name = "celestion"
     manufacturer_display = "Celestion"
     schema_version = "1.0"
-    expected_min_records = 180   # sitemap has 213; some guitar drivers drop for missing model/etc.
+    expected_min_records = (
+        180  # sitemap has 213; some guitar drivers drop for missing model/etc.
+    )
     max_seed_rounds = 2
 
     def discover_seeds(self) -> list[SeedRef]:
@@ -219,7 +228,11 @@ class CelestionScraper(Scraper):
             if t and len(t) > len(breadcrumb_text):
                 breadcrumb_text = t
                 break
-        kind = _kind_from_breadcrumb(breadcrumb_text) if breadcrumb_text else DriverKind.LF_WOOFER
+        kind = (
+            _kind_from_breadcrumb(breadcrumb_text)
+            if breadcrumb_text
+            else DriverKind.LF_WOOFER
+        )
 
         model = _model_from_page(soup, raw.url)
         if not model:

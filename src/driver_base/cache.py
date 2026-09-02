@@ -123,7 +123,9 @@ class Cache:
             )
         )
 
-    def purge(self, scraper_name: Optional[str] = None, url: Optional[str] = None) -> int:
+    def purge(
+        self, scraper_name: Optional[str] = None, url: Optional[str] = None
+    ) -> int:
         """Delete matching entries; returns count removed."""
         removed = 0
         if url is not None:

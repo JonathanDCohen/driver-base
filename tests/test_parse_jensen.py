@@ -20,7 +20,8 @@ def scraper() -> JensenScraper:
 
 def test_enumerate_sitemap_filters_to_product_urls(scraper: JensenScraper) -> None:
     seed = load_fixture(
-        "jensen", "seeds/sitemap.xml",
+        "jensen",
+        "seeds/sitemap.xml",
         url="https://www.jensentone.com/sitemap.xml",
     )
     res = scraper.enumerate([seed])
@@ -30,9 +31,18 @@ def test_enumerate_sitemap_filters_to_product_urls(scraper: JensenScraper) -> No
     # for /bass-speakers/v-11-compression-driver which is reclassified to
     # HF_COMPRESSION (it's a horn driver, not a guitar cone).
     for p in res.product_urls:
-        assert any(f"/{c}/" in p.url for c in
-                   ("vintage-alnico", "vintage-ceramic", "vintage-neo",
-                    "jet-series", "mod-series", "d-series", "bass-speakers"))
+        assert any(
+            f"/{c}/" in p.url
+            for c in (
+                "vintage-alnico",
+                "vintage-ceramic",
+                "vintage-neo",
+                "jet-series",
+                "mod-series",
+                "d-series",
+                "bass-speakers",
+            )
+        )
         if p.url.rstrip("/").endswith("/v-11-compression-driver"):
             assert p.context.driver_kind_hint == DriverKind.HF_COMPRESSION
         else:
@@ -44,7 +54,8 @@ def test_parse_p12n_emits_two_impedance_fragments(scraper: JensenScraper) -> Non
     one fragment per impedance so each variant gets its own canonical_id."""
     raw = load_fixture("jensen", "products/p12n.html", url=_P12N_URL)
     res = scraper.parse_artifact(
-        raw, SeedContext(driver_kind_hint=DriverKind.GUITAR_BASS),
+        raw,
+        SeedContext(driver_kind_hint=DriverKind.GUITAR_BASS),
     )
     assert len(res.fragments) == 2
 
@@ -76,7 +87,7 @@ def test_parse_p12n_emits_two_impedance_fragments(scraper: JensenScraper) -> Non
     assert f8.mms_g == pytest.approx(30.9)
     assert f8.bl_tm == pytest.approx(10.62)
     assert f8.le_mh == pytest.approx(0.87)
-    assert f8.cms_mm_per_n == pytest.approx(0.101)   # from '101 µm/N'
+    assert f8.cms_mm_per_n == pytest.approx(0.101)  # from '101 µm/N'
     assert f8.sd_cm2 == pytest.approx(490.9, rel=1e-3)
     assert f8.eta_zero_pct == pytest.approx(3.4)
     assert f8.sensitivity_db_1w_1m == pytest.approx(97.5)

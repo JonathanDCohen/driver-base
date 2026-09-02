@@ -111,8 +111,12 @@ def parse_range(s: Optional[str]) -> Optional[tuple[float, float]]:
     )
     if len(tagged) >= 2:
         (a_s, a_u), (b_s, b_u) = tagged[0], tagged[1]
-        low = abs(float(a_s.replace(",", "."))) * (1000.0 if a_u.lower() == "khz" else 1.0)
-        high = abs(float(b_s.replace(",", "."))) * (1000.0 if b_u.lower() == "khz" else 1.0)
+        low = abs(float(a_s.replace(",", "."))) * (
+            1000.0 if a_u.lower() == "khz" else 1.0
+        )
+        high = abs(float(b_s.replace(",", "."))) * (
+            1000.0 if b_u.lower() == "khz" else 1.0
+        )
     else:
         nums = [abs(n) for n in _all_floats(stripped, comma_is_decimal=True)]
         if len(nums) < 2:
@@ -167,9 +171,7 @@ def parse_length_mm(s: Optional[str]) -> Optional[float]:
     s = s.strip()
     if not s:
         return None
-    metric_m = re.search(
-        r"(-?\d+(?:[.,]\d+)?)\s*(mm|cm|m)\b", s, re.IGNORECASE
-    )
+    metric_m = re.search(r"(-?\d+(?:[.,]\d+)?)\s*(mm|cm|m)\b", s, re.IGNORECASE)
     if metric_m:
         val = float(metric_m.group(1).replace(",", "."))
         unit = metric_m.group(2).lower()

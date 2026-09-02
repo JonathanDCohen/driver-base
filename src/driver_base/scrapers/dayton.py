@@ -55,17 +55,17 @@ _BASE = "https://www.daytonaudio.com"
 # subcategory id → (slug, DriverKind). Slug matches URL text; is stored but not
 # functionally required for enumeration (id alone is enough).
 _CATEGORIES: list[tuple[int, str, DriverKind]] = [
-    (118, "woofers",             DriverKind.LF_WOOFER),
-    (121, "subwoofers",          DriverKind.LF_WOOFER),
-    (119, "tweeters",            DriverKind.TWEETER),
-    (120, "midranges",           DriverKind.FULLRANGE),
-    (123, "full-range",          DriverKind.FULLRANGE),
-    (161, "pro-audio-drivers",   DriverKind.LF_WOOFER),
-    (125, "passive-radiators",   DriverKind.PASSIVE),
+    (118, "woofers", DriverKind.LF_WOOFER),
+    (121, "subwoofers", DriverKind.LF_WOOFER),
+    (119, "tweeters", DriverKind.TWEETER),
+    (120, "midranges", DriverKind.FULLRANGE),
+    (123, "full-range", DriverKind.FULLRANGE),
+    (161, "pro-audio-drivers", DriverKind.LF_WOOFER),
+    (125, "passive-radiators", DriverKind.PASSIVE),
     (178, "mini-micro-speakers", DriverKind.FULLRANGE),
     (272, "compression-drivers", DriverKind.HF_COMPRESSION),
-    (96,  "horns-waveguides",    DriverKind.HORN),
-    (274, "planar-ribbon",       DriverKind.TWEETER),
+    (96, "horns-waveguides", DriverKind.HORN),
+    (274, "planar-ribbon", DriverKind.TWEETER),
     # 126 (replacement-diaphragms) intentionally excluded — not a driver.
 ]
 _CAT_KIND: dict[int, DriverKind] = {cid: kind for cid, _, kind in _CATEGORIES}
@@ -79,33 +79,35 @@ def _weight_kg(s: Optional[str]) -> Optional[float]:
     return g / 1000.0 if g is not None else None
 
 
-_LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]] = {
-    "model number":                                                  ("__model__", None),
-    "resonant frequency":                                             ("fs_hz", parse_float),
-    "dc resistance":                                                  ("re_ohm", parse_impedance),
-    "voice coil inductance":                                          ("le_mh", parse_le_mh),
-    "mechanical q":                                                   ("qms", parse_float),
-    "electromagnetic q":                                              ("qes", parse_float),
-    "total q":                                                        ("qts", parse_float),
-    "compliance equivalent volume":                                   ("vas_liters", parse_liters),
-    "mechanical compliance of suspension":                            ("cms_mm_per_n", parse_compliance_mm_per_n),
-    "surface area of cone":                                           ("sd_cm2", parse_sd_cm2),
-    "bl product":                                                     ("bl_tm", parse_bl_tm),
-    "diaphragm mass inc. airload":                                    ("mms_g", parse_mass_g),
-    "maximum linear excursion":                                       ("xmax_mm", parse_length_mm),
-    "impedance":                                                      ("impedance_nominal_ohm", parse_impedance),
-    "sensitivity":                                                    ("sensitivity_db_2_83v_1m", parse_float),
-    "power handling (rms)":                                           ("power_aes_watts", parse_power),
-    "power handling (max)":                                           ("power_peak_watts", parse_power),
-    "power handling":                                                 ("power_aes_watts", parse_power),  # fallback
-    "frequency response":                                             ("__freq_range__", parse_range),
-    "nominal diameter":                                               ("nominal_size_mm", parse_length_mm),
-    "voice coil diameter":                                            ("voice_coil_diameter_mm", parse_length_mm),
-    "overall outside diameter":                                       ("overall_diameter_mm", parse_length_mm),
-    "overall depth":                                                  ("depth_mm", parse_length_mm),
-    "baffle cutout diameter":                                         ("mounting_diameter_mm", parse_length_mm),
-    "weight":                                                         ("net_weight_kg", _weight_kg),
-    "magnet material":                                                ("magnet_type", lambda s: normalize_magnet_type(s)),
+_LABEL_MAP: dict[
+    str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]
+] = {
+    "model number": ("__model__", None),
+    "resonant frequency": ("fs_hz", parse_float),
+    "dc resistance": ("re_ohm", parse_impedance),
+    "voice coil inductance": ("le_mh", parse_le_mh),
+    "mechanical q": ("qms", parse_float),
+    "electromagnetic q": ("qes", parse_float),
+    "total q": ("qts", parse_float),
+    "compliance equivalent volume": ("vas_liters", parse_liters),
+    "mechanical compliance of suspension": ("cms_mm_per_n", parse_compliance_mm_per_n),
+    "surface area of cone": ("sd_cm2", parse_sd_cm2),
+    "bl product": ("bl_tm", parse_bl_tm),
+    "diaphragm mass inc. airload": ("mms_g", parse_mass_g),
+    "maximum linear excursion": ("xmax_mm", parse_length_mm),
+    "impedance": ("impedance_nominal_ohm", parse_impedance),
+    "sensitivity": ("sensitivity_db_2_83v_1m", parse_float),
+    "power handling (rms)": ("power_aes_watts", parse_power),
+    "power handling (max)": ("power_peak_watts", parse_power),
+    "power handling": ("power_aes_watts", parse_power),  # fallback
+    "frequency response": ("__freq_range__", parse_range),
+    "nominal diameter": ("nominal_size_mm", parse_length_mm),
+    "voice coil diameter": ("voice_coil_diameter_mm", parse_length_mm),
+    "overall outside diameter": ("overall_diameter_mm", parse_length_mm),
+    "overall depth": ("depth_mm", parse_length_mm),
+    "baffle cutout diameter": ("mounting_diameter_mm", parse_length_mm),
+    "weight": ("net_weight_kg", _weight_kg),
+    "magnet material": ("magnet_type", lambda s: normalize_magnet_type(s)),
 }
 
 
@@ -139,12 +141,15 @@ class DaytonScraper(Scraper):
     name = "dayton"
     manufacturer_display = "Dayton Audio"
     schema_version = "1.0"
-    expected_min_records = 250     # recon estimated ~370; go conservative
-    max_seed_rounds = 8            # 20/page × ≤80 = 1600 (bounded well above catalog size)
+    expected_min_records = 250  # recon estimated ~370; go conservative
+    max_seed_rounds = 8  # 20/page × ≤80 = 1600 (bounded well above catalog size)
 
     def discover_seeds(self) -> list[SeedRef]:
         return [
-            SeedRef(url=_cat_page_url(cid, 1), context=SeedContext(driver_kind_hint=kind, category_id=slug))
+            SeedRef(
+                url=_cat_page_url(cid, 1),
+                context=SeedContext(driver_kind_hint=kind, category_id=slug),
+            )
             for cid, slug, kind in _CATEGORIES
         ]
 

@@ -7,31 +7,37 @@ import pytest
 from driver_base.id import build_canonical_id, encode_impedance, slugify
 
 
-@pytest.mark.parametrize("s,expected", [
-    ("18LW1400", "18lw1400"),
-    ("18-LW-1400", "18_lw_1400"),
-    ("18 LW 1400", "18_lw_1400"),
-    # Greek letters have no ASCII decomposition — they get dropped, leaving
-    # separators. Empty result is the expected outcome.
-    ("Α-Ω", ""),
-    ("N/A", "n_a"),
-    ("", ""),
-])
+@pytest.mark.parametrize(
+    "s,expected",
+    [
+        ("18LW1400", "18lw1400"),
+        ("18-LW-1400", "18_lw_1400"),
+        ("18 LW 1400", "18_lw_1400"),
+        # Greek letters have no ASCII decomposition — they get dropped, leaving
+        # separators. Empty result is the expected outcome.
+        ("Α-Ω", ""),
+        ("N/A", "n_a"),
+        ("", ""),
+    ],
+)
 def test_slugify(s: str, expected: str) -> None:
     assert slugify(s) == expected
 
 
-@pytest.mark.parametrize("ohm,expected", [
-    (8.0, "8ohm"),
-    (4.0, "4ohm"),
-    (2.5, "2p5ohm"),
-    (12.0, "12ohm"),
-    (3.2, "3p2ohm"),
-    (16.0, "16ohm"),
-    (None, None),
-    (0.0, None),
-    (-1.0, None),
-])
+@pytest.mark.parametrize(
+    "ohm,expected",
+    [
+        (8.0, "8ohm"),
+        (4.0, "4ohm"),
+        (2.5, "2p5ohm"),
+        (12.0, "12ohm"),
+        (3.2, "3p2ohm"),
+        (16.0, "16ohm"),
+        (None, None),
+        (0.0, None),
+        (-1.0, None),
+    ],
+)
 def test_encode_impedance(ohm, expected) -> None:
     assert encode_impedance(ohm) == expected
 
@@ -86,7 +92,7 @@ def test_canonical_id_never_na() -> None:
         source_url="",
         canonical_id_seed=None,
     )
-    assert got is None    # no fallback → None (orchestrator drops fragment)
+    assert got is None  # no fallback → None (orchestrator drops fragment)
 
 
 def test_canonical_id_returns_none_on_empty_model() -> None:

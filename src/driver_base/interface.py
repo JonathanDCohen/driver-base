@@ -68,16 +68,16 @@ class RawArtifact:
     body: bytes
     status: int
     content_type: str
-    fetched_at: str   # ISO 8601
-    body_sha: str     # hex sha256; sidecar only, not part of cache key
+    fetched_at: str  # ISO 8601
+    body_sha: str  # hex sha256; sidecar only, not part of cache key
     from_cache: bool = False
 
 
 @dataclass(frozen=True)
 class FetchError:
     url: str
-    kind: str          # "transient" or "permanent"
-    reason: str        # e.g. "http_404", "dns_nxdomain", "timeout_read"
+    kind: str  # "transient" or "permanent"
+    reason: str  # e.g. "http_404", "dns_nxdomain", "timeout_read"
     attempts: int
 
 
@@ -108,17 +108,19 @@ class FetchCtx(Protocol):
     async def fetch(self, url: str) -> "RawArtifact | FetchError": ...
     async def fetch_many(self, urls: list[str]) -> list["RawArtifact | FetchError"]: ...
     async def fetch_seed(self, seed: SeedRef) -> "RawArtifact | FetchError": ...
-    async def fetch_seeds(self, seeds: list[SeedRef]) -> list["RawArtifact | FetchError"]: ...
+    async def fetch_seeds(
+        self, seeds: list[SeedRef]
+    ) -> list["RawArtifact | FetchError"]: ...
 
 
 class Scraper(ABC):
     """Base class for a manufacturer scraper. Subclass + register."""
 
-    name: str                                    # e.g. "eighteensound"
-    manufacturer_display: str                    # e.g. "18Sound"
+    name: str  # e.g. "eighteensound"
+    manufacturer_display: str  # e.g. "18Sound"
     schema_version: str = "1.0"
     playwright_required: bool = False
-    expected_min_records: int = 10               # first-run absolute floor
+    expected_min_records: int = 10  # first-run absolute floor
     populated_field_floors: dict[DriverKind, dict[str, float]] = {}
     max_seed_rounds: int = 8
 
@@ -136,9 +138,7 @@ class Scraper(ABC):
     ) -> ParseResult:
         """Pure bytes → DriverFragment[] + followup SeedRef[]. NEVER does I/O."""
 
-    def classify_driver_kind(
-        self, fragment: "DriverFragment"
-    ) -> Optional[DriverKind]:
+    def classify_driver_kind(self, fragment: "DriverFragment") -> Optional[DriverKind]:
         """Post-parse hook. Default: trust fragment.driver_kind.
 
         Scrapers whose enumeration path can't tag kind (Eminence /products.json)

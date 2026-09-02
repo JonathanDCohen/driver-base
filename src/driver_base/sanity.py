@@ -13,7 +13,6 @@ Delta gate: applied at the scraper level in the orchestrator after merge; see
 
 from __future__ import annotations
 
-from dataclasses import fields as dc_fields
 from typing import Optional
 
 from driver_base.interface import DriverKind
@@ -54,7 +53,9 @@ _RANGE_GATES: dict[str, tuple[float, float]] = {
 }
 
 # Impedance values that ARE physically plausible but unusual (WARN, keep value).
-_COMMON_IMPEDANCES: frozenset[float] = frozenset({2.0, 2.5, 3.0, 4.0, 6.0, 8.0, 12.0, 16.0})
+_COMMON_IMPEDANCES: frozenset[float] = frozenset(
+    {2.0, 2.5, 3.0, 4.0, 6.0, 8.0, 12.0, 16.0}
+)
 
 
 def sanity_check_fragment(f: DriverFragment) -> DriverFragment:

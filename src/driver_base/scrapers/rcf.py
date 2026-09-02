@@ -54,12 +54,12 @@ _BASE = "https://www.rcf.it"
 
 # serieId → DriverKind. serieId=14 (Custom Designs) EXCLUDED as non-driver.
 _SERIES: list[tuple[int, str, DriverKind]] = [
-    (27, "ferrite-lf",             DriverKind.LF_WOOFER),
-    (51, "neodymium-lf",           DriverKind.LF_WOOFER),
-    (50, "neodymium-compression",  DriverKind.HF_COMPRESSION),
-    (26, "ferrite-compression",    DriverKind.HF_COMPRESSION),
-    (11, "coaxial",                DriverKind.COAX),
-    (34, "horn-series",            DriverKind.HORN),
+    (27, "ferrite-lf", DriverKind.LF_WOOFER),
+    (51, "neodymium-lf", DriverKind.LF_WOOFER),
+    (50, "neodymium-compression", DriverKind.HF_COMPRESSION),
+    (26, "ferrite-compression", DriverKind.HF_COMPRESSION),
+    (11, "coaxial", DriverKind.COAX),
+    (34, "horn-series", DriverKind.HORN),
 ]
 _SERIE_TO_KIND: dict[int, DriverKind] = {sid: kind for sid, _, kind in _SERIES}
 
@@ -71,52 +71,57 @@ def _weight_kg(s: Optional[str]) -> Optional[float]:
     return g / 1000.0 if g is not None else None
 
 
-_LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]] = {
+_LABEL_MAP: dict[
+    str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]
+] = {
     # electrical / commercial
-    "rated impedance":                       ("impedance_nominal_ohm",  parse_impedance),
+    "rated impedance": ("impedance_nominal_ohm", parse_impedance),
     # HF drivers + coax pages use "Related Impedance" (RCF phrasing) instead of
     # "Rated Impedance". On coax the LF section is listed first, so first-wins
     # keeps the LF value for the generic field.
-    "related impedance":                     ("impedance_nominal_ohm",  parse_impedance),
-    "minimum impedance":                     ("impedance_min_ohm",      parse_impedance),
-    "cut-off frequency":                     ("recommended_crossover_hz", parse_frequency),
-    "program power":                         ("power_program_watts",    parse_power),
-    "power handling capacity":               ("power_aes_watts",        parse_power),
-    "sensitivity":                           ("sensitivity_db_1w_1m",   parse_float),
-    "frequency range":                       ("__freq_range__",         parse_range),
+    "related impedance": ("impedance_nominal_ohm", parse_impedance),
+    "minimum impedance": ("impedance_min_ohm", parse_impedance),
+    "cut-off frequency": ("recommended_crossover_hz", parse_frequency),
+    "program power": ("power_program_watts", parse_power),
+    "power handling capacity": ("power_aes_watts", parse_power),
+    "sensitivity": ("sensitivity_db_1w_1m", parse_float),
+    "frequency range": ("__freq_range__", parse_range),
     # T/S — RCF labels values (not the label) with the abbreviation, so
     # "Mechanical factor" → "6.50 Qms".  parse_float ignores trailing text.
-    "resonance frequency":                   ("fs_hz",                  parse_frequency),
-    "dc resistance":                         ("re_ohm",                 parse_impedance),
-    "mechanical factor":                     ("qms",                    parse_float),
-    "electrical factor":                     ("qes",                    parse_float),
-    "total factor":                          ("qts",                    parse_float),
-    "bl factor":                             ("bl_tm",                  parse_bl_tm),
-    "effective moving mass":                 ("mms_g",                  parse_mass_g),
-    "equivalent cas air loaded":             ("vas_liters",             parse_liters),
-    "effective piston area":                 ("sd_cm2",                 parse_sd_cm2),
-    "max. linear excursion":                 ("xmax_mm",                parse_length_mm),
-    "max. excursion before damage":          ("xmech_mm",               parse_length_mm),  # PP as-reported
-    "voice coil inductance @ 1khz":          ("le_mh",                  parse_le_mh),
-    "half-space efficency":                  ("eta_zero_pct",           parse_float),  # note typo in RCF source
+    "resonance frequency": ("fs_hz", parse_frequency),
+    "dc resistance": ("re_ohm", parse_impedance),
+    "mechanical factor": ("qms", parse_float),
+    "electrical factor": ("qes", parse_float),
+    "total factor": ("qts", parse_float),
+    "bl factor": ("bl_tm", parse_bl_tm),
+    "effective moving mass": ("mms_g", parse_mass_g),
+    "equivalent cas air loaded": ("vas_liters", parse_liters),
+    "effective piston area": ("sd_cm2", parse_sd_cm2),
+    "max. linear excursion": ("xmax_mm", parse_length_mm),
+    "max. excursion before damage": ("xmech_mm", parse_length_mm),  # PP as-reported
+    "voice coil inductance @ 1khz": ("le_mh", parse_le_mh),
+    "half-space efficency": ("eta_zero_pct", parse_float),  # note typo in RCF source
     # physical
-    "nominal diameter":                      ("nominal_size_mm",        parse_length_mm),
-    "voice coil diameter":                   ("voice_coil_diameter_mm", parse_length_mm),
-    "overall diameter":                      ("overall_diameter_mm",    parse_length_mm),
-    "front mount baffle cut-out":            ("mounting_diameter_mm",   parse_length_mm),
+    "nominal diameter": ("nominal_size_mm", parse_length_mm),
+    "voice coil diameter": ("voice_coil_diameter_mm", parse_length_mm),
+    "overall diameter": ("overall_diameter_mm", parse_length_mm),
+    "front mount baffle cut-out": ("mounting_diameter_mm", parse_length_mm),
     # HF driver pages publish `Exit Throat Diameter`; used as size fallback below.
-    "exit throat diameter":                  ("throat_diameter_mm",     parse_length_mm),
-    "weight":                                ("net_weight_kg",          _weight_kg),
-    "magnets":                               ("magnet_type",            lambda s: normalize_magnet_type(s)),
+    "exit throat diameter": ("throat_diameter_mm", parse_length_mm),
+    "weight": ("net_weight_kg", _weight_kg),
+    "magnets": ("magnet_type", lambda s: normalize_magnet_type(s)),
     # HF/coax pages label the magnet field "Magnetics" (plural, without 's').
-    "magnetics":                             ("magnet_type",            lambda s: normalize_magnet_type(s)),
-    "diaphragm material":                    ("diaphragm_material",     lambda s: (s or "").strip() or None),
+    "magnetics": ("magnet_type", lambda s: normalize_magnet_type(s)),
+    "diaphragm material": ("diaphragm_material", lambda s: (s or "").strip() or None),
     # Construction descriptors.
-    "voice coil winding material":           ("winding_material",       lambda s: s or None),
-    "voice coil former design":              ("former_material",        lambda s: s or None),  # "Direct Drive Kapton" style
-    "surround material":                     ("surround_material",      lambda s: s or None),
-    "phase plug design":                     ("phase_plug_design",      lambda s: s or None),
-    "flux density":                          ("flux_density_t",         parse_float),
+    "voice coil winding material": ("winding_material", lambda s: s or None),
+    "voice coil former design": (
+        "former_material",
+        lambda s: s or None,
+    ),  # "Direct Drive Kapton" style
+    "surround material": ("surround_material", lambda s: s or None),
+    "phase plug design": ("phase_plug_design", lambda s: s or None),
+    "flux density": ("flux_density_t", parse_float),
     # Volume occupied — driver's own displacement, not enclosure recommendation.
     # RCF doesn't publish a recommended enclosure volume field consistently.
 }
@@ -127,14 +132,16 @@ class RcfScraper(Scraper):
     name = "rcf"
     manufacturer_display = "RCF"
     schema_version = "1.0"
-    expected_min_records = 90    # recon: ~103 across 6 series (excl. Custom Designs)
+    expected_min_records = 90  # recon: ~103 across 6 series (excl. Custom Designs)
     max_seed_rounds = 2
 
     def discover_seeds(self) -> list[SeedRef]:
         return [
             SeedRef(
                 url=f"{_BASE}/en/search-results?serieId={sid}",
-                context=SeedContext(driver_kind_hint=kind, series=slug, category_id=slug),
+                context=SeedContext(
+                    driver_kind_hint=kind, series=slug, category_id=slug
+                ),
             )
             for sid, slug, kind in _SERIES
         ]

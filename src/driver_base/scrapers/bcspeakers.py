@@ -61,13 +61,13 @@ _CAT_TO_KIND: dict[str, DriverKind] = {slug: kind for slug, kind in _CATEGORIES}
 
 # Product URL captured from category HTML.
 _PRODUCT_URL_RE = re.compile(
-    r'/en/products/(?P<category>lf-driver|hf-driver)/[\d.]+/\d+/[A-Za-z0-9._-]+',
+    r"/en/products/(?P<category>lf-driver|hf-driver)/[\d.]+/\d+/[A-Za-z0-9._-]+",
     re.IGNORECASE,
 )
 # Parse the `<inches>/<ohms>/<model>` tail — the inches segment is the LF cone
 # diameter for lf-driver URLs, or the HF throat diameter for hf-driver URLs.
 _URL_PATH_RE = re.compile(
-    r'/en/products/(?P<category>lf-driver|hf-driver)/(?P<size>[\d.]+)/\d+/[A-Za-z0-9._-]+',
+    r"/en/products/(?P<category>lf-driver|hf-driver)/(?P<size>[\d.]+)/\d+/[A-Za-z0-9._-]+",
     re.IGNORECASE,
 )
 _MM_PER_INCH = 25.4
@@ -78,42 +78,44 @@ def _weight_kg(s: Optional[str]) -> Optional[float]:
     return g / 1000.0 if g is not None else None
 
 
-_LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]] = {
-    "fs":                          ("fs_hz",                  parse_frequency),
-    "re":                          ("re_ohm",                 parse_impedance),
-    "qes":                         ("qes",                    parse_float),
-    "qms":                         ("qms",                    parse_float),
-    "qts":                         ("qts",                    parse_float),
-    "vas":                         ("vas_liters",             parse_liters),
-    "sd":                          ("sd_cm2",                 parse_sd_cm2),
-    "xmax":                        ("xmax_mm",                parse_length_mm),
-    "mms":                         ("mms_g",                  parse_mass_g),
-    "bl":                          ("bl_tm",                  parse_bl_tm),
-    "le":                          ("le_mh",                  parse_le_mh),
-    "ebp":                         ("ebp_hz",                 parse_frequency),
-    "eta0":                        ("eta_zero_pct",           parse_float),
-    "nominal impedance":           ("impedance_nominal_ohm",  parse_impedance),
-    "minimum impedance":           ("impedance_min_ohm",      parse_impedance),
-    "nominal power handling":      ("power_aes_watts",        parse_power),
-    "continuous power handling":   ("power_long_term_watts",  parse_power),
-    "sensitivity":                 ("sensitivity_db_2_83v_1m", parse_float),  # B&C tooltip: 2.83V
-    "frequency range":             ("__freq_range__",         parse_range),
-    "nominal diameter":            ("nominal_size_mm",        parse_length_mm),
-    "voice coil diameter":         ("voice_coil_diameter_mm", parse_length_mm),
-    "overall diameter":            ("overall_diameter_mm",    parse_length_mm),
-    "baffle cutout diameter":      ("mounting_diameter_mm",   parse_length_mm),
-    "depth":                       ("depth_mm",               parse_length_mm),
-    "net weight":                  ("net_weight_kg",          _weight_kg),
-    "magnet material":             ("magnet_type",            lambda s: normalize_magnet_type(s)),
+_LABEL_MAP: dict[
+    str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]
+] = {
+    "fs": ("fs_hz", parse_frequency),
+    "re": ("re_ohm", parse_impedance),
+    "qes": ("qes", parse_float),
+    "qms": ("qms", parse_float),
+    "qts": ("qts", parse_float),
+    "vas": ("vas_liters", parse_liters),
+    "sd": ("sd_cm2", parse_sd_cm2),
+    "xmax": ("xmax_mm", parse_length_mm),
+    "mms": ("mms_g", parse_mass_g),
+    "bl": ("bl_tm", parse_bl_tm),
+    "le": ("le_mh", parse_le_mh),
+    "ebp": ("ebp_hz", parse_frequency),
+    "eta0": ("eta_zero_pct", parse_float),
+    "nominal impedance": ("impedance_nominal_ohm", parse_impedance),
+    "minimum impedance": ("impedance_min_ohm", parse_impedance),
+    "nominal power handling": ("power_aes_watts", parse_power),
+    "continuous power handling": ("power_long_term_watts", parse_power),
+    "sensitivity": ("sensitivity_db_2_83v_1m", parse_float),  # B&C tooltip: 2.83V
+    "frequency range": ("__freq_range__", parse_range),
+    "nominal diameter": ("nominal_size_mm", parse_length_mm),
+    "voice coil diameter": ("voice_coil_diameter_mm", parse_length_mm),
+    "overall diameter": ("overall_diameter_mm", parse_length_mm),
+    "baffle cutout diameter": ("mounting_diameter_mm", parse_length_mm),
+    "depth": ("depth_mm", parse_length_mm),
+    "net weight": ("net_weight_kg", _weight_kg),
+    "magnet material": ("magnet_type", lambda s: normalize_magnet_type(s)),
     # Construction descriptors.
-    "winding material":            ("winding_material",       lambda s: s or None),
-    "former material":             ("former_material",        lambda s: s or None),
-    "surround shape":              ("surround_material",      lambda s: s or None),
-    "phase plug design":           ("phase_plug_design",      lambda s: s or None),
-    "flux density":                ("flux_density_t",         parse_float),
-    "xvar":                        ("xvar_mm",                parse_length_mm),
-    "diaphragm material":          ("diaphragm_material",     lambda s: s or None),
-    "recommended crossover":       ("recommended_crossover_hz", parse_frequency),
+    "winding material": ("winding_material", lambda s: s or None),
+    "former material": ("former_material", lambda s: s or None),
+    "surround shape": ("surround_material", lambda s: s or None),
+    "phase plug design": ("phase_plug_design", lambda s: s or None),
+    "flux density": ("flux_density_t", parse_float),
+    "xvar": ("xvar_mm", parse_length_mm),
+    "diaphragm material": ("diaphragm_material", lambda s: s or None),
+    "recommended crossover": ("recommended_crossover_hz", parse_frequency),
     # B&C HF also publishes "Continuous Power Handling" already mapped above.
     # B&C HF publishes "Minimum Impedance" already mapped above.
 }
@@ -124,7 +126,7 @@ class BcSpeakersScraper(Scraper):
     name = "bcspeakers"
     manufacturer_display = "B&C Speakers"
     schema_version = "1.0"
-    expected_min_records = 200    # recon: ~274 variants across LF+HF
+    expected_min_records = 200  # recon: ~274 variants across LF+HF
     max_seed_rounds = 2
 
     def discover_seeds(self) -> list[SeedRef]:
@@ -159,7 +161,9 @@ class BcSpeakersScraper(Scraper):
                 products.append(
                     SeedRef(
                         url=f"{_BASE}{rel}",
-                        context=SeedContext(driver_kind_hint=seed_kind, category_id=seed_cat),
+                        context=SeedContext(
+                            driver_kind_hint=seed_kind, category_id=seed_cat
+                        ),
                     )
                 )
         return EnumerateResult(product_urls=products)

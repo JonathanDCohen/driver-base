@@ -67,12 +67,12 @@ def test_does_not_overwrite_manufacturer_long_term() -> None:
     f = _frag(power_aes_watts=1000.0, power_long_term_watts=1400.0)
     derive_missing_power(f)
     assert f.power_long_term_watts == pytest.approx(1400.0)
-    assert "power_long_term_watts" not in f.spec_source   # not derived — preserved
+    assert "power_long_term_watts" not in f.spec_source  # not derived — preserved
 
 
 def test_derives_long_term_from_program_via_aes() -> None:
     """When only Program is published, we derive AES first, then long_term."""
-    f = _frag(power_program_watts=1000.0)   # → aes 500 → long_term 500
+    f = _frag(power_program_watts=1000.0)  # → aes 500 → long_term 500
     derive_missing_power(f)
     assert f.power_aes_watts == pytest.approx(500.0)
     assert f.power_long_term_watts == pytest.approx(500.0)

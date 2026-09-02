@@ -19,7 +19,7 @@ import asyncio
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Awaitable, Callable, Optional
+from typing import Any, Callable, Optional
 
 from driver_base.aliases import Aliases, apply_aliases, load_aliases
 from driver_base.cache import Cache
@@ -55,7 +55,7 @@ def _iso_now() -> str:
 class ScraperResult:
     scraper_name: str
     manufacturer_display: str
-    status: str                              # "ok" | "preserved" | "blocked"
+    status: str  # "ok" | "preserved" | "blocked"
     drivers: list[Driver] = field(default_factory=list)
     reason: Optional[str] = None
     consecutive_failures: int = 0
@@ -207,8 +207,12 @@ async def _run_isolated(
     prior_last_success = prior_status.get("last_success_at")
 
     fetch_stats = {
-        "requested": 0, "cache_hits": 0, "network_fetches": 0,
-        "transient_errors": 0, "permanent_errors": 0, "playwright_incidents": 0,
+        "requested": 0,
+        "cache_hits": 0,
+        "network_fetches": 0,
+        "transient_errors": 0,
+        "permanent_errors": 0,
+        "playwright_incidents": 0,
     }
 
     if fetcher_factory is not None:
@@ -342,7 +346,9 @@ async def _run_parse_phase(
     force_refresh: bool,
 ) -> tuple[list[DriverFragment], list[dict]]:
     url_to_ctx = {p.url: p.context for p in product_urls}
-    arts = await ctx.fetch_many([p.url for p in product_urls], force_refresh=force_refresh)
+    arts = await ctx.fetch_many(
+        [p.url for p in product_urls], force_refresh=force_refresh
+    )
     _tally_fetches(arts, fetch_stats)
 
     fragments: list[DriverFragment] = []
@@ -355,7 +361,9 @@ async def _run_parse_phase(
         try:
             res = scraper.parse_artifact(r, url_to_ctx.get(r.url, SeedContext()))
         except Exception as e:
-            dropped_dbg.append({"url": r.url, "reason": f"parse_exception:{type(e).__name__}:{e}"})
+            dropped_dbg.append(
+                {"url": r.url, "reason": f"parse_exception:{type(e).__name__}:{e}"}
+            )
             continue
         fragments.extend(res.fragments)
         pending_followups.extend(res.followups)
@@ -448,9 +456,7 @@ def _parse_stats(
     }
 
 
-def _prior_status(
-    prior: Optional[dict[str, Any]], scraper_name: str
-) -> dict[str, Any]:
+def _prior_status(prior: Optional[dict[str, Any]], scraper_name: str) -> dict[str, Any]:
     if not prior:
         return {}
     return (prior.get("per_scraper_status") or {}).get(scraper_name) or {}
@@ -462,7 +468,8 @@ def _prior_records_for(
     if not prior:
         return []
     return [
-        d for d in (prior.get("drivers") or [])
+        d
+        for d in (prior.get("drivers") or [])
         if d.get("manufacturer") == manufacturer_display
     ]
 

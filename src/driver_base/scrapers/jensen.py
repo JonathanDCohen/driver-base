@@ -72,7 +72,9 @@ _CATEGORIES = (
 
 _LOC_RE = re.compile(r"<loc>([^<]+)</loc>", re.IGNORECASE)
 _PRODUCT_URL_RE = re.compile(
-    r"^https?://www\.jensentone\.com/(?:" + "|".join(re.escape(c) for c in _CATEGORIES) + r")/[a-z0-9-]+/?$",
+    r"^https?://www\.jensentone\.com/(?:"
+    + "|".join(re.escape(c) for c in _CATEGORIES)
+    + r")/[a-z0-9-]+/?$",
     re.IGNORECASE,
 )
 
@@ -86,29 +88,29 @@ def _weight_kg(s: Optional[str]) -> Optional[float]:
 # canonical field; missing labels are simply skipped.
 _LABEL_MAP: dict[str, tuple[str, Callable[[Optional[str]], Any]]] = {
     # General Characteristics — read the metric column (index 1)
-    "nominal overall diameter":        ("nominal_size_mm",        parse_length_mm),
-    "nominal voice coil diameter":     ("voice_coil_diameter_mm", parse_length_mm),
-    "overall weight":                  ("net_weight_kg",          _weight_kg),
+    "nominal overall diameter": ("nominal_size_mm", parse_length_mm),
+    "nominal voice coil diameter": ("voice_coil_diameter_mm", parse_length_mm),
+    "overall weight": ("net_weight_kg", _weight_kg),
     # Thiele-Small
-    "voice coil dc resistance":        ("re_ohm",                 parse_impedance),
-    "resonance frequency":             ("fs_hz",                  parse_frequency),
-    "mechanical q factor":             ("qms",                    parse_float),
-    "electrical q factor":             ("qes",                    parse_float),
-    "total q factor":                  ("qts",                    parse_float),
-    "mechanical moving mass":          ("mms_g",                  parse_mass_g),
-    "mechanical compliance":           ("cms_mm_per_n",           parse_compliance_mm_per_n),
-    "force factor":                    ("bl_tm",                  parse_bl_tm),
-    "equivalent acoustic volume":      ("vas_liters",             parse_liters),
-    "maximum linear displacement":     ("xmax_mm",                parse_length_mm),
-    "reference efficiency":            ("eta_zero_pct",           parse_float),
-    "diaphragm area":                  ("sd_cm2",                 parse_sd_cm2),
-    "voice coil inductance @ 1khz":    ("le_mh",                  parse_le_mh),
+    "voice coil dc resistance": ("re_ohm", parse_impedance),
+    "resonance frequency": ("fs_hz", parse_frequency),
+    "mechanical q factor": ("qms", parse_float),
+    "electrical q factor": ("qes", parse_float),
+    "total q factor": ("qts", parse_float),
+    "mechanical moving mass": ("mms_g", parse_mass_g),
+    "mechanical compliance": ("cms_mm_per_n", parse_compliance_mm_per_n),
+    "force factor": ("bl_tm", parse_bl_tm),
+    "equivalent acoustic volume": ("vas_liters", parse_liters),
+    "maximum linear displacement": ("xmax_mm", parse_length_mm),
+    "reference efficiency": ("eta_zero_pct", parse_float),
+    "diaphragm area": ("sd_cm2", parse_sd_cm2),
+    "voice coil inductance @ 1khz": ("le_mh", parse_le_mh),
     # Constructive
-    "magnet":                          ("magnet_type",            lambda s: normalize_magnet_type(s)),
+    "magnet": ("magnet_type", lambda s: normalize_magnet_type(s)),
     # Electrical
-    "rated power":                     ("power_aes_watts",        parse_power),
-    "musical power":                   ("power_peak_watts",       parse_power),
-    "sensitivity@1w,1m":               ("sensitivity_db_1w_1m",   parse_float),
+    "rated power": ("power_aes_watts", parse_power),
+    "musical power": ("power_peak_watts", parse_power),
+    "sensitivity@1w,1m": ("sensitivity_db_1w_1m", parse_float),
 }
 
 
@@ -165,12 +167,12 @@ def _per_impedance_value(cells, imp_idx: int, n_impedances: int) -> Optional[str
         return None
     if imp_idx < len(values):
         return values[imp_idx]
-    return values[0]   # single-value row → apply to every impedance fragment
+    return values[0]  # single-value row → apply to every impedance fragment
 
 
 def _caption_key(table) -> str:
     cap = table.find("caption")
-    return (cap.get_text(" ", strip=True).lower() if cap else "")
+    return cap.get_text(" ", strip=True).lower() if cap else ""
 
 
 def _model_from_page(soup: BeautifulSoup, url: str) -> Optional[str]:
@@ -188,7 +190,9 @@ class JensenScraper(Scraper):
     name = "jensen"
     manufacturer_display = "Jensen"
     schema_version = "1.0"
-    expected_min_records = 55    # 63 product URLs; some emit 2 fragments (8+16Ω); some emit 1
+    expected_min_records = (
+        55  # 63 product URLs; some emit 2 fragments (8+16Ω); some emit 1
+    )
     max_seed_rounds = 2
 
     def discover_seeds(self) -> list[SeedRef]:
@@ -227,9 +231,7 @@ class JensenScraper(Scraper):
         self, raw: RawArtifact, seed_context: SeedContext
     ) -> ParseResult:
         soup = BeautifulSoup(raw.body, "lxml")
-        container = soup.find(
-            "div", class_=lambda c: c and "jensentone-ohm-specs" in c
-        )
+        container = soup.find("div", class_=lambda c: c and "jensentone-ohm-specs" in c)
         if container is None:
             return ParseResult(fragments=[])
 

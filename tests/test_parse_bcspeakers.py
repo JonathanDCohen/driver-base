@@ -20,13 +20,16 @@ def scraper() -> BcSpeakersScraper:
 
 def test_enumerate_lf_category(scraper: BcSpeakersScraper) -> None:
     seed = load_fixture(
-        "bcspeakers", "seeds/lf-driver.html",
+        "bcspeakers",
+        "seeds/lf-driver.html",
         url="https://www.bcspeakers.com/en/products/lf-driver",
     )
     res = scraper.enumerate([seed])
     # Recon: 175 LF variants; observed 179 on 2026-08-22
     assert len(res.product_urls) >= 170
-    assert all(p.context.driver_kind_hint == DriverKind.LF_WOOFER for p in res.product_urls)
+    assert all(
+        p.context.driver_kind_hint == DriverKind.LF_WOOFER for p in res.product_urls
+    )
     assert all("/en/products/lf-driver/" in p.url for p in res.product_urls)
     # dedup: case-insensitive
     lowered = {p.url.lower() for p in res.product_urls}
@@ -36,7 +39,8 @@ def test_enumerate_lf_category(scraper: BcSpeakersScraper) -> None:
 def test_parse_12fw64(scraper: BcSpeakersScraper) -> None:
     raw = load_fixture("bcspeakers", "products/12FW64.html", url=_12FW64_URL)
     res = scraper.parse_artifact(
-        raw, SeedContext(driver_kind_hint=DriverKind.LF_WOOFER, category_id="lf-driver"),
+        raw,
+        SeedContext(driver_kind_hint=DriverKind.LF_WOOFER, category_id="lf-driver"),
     )
     assert len(res.fragments) == 1
     f = res.fragments[0]

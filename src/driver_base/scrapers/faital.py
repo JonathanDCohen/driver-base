@@ -72,8 +72,8 @@ _BASE = "https://faitalpro.com"
 # breaks the search.php seeds. Category paths are mixed-case — lowercase 404s.
 # Kind is set from the seed URL in enumerate().
 _CATEGORY_TO_KIND: dict[str, DriverKind] = {
-    "LF_Loudspeakers":      DriverKind.LF_WOOFER,
-    "HF_Drivers":           DriverKind.HF_COMPRESSION,
+    "LF_Loudspeakers": DriverKind.LF_WOOFER,
+    "HF_Drivers": DriverKind.HF_COMPRESSION,
     "Coaxial_Loudspeakers": DriverKind.COAX,
 }
 
@@ -81,25 +81,39 @@ _CATEGORY_TO_KIND: dict[str, DriverKind] = {
 # `update_data()` JS. Wide-open ranges — matches "show me everything".
 # LF_Loudspeakers/search.php filter:
 _LF_SEARCH_POST: tuple[tuple[str, str], ...] = (
-    ("neodymium", "10"), ("ferrite", "20"),
+    ("neodymium", "10"),
+    ("ferrite", "20"),
     ("size", "All"),
-    ("powermin", "20"), ("powermax", "3000"),
-    ("vcmin", "15"), ("vcmax", "170"),
-    ("fsmin", "20"), ("fsmax", "180"),
-    ("demod", "1"), ("nodemod", "1"),
+    ("powermin", "20"),
+    ("powermax", "3000"),
+    ("vcmin", "15"),
+    ("vcmax", "170"),
+    ("fsmin", "20"),
+    ("fsmax", "180"),
+    ("demod", "1"),
+    ("nodemod", "1"),
 )
 # HF_Drivers/search.php filter:
 _HF_SEARCH_POST: tuple[tuple[str, str], ...] = (
-    ("neodymium", "10"), ("ferrite", "20"),
+    ("neodymium", "10"),
+    ("ferrite", "20"),
     ("size", "All"),
-    ("powermin", "30"), ("powermax", "120"),
+    ("powermin", "30"),
+    ("powermax", "120"),
     ("vcdiam", "All"),
-    ("crossfreqmin", "0.4"), ("crossfreqmax", "2.6"),
-    ("demod", "1"), ("nodemod", "1"),
-    ("dshape1", "Dome"), ("dshape2", "Annular"), ("dshape3", "Double Edge Cone"),
-    ("dmaterial1", "Titanium"), ("dmaterial2", "Ketone Polymer"),
-    ("dmaterial3", "Paper"), ("dmaterial4", "Carbon Fiber"),
-    ("plugdesign1", "Annular"), ("plugdesign2", "Radial"),
+    ("crossfreqmin", "0.4"),
+    ("crossfreqmax", "2.6"),
+    ("demod", "1"),
+    ("nodemod", "1"),
+    ("dshape1", "Dome"),
+    ("dshape2", "Annular"),
+    ("dshape3", "Double Edge Cone"),
+    ("dmaterial1", "Titanium"),
+    ("dmaterial2", "Ketone Polymer"),
+    ("dmaterial3", "Paper"),
+    ("dmaterial4", "Carbon Fiber"),
+    ("plugdesign1", "Annular"),
+    ("plugdesign2", "Radial"),
 )
 
 # Match the URL segment naming the category, in either a seed URL
@@ -119,9 +133,7 @@ _PRODUCT_ID_RE = re.compile(r"product_details\\?/index\.php\?id=(\d+)")
 # by LF drivers so they hit the same map entries. The higher-crossover rating
 # (safer, matches "Minimum Crossover Frequency") is listed first in every Faital
 # HF page we've inspected, so the first-occurrence-wins dedup keeps that one.
-_POWER_ABOVE_KHZ_RE = re.compile(
-    r"^(aes power|maximum power) above [\d.]+ khz$"
-)
+_POWER_ABOVE_KHZ_RE = re.compile(r"^(aes power|maximum power) above [\d.]+ khz$")
 
 # `FaitalPRO | LF Loudspeakers | 12PR320 (8Ω)` → group(1) = '12PR320'
 _TITLE_MODEL_RE = re.compile(r"\|\s*([^|()]+?)\s*(?:\(|$)")
@@ -132,60 +144,68 @@ def _weight_kg(s: Optional[str]) -> Optional[float]:
     return g / 1000.0 if g is not None else None
 
 
-_LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]] = {
+_LABEL_MAP: dict[
+    str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]
+] = {
     # T/S
-    "fs":                          ("fs_hz",                  parse_frequency),
-    "re":                          ("re_ohm",                 parse_impedance),
-    "qes":                         ("qes",                    parse_float),
-    "qms":                         ("qms",                    parse_float),
-    "qts":                         ("qts",                    parse_float),
-    "vas":                         ("vas_liters",             parse_liters),
-    "sd":                          ("sd_cm2",                 parse_sd_cm2),
-    "xmax":                        ("xmax_mm",                parse_length_mm),
-    "xdamage":                     ("xmech_mm",               parse_length_mm),   # Faital ONE-WAY AS-REPORTED (framework nominally p-p; see docs/manufacturers.md)
-    "mms":                         ("mms_g",                  parse_mass_g),
-    "bl":                          ("bl_tm",                  parse_bl_tm),
-    "le":                          ("le_mh",                  parse_le_mh),
-    "cms":                         ("cms_mm_per_n",           parse_compliance_mm_per_n),
-    "rms":                         ("rms_ns_per_m",           parse_float),       # kg/s ≡ N·s/m
-    "eta zero":                    ("eta_zero_pct",           parse_float),
-    "ebp":                         ("ebp_hz",                 parse_frequency),
+    "fs": ("fs_hz", parse_frequency),
+    "re": ("re_ohm", parse_impedance),
+    "qes": ("qes", parse_float),
+    "qms": ("qms", parse_float),
+    "qts": ("qts", parse_float),
+    "vas": ("vas_liters", parse_liters),
+    "sd": ("sd_cm2", parse_sd_cm2),
+    "xmax": ("xmax_mm", parse_length_mm),
+    "xdamage": (
+        "xmech_mm",
+        parse_length_mm,
+    ),  # Faital ONE-WAY AS-REPORTED (framework nominally p-p; see docs/manufacturers.md)
+    "mms": ("mms_g", parse_mass_g),
+    "bl": ("bl_tm", parse_bl_tm),
+    "le": ("le_mh", parse_le_mh),
+    "cms": ("cms_mm_per_n", parse_compliance_mm_per_n),
+    "rms": ("rms_ns_per_m", parse_float),  # kg/s ≡ N·s/m
+    "eta zero": ("eta_zero_pct", parse_float),
+    "ebp": ("ebp_hz", parse_frequency),
     # electrical / commercial
-    "nominal impedance":           ("impedance_nominal_ohm",  parse_impedance),
-    "minimum impedance":           ("impedance_min_ohm",      parse_impedance),
-    "aes power handling":          ("power_aes_watts",        parse_power),
-    "maximum power handling":      ("power_peak_watts",       parse_power),
-    "sensitivity (1w/1m)":         ("sensitivity_db_1w_1m",   parse_float),
-    "frequency range":             ("__freq_range__",         parse_range),
+    "nominal impedance": ("impedance_nominal_ohm", parse_impedance),
+    "minimum impedance": ("impedance_min_ohm", parse_impedance),
+    "aes power handling": ("power_aes_watts", parse_power),
+    "maximum power handling": ("power_peak_watts", parse_power),
+    "sensitivity (1w/1m)": ("sensitivity_db_1w_1m", parse_float),
+    "frequency range": ("__freq_range__", parse_range),
     # physical
-    "nominal diameter":            ("nominal_size_mm",        parse_length_mm),
-    "voice coil diameter":         ("voice_coil_diameter_mm", parse_length_mm),
-    "overall diameter":            ("overall_diameter_mm",    parse_length_mm),
-    "baffle cutout diameter":      ("mounting_diameter_mm",   parse_length_mm),
-    "depth":                       ("depth_mm",               parse_length_mm),
-    "net weight":                  ("net_weight_kg",          _weight_kg),
-    "magnet":                      ("magnet_type",            lambda s: normalize_magnet_type(s)),
+    "nominal diameter": ("nominal_size_mm", parse_length_mm),
+    "voice coil diameter": ("voice_coil_diameter_mm", parse_length_mm),
+    "overall diameter": ("overall_diameter_mm", parse_length_mm),
+    "baffle cutout diameter": ("mounting_diameter_mm", parse_length_mm),
+    "depth": ("depth_mm", parse_length_mm),
+    "net weight": ("net_weight_kg", _weight_kg),
+    "magnet": ("magnet_type", lambda s: normalize_magnet_type(s)),
     # Compression-driver fields (HF pages have no Nominal Diameter; the throat
     # is used to derive `nominal_size_mm` in a post-parse step below).
-    "throat diameter":             ("throat_diameter_mm",     parse_length_mm),
+    "throat diameter": ("throat_diameter_mm", parse_length_mm),
     # HF drivers: `Minimum Crossover Frequency (3)` → `minimum crossover frequency`.
     # Coax: `Min. Cross. Freq. (4)` in the 3-col HF cell → `min. cross. freq.`
     # (handled by _LABEL_MAP_COAX_HF below, routing to the same generic field).
     "minimum crossover frequency": ("recommended_crossover_hz", parse_frequency),
-    "diaphragm material":          ("diaphragm_material",     lambda s: s or None),
-    "diaphragm shape":             ("diaphragm_shape",        lambda s: s or None),
+    "diaphragm material": ("diaphragm_material", lambda s: s or None),
+    "diaphragm shape": ("diaphragm_shape", lambda s: s or None),
     # Construction descriptors — mostly LF, some on HF.
-    "winding material":            ("winding_material",       lambda s: s or None),
-    "former material":             ("former_material",        lambda s: s or None),
-    "cone surround":               ("surround_material",      lambda s: s or None),
-    "phase plug design":           ("phase_plug_design",      lambda s: s or None),
-    "flux density":                ("flux_density_t",         parse_float),
-    "net air volume filled by loudspeaker": ("recommended_enclosure_volume_liters", parse_liters),
+    "winding material": ("winding_material", lambda s: s or None),
+    "former material": ("former_material", lambda s: s or None),
+    "cone surround": ("surround_material", lambda s: s or None),
+    "phase plug design": ("phase_plug_design", lambda s: s or None),
+    "flux density": ("flux_density_t", parse_float),
+    "net air volume filled by loudspeaker": (
+        "recommended_enclosure_volume_liters",
+        parse_liters,
+    ),
     # Coax pages use abbreviated forms of the same labels — keep original entries
     # above (for LF/HF pages) and add abbreviated aliases here.
-    "nom. diameter":               ("nominal_size_mm",        parse_length_mm),
-    "nom. impedance":              ("impedance_nominal_ohm",  parse_impedance),
-    "max power handling":          ("power_peak_watts",       parse_power),
+    "nom. diameter": ("nominal_size_mm", parse_length_mm),
+    "nom. impedance": ("impedance_nominal_ohm", parse_impedance),
+    "max power handling": ("power_peak_watts", parse_power),
 }
 
 
@@ -194,23 +214,25 @@ _LABEL_MAP: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], An
 # routes the HF value (cells[2]) to the coax_hf_* fields. Only labels that have
 # both an LF and HF variant need entries here; single-section labels (e.g.
 # `Basket Material`, `Cone Surround`) don't.
-_LABEL_MAP_COAX_HF: dict[str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]] = {
-    "nominal impedance":           ("coax_hf_impedance_nominal_ohm", parse_impedance),
-    "nom. impedance":              ("coax_hf_impedance_nominal_ohm", parse_impedance),
-    "minimum impedance":           ("coax_hf_impedance_min_ohm",     parse_impedance),
-    "aes power handling":          ("coax_hf_power_aes_watts",       parse_power),
-    "max power handling":          ("coax_hf_power_peak_watts",      parse_power),
-    "maximum power handling":      ("coax_hf_power_peak_watts",      parse_power),
-    "sensitivity (1w/1m)":         ("coax_hf_sensitivity_db_1w_1m",  parse_float),
-    "frequency range":             ("__coax_hf_freq_range__",        parse_range),
-    "voice coil diameter":         ("coax_hf_voice_coil_diameter_mm", parse_length_mm),
+_LABEL_MAP_COAX_HF: dict[
+    str, tuple[Optional[str], Optional[Callable[[Optional[str]], Any]]]
+] = {
+    "nominal impedance": ("coax_hf_impedance_nominal_ohm", parse_impedance),
+    "nom. impedance": ("coax_hf_impedance_nominal_ohm", parse_impedance),
+    "minimum impedance": ("coax_hf_impedance_min_ohm", parse_impedance),
+    "aes power handling": ("coax_hf_power_aes_watts", parse_power),
+    "max power handling": ("coax_hf_power_peak_watts", parse_power),
+    "maximum power handling": ("coax_hf_power_peak_watts", parse_power),
+    "sensitivity (1w/1m)": ("coax_hf_sensitivity_db_1w_1m", parse_float),
+    "frequency range": ("__coax_hf_freq_range__", parse_range),
+    "voice coil diameter": ("coax_hf_voice_coil_diameter_mm", parse_length_mm),
     # Diaphragm fields — on coax, LF cell is `-` and HF has the real value; the
     # HF value routes into the GENERIC field (the HF section IS the compression
     # driver, and there's no LF competitor for the diaphragm slot).
-    "diaphragm material":          ("diaphragm_material",     lambda s: s or None),
-    "diaphragm shape":             ("diaphragm_shape",        lambda s: s or None),
+    "diaphragm material": ("diaphragm_material", lambda s: s or None),
+    "diaphragm shape": ("diaphragm_shape", lambda s: s or None),
     # `Min. Cross. Freq.` HF cell → recommended_crossover_hz (LF cell is `-`).
-    "min. cross. freq.":           ("recommended_crossover_hz", parse_frequency),
+    "min. cross. freq.": ("recommended_crossover_hz", parse_frequency),
 }
 
 
@@ -229,7 +251,7 @@ class FaitalScraper(Scraper):
     name = "faital"
     manufacturer_display = "Faital Pro"
     schema_version = "1.0"
-    expected_min_records = 120   # recon: ~158 active English URLs across 4 categories
+    expected_min_records = 120  # recon: ~158 active English URLs across 4 categories
     max_seed_rounds = 2
 
     def discover_seeds(self) -> list[SeedRef]:
@@ -272,8 +294,7 @@ class FaitalScraper(Scraper):
             body = art.body.decode("utf-8", errors="ignore")
             for pid in _PRODUCT_ID_RE.findall(body):
                 product_url = (
-                    f"{_BASE}/en/products/{category}"
-                    f"/product_details/index.php?id={pid}"
+                    f"{_BASE}/en/products/{category}/product_details/index.php?id={pid}"
                 )
                 if product_url in seen:
                     continue
@@ -297,8 +318,8 @@ class FaitalScraper(Scraper):
         # `tbl_datasheet` = master table; coax's 3-col "Technical Parameters"
         # block (label | LF | HF) lives ONLY here. Use `recursive=False` on cell
         # lookup so nested tables don't bleed their content into outer rows.
-        specs: dict[str, str] = {}          # label → LF-or-only value
-        specs_hf: dict[str, str] = {}       # label → HF value (3-col rows only)
+        specs: dict[str, str] = {}  # label → LF-or-only value
+        specs_hf: dict[str, str] = {}  # label → HF value (3-col rows only)
         for table in soup.select("table.tbl_data, table.tbl_datasheet"):
             for tr in table.find_all("tr"):
                 cells = tr.find_all(["td", "th"], recursive=False)
@@ -326,7 +347,9 @@ class FaitalScraper(Scraper):
                 if m:
                     key = f"{m.group(1)} handling"
                 value_lf = cells[1].get_text(" ", strip=True)
-                value_hf = cells[2].get_text(" ", strip=True) if len(cells) >= 3 else None
+                value_hf = (
+                    cells[2].get_text(" ", strip=True) if len(cells) >= 3 else None
+                )
                 if hf_from_2col:
                     # `Re [HF]` — the single value belongs to the HF section.
                     if value_lf and value_lf not in ("--", "-") and key not in specs_hf:

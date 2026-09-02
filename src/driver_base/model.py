@@ -18,14 +18,14 @@ from driver_base.interface import DriverKind
 class DriverStatus(str, Enum):
     ACTIVE = "active"
     ARCHIVED = "archived"
-    UNAVAILABLE = "unavailable"    # temporarily out of stock but listed
+    UNAVAILABLE = "unavailable"  # temporarily out of stock but listed
 
 
 class MagnetType(str, Enum):
-    CERAMIC = "ceramic"            # includes raw values "ferrite"/"ceramic"
-    NEODYMIUM = "neodymium"        # includes "neo"/"neodymium slug/ring"
-    ALNICO = "alnico"              # Celestion Blue and similar classics
-    OTHER = "other"                # hybrid, unknown, or unparseable
+    CERAMIC = "ceramic"  # includes raw values "ferrite"/"ceramic"
+    NEODYMIUM = "neodymium"  # includes "neo"/"neodymium slug/ring"
+    ALNICO = "alnico"  # Celestion Blue and similar classics
+    OTHER = "other"  # hybrid, unknown, or unparseable
 
 
 class SpecSource(str, Enum):
@@ -33,14 +33,14 @@ class SpecSource(str, Enum):
     HTML_GRID = "html_grid"
     HTML_PROSE = "html_prose"
     HTML_DIV_PAIRS = "html_div_pairs"
-    INLINE_JS = "inline_js"        # HOQS var speakerData = {...};
+    INLINE_JS = "inline_js"  # HOQS var speakerData = {...};
     PDF_TEXT = "pdf_text"
     PDF_TABLE = "pdf_table"
-    JSON_API = "json_api"          # Shopify /products.json, B&C _data=
+    JSON_API = "json_api"  # Shopify /products.json, B&C _data=
     XLSX = "xlsx"
-    INFERRED = "inferred"          # driver_kind from category slug
-    DERIVED = "derived"            # xmech doubled from labelled one-way
-    OVERRIDE = "override"          # hand-patched via OVERRIDES list in driver_base.overrides
+    INFERRED = "inferred"  # driver_kind from category slug
+    DERIVED = "derived"  # xmech doubled from labelled one-way
+    OVERRIDE = "override"  # hand-patched via OVERRIDES list in driver_base.overrides
 
 
 # Best-first ordering when a field appears in multiple fragments. INLINE_JS
@@ -81,8 +81,8 @@ class DriverFragment:
     spec_source: dict[str, SpecSource] = field(default_factory=dict)
 
     # Identity
-    canonical_id_seed: Optional[str] = None    # e.g. Celestion post-id, RCF productCode
-    canonical_id: Optional[str] = None         # assigned post-merge
+    canonical_id_seed: Optional[str] = None  # e.g. Celestion post-id, RCF productCode
+    canonical_id: Optional[str] = None  # assigned post-merge
 
     # T/S parameters
     fs_hz: Optional[float] = None
@@ -95,14 +95,14 @@ class DriverFragment:
     rms_ns_per_m: Optional[float] = None
     bl_tm: Optional[float] = None
     re_ohm: Optional[float] = None
-    le_mh: Optional[float] = None              # canonical: Le at 1 kHz
+    le_mh: Optional[float] = None  # canonical: Le at 1 kHz
     sd_cm2: Optional[float] = None
     eta_zero_pct: Optional[float] = None
     ebp_hz: Optional[float] = None
 
     # Physical / mechanical
-    xmax_mm: Optional[float] = None            # one-way linear excursion
-    xmech_mm: Optional[float] = None           # peak-to-peak by convention
+    xmax_mm: Optional[float] = None  # one-way linear excursion
+    xmech_mm: Optional[float] = None  # peak-to-peak by convention
     voice_coil_diameter_mm: Optional[float] = None
     voice_coil_layers: Optional[int] = None
     overall_diameter_mm: Optional[float] = None
@@ -133,7 +133,7 @@ class DriverFragment:
     # Frequency
     freq_low_hz: Optional[float] = None
     freq_high_hz: Optional[float] = None
-    fs_diaphragm_hz: Optional[float] = None    # compression-driver diaphragm Fs
+    fs_diaphragm_hz: Optional[float] = None  # compression-driver diaphragm Fs
 
     # Sensitivity — both slots may be populated; slot chosen per manufacturer
     sensitivity_db_1w_1m: Optional[float] = None
@@ -149,20 +149,22 @@ class DriverFragment:
     # Compression-driver-specific (also populated on coax HF section for the
     # diaphragm fields, since the coax HF section IS a compression driver).
     throat_diameter_mm: Optional[float] = None
-    diaphragm_material: Optional[str] = None    # e.g. "Titanium", "Ketone Polymer"
-    diaphragm_shape: Optional[str] = None       # e.g. "Dome", "Annular"
+    diaphragm_material: Optional[str] = None  # e.g. "Titanium", "Ketone Polymer"
+    diaphragm_shape: Optional[str] = None  # e.g. "Dome", "Annular"
     # Manufacturer's recommended minimum high-pass crossover — the low-end
     # frequency at which the driver's HF section can safely be crossed over.
     # Populated on coax (LF/HF junction) and standalone HF/compression drivers.
     recommended_crossover_hz: Optional[float] = None
     # Voice-coil / cone construction descriptors (strings).
-    winding_material: Optional[str] = None       # VC wire (Cu, Al, Edgewound CCAW, ...)
-    former_material: Optional[str] = None        # VC former (Kapton, Glass Fiber, Nomex, ...)
-    surround_material: Optional[str] = None      # LF surround (Cloth, M-roll, Rubber, ...)
-    phase_plug_design: Optional[str] = None      # HF phase plug (Annular, Radial, N slot, ...)
+    winding_material: Optional[str] = None  # VC wire (Cu, Al, Edgewound CCAW, ...)
+    former_material: Optional[str] = None  # VC former (Kapton, Glass Fiber, Nomex, ...)
+    surround_material: Optional[str] = None  # LF surround (Cloth, M-roll, Rubber, ...)
+    phase_plug_design: Optional[str] = (
+        None  # HF phase plug (Annular, Radial, N slot, ...)
+    )
     # Motor / mechanical numerics.
-    flux_density_t: Optional[float] = None       # Gap flux density in Tesla
-    xvar_mm: Optional[float] = None              # linear excursion at 10% distortion (one-way)
+    flux_density_t: Optional[float] = None  # Gap flux density in Tesla
+    xvar_mm: Optional[float] = None  # linear excursion at 10% distortion (one-way)
     # Suggested sealed / vented enclosure volume, LF drivers.
     recommended_enclosure_volume_liters: Optional[float] = None
 
