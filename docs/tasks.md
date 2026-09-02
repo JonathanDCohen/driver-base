@@ -2,6 +2,37 @@
 
 ---
 
+## Framework gaps surfaced by SB Acoustics / Monacor / Peerless
+
+**Added:** 2026-09-01 (during SB/Monacor/Peerless scraper landing)
+
+The three new scrapers publish fields the framework has no slot for. All
+deliberately deferred — v1 downstream consumers don't need them. Surface if
+a downstream feature does.
+
+- **`magnet_weight_kg`** — SB Acoustics, Monacor, Celestion, Beyma all publish
+  it on every driver. Currently ignored. Would compose with `magnet_type` and
+  `flux_density_t` for motor-strength approximations.
+- **`voice_coil_winding_height_mm`, `magnetic_gap_height_mm`** — SB Acoustics
+  publishes both; useful for excursion/BL derating math (Xmax = (VC winding −
+  gap) / 2). Would enable one more consistency check.
+- **`ean` / `gtin`** — Monacor publishes 13-digit GTINs on every product.
+  Useful for retailer cross-linking in v2 (Parts Express carries some Monacor
+  as MC-branded resells).
+- **Coax HF sensitivity slot at 2.83V/1m** — `coax_hf_sensitivity_db_1w_1m`
+  exists, but SB Acoustics coax HF sections publish at 2.83V/1m. Currently
+  left null to avoid mis-slotting. Add `coax_hf_sensitivity_db_2_83v_1m`
+  or a per-manufacturer conversion pass if this data becomes load-bearing.
+- **`SpecSource.JSON_API` provenance for API-only data** — Peerless is the
+  first scraper whose entire spec set comes from a JSON body (not HTML). The
+  enum already covers it; `manufacturers.md` documents the pattern; but the
+  framework doc (`docs/framework.md`) doesn't call out that `parse_artifact`
+  is expected to dispatch on `raw.content_type` when a scraper serves
+  multiple content types. Not urgent — no scraper needs the hybrid path
+  today — but document if a second JSON scraper lands.
+
+---
+
 ## Bring horns back with a horn-appropriate schema
 
 **Added:** 2026-08-25 (globalized 2026-08-26)

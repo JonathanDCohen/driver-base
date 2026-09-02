@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Optional
 
 from driver_base.interface import DriverKind
 from driver_base.model import Driver
@@ -30,7 +29,7 @@ class RejectedDriver:
 # (both are then in the same units, and Xdamage typically sits 1.5–2× Xmax — well
 # under 1.9). Skip the gate for these manufacturers. This is an ASSUMPTION we're
 # tracking — see docs/tasks.md "surface per-manufacturer assumptions".
-_XMECH_ONE_WAY_MANUFACTURERS: frozenset[str] = frozenset({"Faital Pro"})
+_XMECH_ONE_WAY_MANUFACTURERS: frozenset[str] = frozenset({"Faital Pro", "Peerless"})
 
 
 _MIN_BANDWIDTH_HZ: dict[DriverKind, float] = {
@@ -108,9 +107,7 @@ def _hard_gates(d: Driver) -> None:
 
 def _soft_warns(d: Driver) -> None:
     if d.xmech_mm and d.xmax_mm and d.xmech_mm / d.xmax_mm > 6.0:
-        d.warn_flags.append(
-            f"xmech_xmax_ratio_high:{d.xmech_mm}/{d.xmax_mm}"
-        )
+        d.warn_flags.append(f"xmech_xmax_ratio_high:{d.xmech_mm}/{d.xmax_mm}")
 
     if (
         d.sensitivity_db_1w_1m is not None
@@ -126,10 +123,14 @@ def _soft_warns(d: Driver) -> None:
                 f"sensitivity_inconsistent:{d.sensitivity_db_2_83v_1m}vs{expected_2_83:.2f}"
             )
 
-    if d.driver_kind in {
-        DriverKind.LF_WOOFER,
-        DriverKind.FULLRANGE,
-        DriverKind.COAX,
-    } and d.driver_kind is not DriverKind.GUITAR_BASS:
+    if (
+        d.driver_kind
+        in {
+            DriverKind.LF_WOOFER,
+            DriverKind.FULLRANGE,
+            DriverKind.COAX,
+        }
+        and d.driver_kind is not DriverKind.GUITAR_BASS
+    ):
         if d.fs_hz is None or all(getattr(d, q) is None for q in ("qts", "qes", "qms")):
             d.warn_flags.append("missing_ts_for_expected_kind")

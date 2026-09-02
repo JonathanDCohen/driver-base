@@ -20,10 +20,13 @@ The selectors below are the ones the validator's script actually used. Substitut
 | RCF | rcf.it | 6 category pages via `?serieId=` | static HTML | `div.specifications div.row > div.col-md-6:first-child + div.col-md-6.font-family-semibold` (div pairs) | 137 (103 excl. Custom Designs) | No usable sitemap; Liferay OAuth endpoints 403 without token |
 | Beyma | beyma.com | 12 English category pages (10 kept, 2 dropped) | static HTML | `div.block-product-features div.items div.item` (div pairs) | ~194 active | `passive-filter` + `accesories` slugs dropped at enumeration |
 | Jensen | jensentone.com | `sitemap.xml` (63 product URLs across 7 categories) | static HTML | `div.jensentone-ohm-specs` (4 captioned `<table>`s) | ~120 (multi-impedance expansion from 63 URLs) | Every product is guitar/bass; many pages carry both 8Ω and 16Ω specs — one `DriverFragment` emitted per impedance column |
+| SB Acoustics | sbacoustics.com | `product-sitemap.xml` (231 URLs) | static HTML | unadorned `<ul>` of `<li>label value</li>` | ~200 (18 kits + 13 passive radiators excluded) | Sensitivity is `2.83V/1m`; `Linear coil travel` reported peak-to-peak → xmax halved & tagged DERIVED; coax pages ship two spec `<ul>`s (LF + HF); nominal size derived from URL slug |
+| Monacor | monacor.com | 9 category pages under `/products/components/speaker-technology/` with `?page=N` (silent wrap) | static HTML | `<tr class="spec">` with `td.spec-name` + `td.spec-value` | ~240 (Celestion-branded resells excluded) | Trailing hyphen on every category slug is required; `Force factor (BxL)` variant; `Peak music power output (MAX)` = peak; sensitivity 1W/1m; `dep. on horn` → null |
+| Peerless | products.peerless-audio.com | JSON API `/api/drivers?page=N` (paginated) | JSON API `/api/driver/{id}` | JSON-native (no HTML/PDF) | ~94 (109 total minus Preliminary/Prototype/out-of-scope types) | First pure-JSON scraper — no HTML; `PowerLF/PowerUF` are Hz not W (trap); publishes both `SensZ` (measured at TestVolt/1m) and `SensRe` (1W/1m Re-corrected) |
 
 **Deferred:** La Voce (site unreachable — see `memory/la-voce-parked.md` and the "Deferred" section below).
 
-**Total v1 records estimate:** ~1,700 across the 9 in-scope manufacturers (each impedance variant is a separate record per the ID scheme).
+**Total v1 records estimate:** ~2,200 across the 12 in-scope manufacturers (each impedance variant is a separate record per the ID scheme).
 
 ---
 
@@ -589,6 +592,191 @@ Regex `^https?://www\.jensentone\.com/{cat}/[a-z0-9-]+/?$`. Yields 63 product UR
 - `Xmax` values include the `±` sign (`± 1 mm`) — `parse_length_mm` strips it.
 
 **Recon count:** 63 product URLs. Multi-impedance expansion yields **120 driver records**. Set `expected_min_records = 55` (below 63 to allow parse-fail attrition).
+
+---
+
+## SB Acoustics (`sbacoustics`)
+
+**Homepage:** https://sbacoustics.com (Indonesia; Danish design; WordPress + WooCommerce). `robots.txt` allows product pages; disallows only WooCommerce internals. No `Crawl-delay`. `product-sitemap.xml` at the site root (All-in-One SEO plugin) is the canonical enumeration source.
+
+**Enumeration.** `product-sitemap.xml` lists **231 product URLs** (all `/product/{slug}/`). Two categories of non-drivers share this URL space:
+- **Kits** — 18 slugs hard-listed in `_KIT_SLUGS` (`raiya-tx`, `rinjani-be`, `ara-tx`, `arya`, `bromo`, …). Kit pages have no `DC resistance, Re` row, so a parse-time skip would also work; the hard-list avoids the wasted fetch.
+- **Passive radiators** — dropped at parse via `.posted_in` category inspection (any anchor text containing `passive radiator`, `kits`, or `accessories`).
+
+**Sample product page:** https://sbacoustics.com/product/6in-sb17nac35-8/ (SB17NAC35-8, 6″ NAC-cone midwoofer, 8Ω)
+
+**Extraction.** WooCommerce single-product view. Specs are one **unadorned `<ul>`** of `<li>` items in the description tab. Every `<li>` concatenates label and value in a single text node:
+```html
+<li>DC resistance, Re 5.7 Ω</li>
+<li>Sensitivity (2.83 V / 1 m) 86.5 dB</li>
+<li>Linear coil travel (p-p) 11 mm</li>
+```
+The parser locates the spec `<ul>` by presence of ≥3 signal labels among `Nominal Impedance`, `DC resistance`, `Free air resonance`, `Sensitivity`, `Force factor`, `Rated power handling`. Splits each `<li>` by matching the longest known label prefix (normalized: `,Mms` → `, mms`). Coax product pages ship **two** qualifying `<ul>`s — the LF section fills generic fields; the HF section fills `coax_hf_*`.
+
+**Sample data (`SB17NAC35-8`, 8Ω, validated 0.00% delta):**
+- Fs 31.5 Hz, Qts 0.42, Qes 0.45, Qms 6.0, Vas 33 L, Sd 118 cm², Mms 15.2 g, Bl 6.2 Tm, Le 0.15 mH, Re 5.7 Ω, Cms 1.68 mm/N
+- Linear coil travel (p-p) 11 mm → `xmax_mm = 5.5` (halved, tagged DERIVED)
+- Nominal 8 Ω, Sensitivity 86.5 dB (2.83 V / 1 m), Rated power handling 60 W
+- Voice coil diameter 35.5 mm, magnetic flux density 1.0 T, net weight 1.56 kg
+
+Also validated on `TW29BN-B-8` (Satori tweeter, `(2.83V/1m)` no-space variant), `SW26DAC76-8` (shallow subwoofer with `,Mms` missing-space quirk and `ltr.` unit), and `SB15BAC30-8-COAX` (coax, LF+HF sections in two `<ul>`s). All four extracted cleanly.
+
+**Field mapping (SB Acoustics → Driver):**
+- `Free air resonance, Fs` → `fs_hz`; `DC resistance, Re` → `re_ohm`; `Voice coil inductance, Le` → `le_mh`; `Effective piston area, Sd` → `sd_cm2`
+- T/S: `Total/Electrical/Mechanical Q-factor` → `qts/qes/qms`
+- `Equivalent volume, VAS` → `vas_liters` (units: `liters` OR `ltr.`)
+- `Moving mass incl. air, Mms` → `mms_g` (label sometimes emitted as `,Mms` with no space)
+- `Force factor, Bl` → `bl_tm`; `Compliance, Cms` → `cms_mm_per_n`; `Mechanical loss, Rms` → `rms_ns_per_m`
+- **`Sensitivity (2.83 V / 1 m)` / `(2.83V/1m)` → `sensitivity_db_2_83v_1m`** — SB always publishes at 2.83V. Routing to the 1W slot would silently mis-report by 3 dB on 4Ω drivers.
+- **`Linear coil travel (p-p)` → `xmax_mm` halved** — SB reports peak-to-peak; framework `xmax_mm` is one-way. Divide by 2, tag `SpecSource.DERIVED`.
+- `Rated power handling*` → `power_aes_watts` (strip trailing `*`; footnote references IEC 268-5, treat as AES-equivalent)
+- `Voice coil diameter` → `voice_coil_diameter_mm`; `Net weight` → `net_weight_kg`
+- **Nominal size** — not published as a spec row. Derived from the URL slug (`6in-…` → 6″, `10in-…` → 10″, `6½-…` → 6.5″). Tagged `SpecSource.DERIVED`.
+
+**Coax HF section (second `<ul>`):**
+- `Nominal Impedance` → `coax_hf_impedance_nominal_ohm`; `DC resistance, Re` → `coax_hf_re_ohm`; `Voice coil diameter` → `coax_hf_voice_coil_diameter_mm`; `Rated power handling` → `coax_hf_power_aes_watts`
+- Sensitivity NOT routed to `coax_hf_sensitivity_db_1w_1m` — SB's HF is also 2.83V/1m and the framework's coax_hf slot is 1W/1m-only. Left null rather than mis-slotted.
+
+**DriverKind mapping** (from `.posted_in` category anchors, first substring match wins):
+```
+coax                  → COAX
+tweeter               → TWEETER
+widebander, full range, filler driver → FULLRANGE
+subwoofer, midwoofer, woofer → LF_WOOFER
+midrange              → FULLRANGE (no dedicated MIDRANGE kind)
+```
+Skip categories: `Passive Radiators`, `Kits`, `Accessories`. SB has no HF-compression, no horns, no guitar/bass — observed kinds are LF_WOOFER, TWEETER, COAX, FULLRANGE.
+
+**Model extraction.** The H1 (e.g. `6″ SB17NAC35-8 / Aluminum`, `SATORI TW29BN-B-8 / Beryllium`) is split on `/`; the last uppercase-alnum-with-dashes token before the slash is the model.
+
+**Quirks:**
+- Slug encoding: URL-encoded `½` (`%c2%bd`), `″` (`%e2%80%b3`), and literal `½` all appear. URL-decode before size extraction.
+- Unit variants: `cm2` vs `cm 2` (`parse_sd_cm2` tolerates space via existing regex), `liters` vs `ltr.`, `Ω` vs `ohm`.
+- Concatenation bugs: `Moving mass incl. air,Mms 172 g` (no space after comma) — normalizer inserts `, `.
+- No rate-limiting observed; default 1 req/s.
+
+**Recon count (2026-09-01):** 231 sitemap URLs, ~200 in-scope after exclusions. `expected_min_records = 175`.
+
+---
+
+## Monacor (`monacor`)
+
+**Homepage:** https://www.monacor.com (Germany; TYPO3 CMS). `robots.txt` allows all except `/typo3*/` internals. No `Crawl-delay`. **`/sitemap.xml` returns 404** — enumeration crawls category listings directly.
+
+**Enumeration.** 9 category listing pages under `/products/components/speaker-technology/` with `?page=N` pagination (12 products/page). **Silent pagination wrap** — page past end re-serves page 1 rather than 404. Orchestrator's cross-round "no new URLs → stop" handles this (same as Dayton). The scraper enqueues page N+1 as a followup seed whenever page N yields any new products.
+
+**Category slugs (trailing hyphen is required — dropping it 404s):**
+```
+pa-bass-speakers-                              → LF_WOOFER
+pa-midrange-speakers-                          → FULLRANGE
+pa-tweeters-and-horn-drivers-                  → HF_COMPRESSION
+pa-coaxial-speakers-and-full-range-speakers-   → COAX
+hi-fi-speakers-                                → LF_WOOFER
+hi-fi-midrange-speakers-                       → FULLRANGE
+hi-fi-tweeters-                                → TWEETER
+hi-fi-full-range-speakers-                     → FULLRANGE
+miniature-speakers-                            → FULLRANGE
+```
+
+**Excluded** at enumeration:
+- `celestion-pro-audio-` category (~44 products) — Monacor resells Celestion drivers with Celestion-authored T/S. The existing `celestion` scraper is authoritative.
+- SKU-prefix filter inside `pa-tweeters-and-horn-drivers-`: `cdx1-*`, `cdx14-*`, `cdx20-*`, `axi*` are also Celestion resells under Monacor SKUs. Dropped at enumerate.
+- `speaker-building-concepts-` (kits, not drivers) and `discontinued` (v2 archive scope).
+
+Product URL extraction: `href="products/components/speaker-technology/{cat-slug}/{model-slug}/"` — relative, requires normalization against `_BASE`.
+
+**Sample product page:** https://www.monacor.com/products/components/speaker-technology/pa-bass-speakers-/cf1025c-8/ (CF1025C/8, 10″ PA woofer)
+
+**Extraction.** One `<table>` of `<tr class="spec">` rows per page. Each row: `<td class="spec-name">` (label) + `<td class="spec-value">` (value). ~30 rows including physical/packing info. Deduplicate by label (take first) — `Net weight` appears twice per page.
+
+**Sample data (`CF1025C/8`, 8Ω, validated 0.00% delta):**
+- Fs 54.8 Hz, Qts 0.265, Qes 0.299, Qms 2.338, Vas 38.6 l, Sd 346.36 cm², Xmax ± 4.25 mm, Mms 37.03 g, Bl 14.82 Tm, Le 0.57 mH, Re 5.15 Ω, Cms 0.23 mm/N
+- Nominal 8 Ω, Power (RMS) 300 W, Peak music power (MAX) 600 W, SPL 99 dB/W/m, Range 60-5,000 Hz
+- VC 64 mm, magnet weight 1.7 kg, Type of speaker 10″, weight 4.9 kg, mounting cutout Ø 230.8 mm
+
+Also validated on `AN2075/8` (2″ hi-fi full-range with `cm 2` space-before-superscript) and `CDX1-1425/8` (compression driver with no T/S published, `dep. on horn` for mounting cutout).
+
+**Field mapping (Monacor → Driver):**
+- `Impedance (Z)` → `impedance_nominal_ohm`
+- **`Power rating (RMS)` → `power_aes_watts`** (Monacor's RMS ≈ AES per Dayton convention)
+- **`Peak music power output (MAX)` → `power_peak_watts`** (typically 2× RMS)
+- **`SPL` value `99 dB/W/m` → `sensitivity_db_1w_1m`** — unambiguous 1W/1m; no 2.83V trap.
+- `Frequency range` → `freq_low_hz`/`freq_high_hz` (comma-thousands handled by `parse_range`)
+- `Rec. crossov. frequ. (fmax.) (12 dB/oct.)` → `recommended_crossover_hz`
+- T/S: `Resonant frequency`, `Total/Electr./Mech. Q factor`, `Equivalent volume`, `DC resistance`, `Voice coil induct.`, `Suspension compl.`, `Moving mass`, `Force factor` (**note `BxL` variant** — parens stripped by `normalize_label`), `Linear excursion (X MAX )` (interior-space label — `normalize_label` re-appends `(max)` since `MAX` is a preserved measurement-context token), `Eff. cone area`
+- Values: `Ø 64 mm` sigil stripped by number-search; `± 4.25 mm` sign stripped; `dep. on horn` → `None`; `\xa0` (nbsp) matches `\s` in unit regex.
+- `Type of speaker` (`10"`, `28 mm`) → `nominal_size_mm`
+- `Voice coil material` → `winding_material`; `Voice coil former` → `former_material`; `Mounting cutout` → `mounting_diameter_mm`; `Net weight` → `net_weight_kg`
+
+**Model extraction.** H1 `CF1025C/8` split on `/` — model is the left part; the `/N` impedance suffix is dropped so distinct-impedance variants (`CF1025C/8` vs `CF1025C/4`) share a model string but produce distinct canonical IDs via the framework's per-impedance ID scheme.
+
+**Quirks:**
+- Trailing hyphen on every category slug is real and required — do NOT `.rstrip('-')` anywhere.
+- Silent pagination wrap — cross-round dedup handles it.
+- HF compression drivers publish no T/S → hits the `HF_COMPRESSION` populated-rate exemption.
+- No rate-limiting observed.
+
+**Recon count (2026-09-01):** 271 unique product slugs across the 9 in-scope categories; excluding ~30 Celestion resells leaves ~240 Monacor-authored records. `expected_min_records = 210`.
+
+---
+
+## Peerless (`peerless`)
+
+**Homepage:** https://products.peerless-audio.com (Peerless-by-Tymphany, Denmark/HK; formerly `products.tymphany.com` — that host no longer resolves). `robots.txt` fully open. No `sitemap.xml`.
+
+**This is the first pure JSON-API scraper.** Unlike every other scraper, Peerless does not parse HTML — `/transducer/{id}` is a Vue/Laravel SPA shell with zero server-rendered specs. All data comes from a public unauthenticated JSON API. `raw.content_type` is checked (`application/json`) and `json.loads(raw.body)` replaces BeautifulSoup. No framework changes were needed — `RawArtifact.body` is already `bytes` and `content_type` is preserved through fetch and cache.
+
+**Enumeration.** Two API endpoints:
+- `GET /api/drivers?page=N` — paginated list, Laravel envelope (`{data:[...], last_page, total, per_page, ...}`), **12 records per page fixed** (`per_page > 12` returns HTTP 500).
+- `GET /api/driver/{id}` — full per-driver record.
+
+`enumerate` reads page 1 from the envelope, enqueues pages 2..`last_page` as followup seeds, and emits `/api/driver/{id}` product URLs for every row with `Status == "Final"` and a mapped `Type`. Preliminary/Prototype records (13 of 109 as of 2026-09-01) are filtered here.
+
+**Sample product URLs:**
+- Woofer: /api/driver/1497 (`FSL-0512R01-08`, 5.25″ pro woofer)
+- Tweeter: /api/driver/28 (`BC25SC08-04`, 1″ soft dome)
+- Compression: /api/driver/597 (`DFL-2525R00-08`, 1″ comp driver)
+- Fullrange: /api/driver/16 (`ANC-50N25AL04-04`, 2″ full-range)
+
+**Extraction.** `json.loads(body)` — no regex, no CSS. All numeric fields arrive in canonical units except `Cms` (µm/N; divided by 1000 to reach mm/N). `Mmd` and free-text descriptions are ignored.
+
+**Sample data (`FSL-0512R01-08`, `/api/driver/1497`, validated against the SPA render — 0.00% delta):**
+- Fs 120 Hz, Qts 0.58, Vas 3.48 L, Sd 100 cm², Xmax 4.33 mm, Xmech 4.8 mm, Mms 6.99 g, BL 6.44 T·m, Le 0.278 mH, Re 5.9 Ω, Cms 240 µm/N → 0.240 mm/N
+- Nominal 8 Ω, Zmin 6.5 Ω, Size 133 mm
+- SensZ 91.2 (TestVolt=2.83) → `sensitivity_db_2_83v_1m`
+- SensRe 89.9 → `sensitivity_db_1w_1m`
+- Power 90 W (PowerSTD `AES2-1984`), PowerLF 90 Hz, PowerUF 900 Hz (recommended band)
+
+**Field mapping (Peerless JSON → Driver):**
+- `MarketingNo` → `model` (impedance suffix already embedded in the SKU)
+- `Type` → `driver_kind` (mapping table below)
+- `Size`/`Impedance`/`Zmin` → `nominal_size_mm`/`impedance_nominal_ohm`/`impedance_min_ohm`
+- `Fs`/`Qts`/`Qes`/`Qms`/`Vas`/`Sd`/`Mms`/`BL`/`Le`/`Re`/`Xmax`/`Xmech` → canonical fields
+- `Cms` (µm/N) → `cms_mm_per_n` (÷1000)
+- **Sensitivity dual-slot:** `SensRe` → `sensitivity_db_1w_1m` (always); `SensZ` → `sensitivity_db_2_83v_1m` only when `TestVolt == 2.83`. Peerless is unique in publishing both — a free ground-truth for the framework's sensitivity-slot derivations.
+- **Power:** `Power` → `power_aes_watts`. `PowerSTD` varies (`AES2-1984`, `IEC 268-5`); when not AES, a `power_std_non_aes` warn flag is added.
+- **`PowerLF` / `PowerUF` are Hz, NOT W** — they map to `freq_low_hz` / `freq_high_hz`. Easy trap.
+- `NetWeight` → `net_weight_kg`
+
+**DriverKind mapping (`Type`):**
+```
+Woofer      → LF_WOOFER
+Subwoofer   → LF_WOOFER
+Tweeter     → TWEETER
+Compression → HF_COMPRESSION
+Fullrange   → FULLRANGE
+Coaxial     → COAX
+```
+Records typed `Headphone` or `Micro` are silently dropped. No `GUITAR_BASS` type appears.
+
+**Quirks:**
+- Sparse numeric IDs (16 … 1497 with gaps).
+- `/api/driver/1365` (the sole Coaxial record as of 2026-09-01) returns HTTP 500. Fetcher classifies as transient after retries → skipped with a permanent FetchError.
+- `per_page` > 12 → 500. Never override.
+- `Xmech: 0` means "not measured" (not 0 mm) — `_f()` treats it as null.
+- Product HTML pages (`/transducer/{id}`) render zero SSR data — cannot fall back to HTML scraping.
+
+**Recon count (2026-09-01):** 109 total records via `/api/drivers`; after filtering (Status Final, Type in scope, id 1365 skipped): ~94 in-scope. `expected_min_records = 85`.
 
 ---
 

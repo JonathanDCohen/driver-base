@@ -31,5 +31,9 @@ def instantiate_all() -> list[Scraper]:
     from driver_base.scrapers import faital  # noqa: F401
     from driver_base.scrapers import hoqs  # noqa: F401
     from driver_base.scrapers import jensen  # noqa: F401
+    from driver_base.scrapers import monacor  # noqa: F401
+    from driver_base.scrapers import peerless  # noqa: F401
     from driver_base.scrapers import rcf  # noqa: F401
+    from driver_base.scrapers import sbacoustics  # noqa: F401
+
     return [cls() for cls in SCRAPERS.values()]
