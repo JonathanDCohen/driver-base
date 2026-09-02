@@ -1,0 +1,11 @@
+# Revisions listed here are skipped by `git blame` and by GitHub's blame view.
+# Add commit SHAs for large mechanical reformats (formatter sweeps, mass
+# renames) so blame points to the real authoring commit, not the reformat.
+#
+# Local setup (one-time, per clone):
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# GitHub picks this file up automatically — no repo-side config required.
+
+# Adopt ruff + prettier; run initial format sweep (2026-09-02)
+38d652f
