@@ -13,6 +13,13 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
     />
+    <!-- Material Design Icons (MDI, community superset) is loaded solely for
+         `mdi-omega`, which Google's Material Icons doesn't carry. Rest of the
+         app stays on Material Icons. -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
     <script>
       // Applied before styles.css takes effect to avoid a light-mode flash on
@@ -115,26 +122,158 @@
           </div>
 
           <template x-for="group in filterGroups" :key="group.key">
-            <div class="filter-group">
-              <h6 x-text="group.label"></h6>
-              <ul class="chip-list">
-                <template x-for="opt in group.options" :key="opt.value">
-                  <li>
-                    <a
-                      href="#"
-                      class="chip waves-effect"
-                      :class="filters[group.key].includes(opt.value) ? 'teal white-text waves-light' : ''"
-                      @click.prevent="(el => { toggleFilter(group.key, opt.value); setTimeout(() => el.blur(), 350) })($event.currentTarget)"
-                      x-text="`${opt.label} (${opt.count})`"
-                    ></a>
+            <div class="side-picker-block">
+              <div
+                class="picker side-picker"
+                @click.outside="closeSidePickerIf(group.key, $event)"
+              >
+                <button
+                  type="button"
+                  class="btn-flat waves-effect picker-btn side-picker-btn"
+                  @click="toggleSidePicker(group.key, $event)"
+                >
+                  <i
+                    class="material-icons left"
+                    x-show="!group.mdi"
+                    x-text="group.icon"
+                  ></i>
+                  <i
+                    :class="`mdi mdi-${group.mdi} left`"
+                    x-show="group.mdi"
+                  ></i>
+                  <span
+                    x-text="facetSelectedCount(group.key) ? `${group.label} (${facetSelectedCount(group.key)})` : group.label"
+                  ></span>
+                </button>
+                <div
+                  class="picker-popover side-picker-popover"
+                  x-show="sidePickerOpen === group.key"
+                  x-transition.opacity
+                >
+                  <ul>
+                    <template x-for="opt in group.options" :key="opt.value">
+                      <li>
+                        <label>
+                          <input
+                            type="checkbox"
+                            class="filled-in"
+                            :checked="filters[group.key].includes(opt.value)"
+                            @change="toggleFilter(group.key, opt.value)"
+                          />
+                          <span x-text="`${opt.label} (${opt.count})`"></span>
+                        </label>
+                      </li>
+                    </template>
+                  </ul>
+                </div>
+              </div>
+              <ul
+                class="side-chip-list"
+                x-show="facetSelectedCount(group.key) > 0"
+              >
+                <template
+                  x-for="opt in group.options.filter(o => filters[group.key].includes(o.value))"
+                  :key="opt.value"
+                >
+                  <li class="chip teal lighten-4">
+                    <span x-text="opt.label"></span>
+                    <i
+                      class="close material-icons"
+                      @click="toggleFilter(group.key, opt.value)"
+                      title="Remove"
+                      >close</i
+                    >
                   </li>
                 </template>
               </ul>
             </div>
           </template>
 
+          <div class="num-filter-list">
+            <template x-for="row in numFilters" :key="row.id">
+              <div class="num-filter-row">
+                <select
+                  class="browser-default num-filter-field"
+                  @change="row.field = $event.target.value; updateUrl()"
+                >
+                  <option value="" disabled :selected="!row.field">
+                    Parameter…
+                  </option>
+                  <template x-for="f in numericFilterFields" :key="f.key">
+                    <option
+                      :value="f.key"
+                      :selected="row.field === f.key"
+                      x-text="f.label"
+                    ></option>
+                  </template>
+                </select>
+                <select
+                  class="browser-default num-filter-op"
+                  @change="row.op = $event.target.value; onNumFilterOpChange(row)"
+                >
+                  <template x-for="op in numericOps" :key="op.key">
+                    <option
+                      :value="op.key"
+                      :selected="row.op === op.key"
+                      x-text="op.label"
+                    ></option>
+                  </template>
+                </select>
+                <template x-if="row.op === 'range'">
+                  <span class="num-filter-values">
+                    <input
+                      type="number"
+                      step="any"
+                      class="num-filter-input"
+                      placeholder="min"
+                      x-model.number="row.min"
+                      @change="updateUrl()"
+                    />
+                    <span class="num-filter-sep">–</span>
+                    <input
+                      type="number"
+                      step="any"
+                      class="num-filter-input"
+                      placeholder="max"
+                      x-model.number="row.max"
+                      @change="updateUrl()"
+                    />
+                  </span>
+                </template>
+                <template
+                  x-if="row.op !== 'range' && row.op !== 'isset' && row.op !== 'notset'"
+                >
+                  <input
+                    type="number"
+                    step="any"
+                    class="num-filter-input"
+                    placeholder="value"
+                    x-model.number="row.value"
+                    @change="updateUrl()"
+                  />
+                </template>
+                <button
+                  type="button"
+                  class="btn-flat num-filter-remove"
+                  @click="removeNumFilter(row.id)"
+                  title="Remove filter"
+                >
+                  <i class="material-icons">close</i>
+                </button>
+              </div>
+            </template>
+          </div>
+
           <button
-            class="btn-flat waves-effect grey-text"
+            type="button"
+            class="btn-flat waves-effect add-filter-btn"
+            @click="addNumFilter()"
+          >
+            <i class="material-icons left">add</i> Add filter
+          </button>
+
+          <button
+            class="btn-flat waves-effect grey-text clear-filters-btn"
             @click="clearFilters"
             x-show="hasFilters"
           >

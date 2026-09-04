@@ -278,6 +278,99 @@ function cmpWithDir(a, b, dir) {
   return dir === "asc" ? cmp : -cmp;
 }
 
+// Ad-hoc numeric filters ("+ Add filter"). Each row: { id, field, op, ... }.
+// `arity` is used by the row UI to decide how many number inputs to render.
+const NUMERIC_OPS = [
+  { key: "eq", label: "=", arity: 1 },
+  { key: "ne", label: "≠", arity: 1 },
+  { key: "lt", label: "<", arity: 1 },
+  { key: "gt", label: ">", arity: 1 },
+  { key: "lte", label: "≤", arity: 1 },
+  { key: "gte", label: "≥", arity: 1 },
+  { key: "range", label: "in range", arity: 2 },
+  { key: "isset", label: "is set", arity: 0 },
+  { key: "notset", label: "is not set", arity: 0 },
+];
+const NUMERIC_OP_KEYS = new Set(NUMERIC_OPS.map((o) => o.key));
+
+function opArity(op) {
+  const spec = NUMERIC_OPS.find((o) => o.key === op);
+  return spec ? spec.arity : 1;
+}
+
+// Returns true iff `driver[field]` satisfies the row. Rows with unfilled
+// value(s) match everything — so a half-typed row doesn't blank the table.
+function evalNumFilter(driver, row) {
+  const v = driver[row.field];
+  if (row.op === "isset") return v != null;
+  if (row.op === "notset") return v == null;
+  if (v == null) return false;
+  if (row.op === "range") {
+    if (row.min == null && row.max == null) return true;
+    if (row.min != null && v < row.min) return false;
+    if (row.max != null && v > row.max) return false;
+    return true;
+  }
+  if (row.value == null) return true;
+  switch (row.op) {
+    case "eq":
+      return v === row.value;
+    case "ne":
+      return v !== row.value;
+    case "lt":
+      return v < row.value;
+    case "gt":
+      return v > row.value;
+    case "lte":
+      return v <= row.value;
+    case "gte":
+      return v >= row.value;
+  }
+  return true;
+}
+
+// URL token: `field:op` (nullary), `field:op:value`, or `field:range:min..max`
+// (either side may be empty). Returns null for anything unparseable so
+// unknown/legacy tokens are dropped rather than crashing the page.
+function parseNumFilterToken(tok, id) {
+  const idx1 = tok.indexOf(":");
+  if (idx1 < 0) return null;
+  const field = tok.slice(0, idx1);
+  const rest = tok.slice(idx1 + 1);
+  const idx2 = rest.indexOf(":");
+  const op = idx2 < 0 ? rest : rest.slice(0, idx2);
+  const valuePart = idx2 < 0 ? "" : rest.slice(idx2 + 1);
+  if (!field || !NUMERIC_OP_KEYS.has(op)) return null;
+  if (op === "isset" || op === "notset") return { id, field, op };
+  if (op === "range") {
+    const sep = valuePart.indexOf("..");
+    if (sep < 0) return null;
+    const minS = valuePart.slice(0, sep);
+    const maxS = valuePart.slice(sep + 2);
+    const min = minS === "" ? null : Number(minS);
+    const max = maxS === "" ? null : Number(maxS);
+    if (min != null && Number.isNaN(min)) return null;
+    if (max != null && Number.isNaN(max)) return null;
+    return { id, field, op, min, max };
+  }
+  const value = valuePart === "" ? null : Number(valuePart);
+  if (value != null && Number.isNaN(value)) return null;
+  return { id, field, op, value };
+}
+
+function serializeNumFilter(row) {
+  if (!row.field) return null;
+  if (row.op === "isset" || row.op === "notset")
+    return `${row.field}:${row.op}`;
+  if (row.op === "range") {
+    const min = row.min == null ? "" : String(row.min);
+    const max = row.max == null ? "" : String(row.max);
+    return `${row.field}:range:${min}..${max}`;
+  }
+  const val = row.value == null ? "" : String(row.value);
+  return `${row.field}:${row.op}:${val}`;
+}
+
 function multiSort(items, sorts) {
   if (!sorts.length) return items;
   const arr = items.slice();
@@ -295,6 +388,10 @@ function parseURLState() {
   const p = new URLSearchParams(window.location.search);
   const arr = (k) => (p.get(k) ? p.get(k).split(",").filter(Boolean) : []);
   const num = (v) => (isNaN(+v) ? v : +v);
+  let nfId = 0;
+  const numFilters = arr("nf")
+    .map((tok) => parseNumFilterToken(tok, nfId++))
+    .filter(Boolean);
   return {
     filters: {
       q: p.get("q") || "",
@@ -307,6 +404,8 @@ function parseURLState() {
       .map((s) => s.split(":"))
       .filter(([f, d]) => f && (d === "asc" || d === "desc"))
       .map(([field, dir]) => ({ field, dir })),
+    numFilters,
+    nextNumFilterId: nfId,
   };
 }
 
@@ -321,6 +420,10 @@ function writeURLState(state) {
     p.set("size", state.filters.size_in.join(","));
   if (state.sorts.length)
     p.set("sort", state.sorts.map((s) => `${s.field}:${s.dir}`).join(","));
+  if (state.numFilters && state.numFilters.length) {
+    const toks = state.numFilters.map(serializeNumFilter).filter(Boolean);
+    if (toks.length) p.set("nf", toks.join(","));
+  }
   const qs = p.toString();
   const url = qs
     ? `${window.location.pathname}?${qs}`
@@ -403,9 +506,13 @@ function app() {
     generatedAt: "?",
 
     filters: { q: "", mfg: [], kind: [], impedance: [], size_in: [] },
+    numFilters: [], // ad-hoc numeric filter rows (see NUMERIC_OPS)
+    nextNumFilterId: 0, // monotonically increasing id so Alpine :key stays stable
+    sidePickerOpen: null, // which sidebar facet popover is open ('mfg'|'kind'|'impedance'|'size_in'|null)
     sorts: [],
     pageSize: 500,
 
+    numericOps: NUMERIC_OPS,
     sortableFields: SORTABLE_FIELDS,
     columns: [], // ordered { key, visible } — includes fixed keys at [0..1]
     units: "metric", // "metric" | "imperial" — affects Size, Weight, Vas display + labels
@@ -433,6 +540,8 @@ function app() {
       const state = parseURLState();
       Object.assign(this.filters, state.filters);
       this.sorts = state.sorts;
+      this.numFilters = state.numFilters;
+      this.nextNumFilterId = state.nextNumFilterId;
       this.columns = reconcileColumns(readColumnsCookie());
       this.units = readUnitsCookie() || "metric";
       this.theme =
@@ -485,6 +594,7 @@ function app() {
       groups.push({
         key: "mfg",
         label: "Manufacturer",
+        icon: "factory",
         options: [...mCounts.entries()]
           .sort()
           .map(([value, count]) => ({ value, label: value, count })),
@@ -493,6 +603,7 @@ function app() {
       groups.push({
         key: "kind",
         label: "Type",
+        icon: "category",
         options: [...kCounts.entries()].sort().map(([value, count]) => ({
           value,
           label: DRIVER_KIND_LABEL[value] || value,
@@ -503,6 +614,8 @@ function app() {
       groups.push({
         key: "impedance",
         label: "Impedance",
+        // Ω lives in MDI, not Google's Material Icons — see index.html.
+        mdi: "omega",
         options: [...impCounts.entries()]
           .sort((a, b) => a[0] - b[0])
           .map(([value, count]) => ({ value, label: `${value} Ω`, count })),
@@ -511,6 +624,9 @@ function app() {
       groups.push({
         key: "size_in",
         label: "Size",
+        // Deliberately distinct from `straighten` used by the metric/
+        // imperial toggle in the sort bar.
+        icon: "square_foot",
         options: SIZE_BUCKETS_MM.map((b) => ({
           value: b.label,
           label: b.label,
@@ -523,6 +639,9 @@ function app() {
     get filtered() {
       const f = this.filters;
       const q = (f.q || "").trim().toLowerCase();
+      // Only rows with a chosen field participate; a partially-configured row
+      // (no field selected yet) is inert — see evalNumFilter for value-side.
+      const activeNumFilters = this.numFilters.filter((r) => r.field);
       return this.drivers.filter((d) => {
         if (f.mfg.length && !f.mfg.includes(d.manufacturer)) return false;
         if (f.kind.length && !f.kind.includes(d.driver_kind)) return false;
@@ -535,6 +654,9 @@ function app() {
           return false;
         if (q && !`${d.manufacturer} ${d.model}`.toLowerCase().includes(q))
           return false;
+        for (const row of activeNumFilters) {
+          if (!evalNumFilter(d, row)) return false;
+        }
         return true;
       });
     },
@@ -557,8 +679,13 @@ function app() {
         this.filters.mfg.length ||
         this.filters.kind.length ||
         this.filters.impedance.length ||
-        this.filters.size_in.length
+        this.filters.size_in.length ||
+        this.numFilters.length
       );
+    },
+
+    get numericFilterFields() {
+      return SORTABLE_FIELDS.filter((f) => f.numeric);
     },
 
     get unusedSortableFields() {
@@ -607,6 +734,63 @@ function app() {
 
     clearFilters() {
       this.filters = { q: "", mfg: [], kind: [], impedance: [], size_in: [] };
+      this.numFilters = [];
+      this.updateUrl();
+    },
+
+    facetSelectedCount(key) {
+      const arr = this.filters[key];
+      return Array.isArray(arr) ? arr.length : 0;
+    },
+
+    // Toggle a sidebar facet popover. When closing (either by clicking the
+    // same button or via outside click), blur the button so its :focus grey
+    // — which we use as the "menu is open" indicator — actually clears.
+    toggleSidePicker(key, ev) {
+      const nowOpen = this.sidePickerOpen !== key;
+      this.sidePickerOpen = nowOpen ? key : null;
+      if (!nowOpen && ev && ev.currentTarget) ev.currentTarget.blur();
+    },
+    // Outside-click close. The click already moved focus off our button (to
+    // wherever it landed), so no explicit blur is needed — the :focus grey
+    // clears automatically. The guard prevents an outside click on picker A
+    // from clobbering picker B if the user is switching between them.
+    closeSidePickerIf(key) {
+      if (this.sidePickerOpen !== key) return;
+      this.sidePickerOpen = null;
+    },
+
+    // Ad-hoc numeric filter row lifecycle. New rows start with no field
+    // selected (inert); user picks field + op + value(s), each edit fires
+    // updateUrl() via @change bindings in the template.
+    addNumFilter() {
+      this.numFilters.push({
+        id: this.nextNumFilterId++,
+        field: null,
+        op: "eq",
+        value: null,
+      });
+    },
+    removeNumFilter(id) {
+      this.numFilters = this.numFilters.filter((r) => r.id !== id);
+      this.updateUrl();
+    },
+    onNumFilterOpChange(row) {
+      // Switching operator can invalidate value fields — clear stale slots so
+      // an isset→eq flip doesn't inherit `min`/`max` from an earlier range.
+      if (row.op === "range") {
+        delete row.value;
+        if (!("min" in row)) row.min = null;
+        if (!("max" in row)) row.max = null;
+      } else if (row.op === "isset" || row.op === "notset") {
+        delete row.value;
+        delete row.min;
+        delete row.max;
+      } else {
+        delete row.min;
+        delete row.max;
+        if (!("value" in row)) row.value = null;
+      }
       this.updateUrl();
     },
 
@@ -887,7 +1071,11 @@ function app() {
     },
 
     updateUrl() {
-      writeURLState({ filters: this.filters, sorts: this.sorts });
+      writeURLState({
+        filters: this.filters,
+        sorts: this.sorts,
+        numFilters: this.numFilters,
+      });
     },
   };
 }

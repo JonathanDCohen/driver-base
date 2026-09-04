@@ -126,6 +126,21 @@ nav .brand-logo .brand-mark {
   outline: none;
   color: var(--nav-fg);
 }
+/* Prevent Material Icons FOUT layout shift. Google's icon font uses
+ * ligatures: `<i class="material-icons">factory</i>` renders as the literal
+ * text "factory" in a fallback font until the webfont downloads, which is
+ * much wider than the icon glyph and jerks buttons around on cold load.
+ * Icons are 1em square by design, so clipping the box to 1em × 1em with
+ * `overflow: hidden` collapses the pre-swap text into the same footprint
+ * as the eventual glyph — no layout shift. Applied globally; MDI icons
+ * use ::before and aren't affected. */
+.material-icons {
+  display: inline-block;
+  width: 1em;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: middle;
+}
 .nav-icon-btn .material-icons {
   font-size: 22px;
 }
@@ -189,14 +204,16 @@ html[data-theme="dark"] .theme-switch label .lever:after {
   margin: 0;
 }
 
-/* Sidebar */
+/* Sidebar. min-height matches the sticky viewport-height budget so the panel
+ * always presents a rectangle beside the table instead of shrinking to fit
+ * a short filter list. overflow is left visible so facet popovers (which
+ * pop right, out of the sidebar's box) aren't clipped. */
 .sidebar {
   padding: 12px 16px;
   background: var(--surface);
   border-radius: 4px;
   box-shadow: 0 1px 2px var(--shadow);
-  max-height: calc(100vh - 96px);
-  overflow-y: auto;
+  min-height: calc(100vh - 96px);
   position: sticky;
   top: 76px;
 }
@@ -211,21 +228,133 @@ html[data-theme="dark"] .theme-switch label .lever:after {
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-.chip-list {
-  margin: 0;
-  padding: 0;
+
+/* Sidebar facet dropdowns. Each of the four fixed facet groups (Manufacturer,
+ * Type, Impedance, Size) collapses into a content-width button that reveals
+ * a checkbox popover flush to the button's right edge — same visual language
+ * as the column/sort pickers, just anchored horizontally instead of below.
+ * Only one open at a time; button holds Materialize's :focus grey while the
+ * popover is open, blurred explicitly on second click / outside click. */
+.side-picker {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 2px;
+}
+.side-picker-btn {
+  color: var(--text);
+}
+.side-picker-popover {
+  left: 100%;
+  top: 0;
+  min-width: 220px;
+}
+.side-picker-block {
+  margin-bottom: 6px;
+}
+/* Selected-value chips beneath a facet button. Mirrors the .sort-chip-list
+ * look (teal pill, close icon) but with wrap-friendly layout and no drag
+ * affordance since order doesn't matter here. */
+.side-chip-list {
   list-style: none;
+  margin: 4px 0 0 18px;
+  padding: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
 }
-.chip-list .chip {
+.side-chip-list .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   margin: 0;
+  height: 24px;
+  line-height: 24px;
   font-size: 12px;
+  padding: 0 8px;
+  user-select: none;
+}
+.side-chip-list .chip .close {
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 2px;
+}
+
+/* Ad-hoc numeric filter rows ("+ Add filter"). Each row is a compact
+ * [field] [op] [value] [×] strip that wraps within the sidebar width. */
+.num-filter-list {
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.num-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border-radius: 4px;
+  background: var(--surface-alt, rgba(0, 0, 0, 0.03));
+}
+html[data-theme="dark"] .num-filter-row {
+  background: rgba(255, 255, 255, 0.04);
+}
+.num-filter-row select.browser-default,
+.num-filter-row input[type="number"] {
+  height: 28px;
+  font-size: 12px;
+  padding: 0 4px;
+  margin: 0;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--text);
+  min-width: 0;
+  box-sizing: border-box;
+}
+.num-filter-field {
+  flex: 1 1 110px;
+  min-width: 100px;
+}
+.num-filter-op {
+  flex: 0 0 auto;
+  min-width: 60px;
+}
+.num-filter-input {
+  flex: 1 1 60px;
+  min-width: 50px;
+}
+.num-filter-values {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 130px;
+  min-width: 130px;
+}
+.num-filter-sep {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.num-filter-remove {
+  padding: 0 4px;
+  min-width: 0;
   height: 28px;
   line-height: 28px;
-  padding: 0 12px;
-  cursor: pointer;
+  color: var(--text-muted);
+}
+.num-filter-remove i.material-icons {
+  font-size: 16px;
+  line-height: 28px;
+}
+.add-filter-btn {
+  padding: 0 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-transform: none;
+}
+.clear-filters-btn {
+  margin-top: 8px;
 }
 
 /* Materialize's default .chip is a light grey pill with dark text — invisible
@@ -514,10 +643,29 @@ table.compact-table > tbody > tr.row-hover {
   line-height: 32px;
   color: var(--text);
 }
-.picker-btn i.material-icons.left {
+.picker-btn i.material-icons.left,
+.picker-btn i.mdi.left {
   margin-right: 6px;
   line-height: 32px;
   height: 32px;
+}
+/* Give MDI the same em-sized slot as Material Icons so the label after the
+ * icon lines up across all four buttons. `1em` here resolves against the
+ * button-icon font size Materialize sets (`.btn-flat i { font-size: 1.3rem }`),
+ * matching what `.material-icons { width: 1em }` uses. Without a width, the
+ * narrow Ω glyph shrinks the outer <i> to ~14px and drags the label left. */
+.picker-btn i.mdi.left {
+  display: inline-block;
+  width: 1em;
+  overflow: hidden;
+}
+/* MDI's default ::before font-size is 24px, but the actual glyph metrics
+ * render slightly larger than Material Icons at the same size — trim a
+ * touch so the omega matches the neighbouring factory/category/square_foot
+ * cap height. */
+.picker-btn i.mdi.left::before {
+  font-size: 22px;
+  line-height: 32px;
 }
 .picker-btn[disabled] {
   color: var(--text-faint);
