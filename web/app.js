@@ -19,6 +19,9 @@ const COLUMN_META = {
   vas_liters: { label: "Vas", numeric: true, sortable: true }, // unit appended by columnLabel()
   sd_cm2: { label: "Sd (cm²)", numeric: true, sortable: true },
   xmax_mm: { label: "Xmax", numeric: true, sortable: true },
+  // Derived at load time in init(): Vd = Sd × Xmax (one-way peak displacement
+  // volume). Stored in liters; label appends unit via columnLabel().
+  vd_liters: { label: "Vd", numeric: true, sortable: true },
   mms_g: { label: "Mms", numeric: true, sortable: true },
   bl_tm: { label: "Bl", numeric: true, sortable: true },
   re_ohm: { label: "Re", numeric: true, sortable: true },
@@ -168,6 +171,7 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 const MM_PER_INCH = 25.4;
 const LB_PER_KG = 2.2046226;
 const CUFT_PER_LITER = 0.0353146667;
+const CUIN_PER_LITER = 61.0237441;
 
 const DRIVER_KIND_LABEL = {
   lf_woofer: "LF woofer",
@@ -236,6 +240,7 @@ const DERIVED_FIELD_NOTE = {
   power_program_watts: "Derived from listed AES spec",
   power_aes_watts: "Derived from listed program spec",
   power_long_term_watts: "Derived from listed AES spec",
+  vd_liters: "Computed as Sd × Xmax (one-way peak displacement volume)",
 };
 const GENERIC_SPEC_NOTE = {
   derived: "Derived from another spec",
@@ -440,11 +445,24 @@ function app() {
         if (!resp.ok) throw new Error(`fetch drivers.json → ${resp.status}`);
         const data = await resp.json();
         this.generatedAt = data.generated_at || "?";
-        this.drivers = (data.drivers || []).map((d) => ({
-          ...d,
-          _size_bucket: sizeBucketOf(d.nominal_size_mm),
-          _kind_label: DRIVER_KIND_LABEL[d.driver_kind] || d.driver_kind,
-        }));
+        this.drivers = (data.drivers || []).map((d) => {
+          // Vd = Sd × Xmax; sd_cm2·mm = 0.1 cm³, / 1000 → L, so ÷ 10000.
+          const vd =
+            d.sd_cm2 != null && d.xmax_mm != null
+              ? (d.sd_cm2 * d.xmax_mm) / 10000
+              : null;
+          const spec_source =
+            vd != null
+              ? { ...(d.spec_source || {}), vd_liters: "derived" }
+              : d.spec_source;
+          return {
+            ...d,
+            vd_liters: vd,
+            spec_source,
+            _size_bucket: sizeBucketOf(d.nominal_size_mm),
+            _kind_label: DRIVER_KIND_LABEL[d.driver_kind] || d.driver_kind,
+          };
+        });
       } catch (e) {
         console.error(e);
       }
@@ -783,6 +801,8 @@ function app() {
         return `${meta.label} (${this.units === "imperial" ? "lb" : "kg"})`;
       if (key === "vas_liters")
         return `${meta.label} (${this.units === "imperial" ? "ft³" : "L"})`;
+      if (key === "vd_liters")
+        return `${meta.label} (${this.units === "imperial" ? "in³" : "L"})`;
       return meta.label;
     },
 
@@ -823,6 +843,12 @@ function app() {
           this.units === "imperial"
             ? fmtNumber(v * CUFT_PER_LITER)
             : fmtNumber(v);
+      } else if (col.key === "vd_liters") {
+        // In³ for typical drivers is 1–500; L is 0.01–8. fmtNumber handles both.
+        base =
+          this.units === "imperial"
+            ? fmtNumber(v * CUIN_PER_LITER)
+            : fmtNumber(v, 3);
       } else if (col.key.endsWith("_ohm")) {
         base = `${v}&nbsp;Ω`;
       } else {
