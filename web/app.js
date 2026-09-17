@@ -16,6 +16,9 @@ const COLUMN_META = {
   qts: { label: "Qts", numeric: true, sortable: true },
   qes: { label: "Qes", numeric: true, sortable: true },
   qms: { label: "Qms", numeric: true, sortable: true },
+  // Derived at load time in init(): EBP = Fs / Qes. Dimensionless; rule of
+  // thumb is <50 sealed, 50–100 either, >100 vented.
+  ebp: { label: "EBP", numeric: true, sortable: true },
   vas_liters: { label: "Vas", numeric: true, sortable: true }, // unit appended by columnLabel()
   sd_cm2: { label: "Sd (cm²)", numeric: true, sortable: true },
   xmax_mm: { label: "Xmax", numeric: true, sortable: true },
@@ -241,6 +244,7 @@ const DERIVED_FIELD_NOTE = {
   power_aes_watts: "Derived from listed program spec",
   power_long_term_watts: "Derived from listed AES spec",
   vd_liters: "Computed as Sd × Xmax (one-way peak displacement volume)",
+  ebp: "Computed as Fs / Qes",
 };
 const GENERIC_SPEC_NOTE = {
   derived: "Derived from another spec",
@@ -560,13 +564,19 @@ function app() {
             d.sd_cm2 != null && d.xmax_mm != null
               ? (d.sd_cm2 * d.xmax_mm) / 10000
               : null;
-          const spec_source =
-            vd != null
-              ? { ...(d.spec_source || {}), vd_liters: "derived" }
-              : d.spec_source;
+          const ebp =
+            d.fs_hz != null && d.qes != null && d.qes > 0
+              ? d.fs_hz / d.qes
+              : null;
+          let spec_source = d.spec_source;
+          if (vd != null)
+            spec_source = { ...(spec_source || {}), vd_liters: "derived" };
+          if (ebp != null)
+            spec_source = { ...(spec_source || {}), ebp: "derived" };
           return {
             ...d,
             vd_liters: vd,
+            ebp,
             spec_source,
             _size_bucket: sizeBucketOf(d.nominal_size_mm),
             _kind_label: DRIVER_KIND_LABEL[d.driver_kind] || d.driver_kind,
