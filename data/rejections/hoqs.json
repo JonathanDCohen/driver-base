@@ -1,7 +1,38 @@
 {
   "scraper": "hoqs",
-  "written_at": "2026-10-04T01:33:54.566719+00:00",
-  "reason": "zero_records_this_run",
-  "rejected_count": 0,
-  "sample": []
+  "written_at": "2026-10-11T01:09:11.866853+00:00",
+  "reason": "records_dropped_pct:66.67%>30%",
+  "rejected_count": 6,
+  "sample": [
+    {
+      "url": "https://hoqs.org/products/hoqs-hf143n-1-4",
+      "reason": "http_429",
+      "kind": "transient"
+    },
+    {
+      "url": "https://hoqs.org/products/n62c-6-neodymium-speaker-driver",
+      "reason": "http_429",
+      "kind": "transient"
+    },
+    {
+      "url": "https://hoqs.org/products/hoqs-n123",
+      "reason": "http_429",
+      "kind": "transient"
+    },
+    {
+      "url": "https://hoqs.org/products/hoqs-wg6",
+      "reason": "http_429",
+      "kind": "transient"
+    },
+    {
+      "url": "https://hoqs.org/products/hoqs-bh1",
+      "reason": "http_429",
+      "kind": "transient"
+    },
+    {
+      "url": "https://hoqs.org/products/hoqs-carbon-fiber-18",
+      "reason": "http_429",
+      "kind": "transient"
+    }
+  ]
 }
