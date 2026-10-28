@@ -39,7 +39,7 @@ class SpecSource(str, Enum):
     JSON_API = "json_api"  # Shopify /products.json, B&C _data=
     XLSX = "xlsx"
     INFERRED = "inferred"  # driver_kind from category slug
-    DERIVED = "derived"  # xmech doubled from labelled one-way
+    DERIVED = "derived"  # computed from other listed specs (see derived.py, power.py, sensitivity.py)
     OVERRIDE = "override"  # hand-patched via OVERRIDES list in driver_base.overrides
 
 
@@ -98,7 +98,14 @@ class DriverFragment:
     le_mh: Optional[float] = None  # canonical: Le at 1 kHz
     sd_cm2: Optional[float] = None
     eta_zero_pct: Optional[float] = None
+    # EBP = Fs / Qes. Scraped directly when the manufacturer publishes it
+    # (18Sound, B&C, Eminence, Faital, HOQS); otherwise filled by
+    # `derived.derive_ebp` post-parse and tagged DERIVED.
     ebp_hz: Optional[float] = None
+    # Vd = Sd × Xmax (one-way peak displacement volume). Always derived —
+    # populated by `derived.derive_vd` post-parse when Sd and Xmax are both
+    # present, and tagged DERIVED.
+    vd_liters: Optional[float] = None
 
     # Physical / mechanical
     xmax_mm: Optional[float] = None  # one-way linear excursion
@@ -235,6 +242,7 @@ class Driver:
     sd_cm2: Optional[float] = None
     eta_zero_pct: Optional[float] = None
     ebp_hz: Optional[float] = None
+    vd_liters: Optional[float] = None
 
     xmax_mm: Optional[float] = None
     xmech_mm: Optional[float] = None

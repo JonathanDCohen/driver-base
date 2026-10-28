@@ -96,11 +96,13 @@ assumption invisible to anyone reading `xmech_mm` in the output.
   bypassed. Beyma: Xdamage stored as peak-to-peak per explicit column label.").
 
 **Adjacent scope worth touching in the same effort:**
-- `SpecSource.DERIVED` currently only means "xmech doubled from labelled
-  one-way" (docstring at `model.py:42`). It's really the same shape of
-  concept — a semantic transform applied at parse — but as a single enum
-  value with a fixed comment it can't grow. Either promote to a richer
-  assumption tag or leave alone and add assumptions alongside.
+- `SpecSource.DERIVED` is now a catch-all for several unrelated transforms —
+  xmech doubled from one-way, power derived from AES/program, sensitivity
+  derived from BL/Mms/Re, Vd from Sd×Xmax, EBP from Fs/Qes (see `derived.py`,
+  `power.py`, `sensitivity.py`). It's really the same shape of concept as the
+  assumption tags above — a semantic transform applied at parse — but as a
+  single enum value it can't distinguish which transform. Either promote to a
+  richer assumption tag or leave alone and add assumptions alongside.
 - Faital's `Magnet` value discards magnet *shape* (`Neodymium Ring` → just
   `Neodymium`); users looking for slug vs ring vs bar are silently losing
   info. Same pattern: an assumption "shape suffix dropped."

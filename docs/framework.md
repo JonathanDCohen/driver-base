@@ -273,7 +273,7 @@ class SpecSource(str, Enum):
     JSON_API = "json_api"          # Shopify /products.json, B&C _data=
     XLSX = "xlsx"                  # Faital comparison tables (if used)
     INFERRED = "inferred"          # driver_kind from category slug
-    DERIVED = "derived"            # xmech doubled from labelled one-way
+    DERIVED = "derived"            # computed from other listed specs (see derived.py, power.py, sensitivity.py)
 
 # Precedence (best-first) when a field appears in multiple fragments:
 SPEC_SOURCE_PRECEDENCE = [
