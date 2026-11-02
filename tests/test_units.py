@@ -182,6 +182,7 @@ def test_parse_liters(s: str, expected: float) -> None:
         ("0.120 m2", 1200.0),
         ("0.1255 m²", 1255.0),
         ("539 cm^2 (83.55 in^2)", 539.0),  # Faital caret notation
+        ("1,184 cm²", 1184.0),  # Dayton thousands comma
     ],
 )
 def test_parse_sd_cm2(s: str, expected: float) -> None:

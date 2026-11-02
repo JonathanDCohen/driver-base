@@ -17,9 +17,11 @@ Canonical units (matching the Driver dataclass):
     inductance       mH
 
 Comma vs. period as decimal separator: European catalogs (La Voce, some Faital)
-use `,` as a decimal separator (e.g. `0,068`). Others use `.`. `parse_frequency`
-treats `,` as a thousands separator (Dayton `30 - 4,000 Hz`). Other parsers
-treat `,` as a decimal (converting to `.`).
+use `,` as a decimal separator (e.g. `0,068`). Others use `.`. Parsers that
+see values large enough for Dayton to insert thousands commas — `parse_frequency`
+(`30 - 4,000 Hz`), `parse_range`, `parse_power` (`1,300 watts`), `parse_sd_cm2`
+(`1,184 cm²`) — strip the thousands comma up front. Everywhere else `,` is
+treated as a decimal (converting to `.`).
 """
 
 from __future__ import annotations
@@ -238,12 +240,14 @@ def parse_liters(s: Optional[str]) -> Optional[float]:
 
 
 def parse_sd_cm2(s: Optional[str]) -> Optional[float]:
-    """Return cm². Handles m² and in²."""
+    """Return cm². Handles m² and in², plus thousands commas ('1,184 cm²')."""
     if s is None:
         return None
     s = s.strip()
     if not s:
         return None
+    # Strip thousands commas so Dayton's '1,184 cm²' isn't read as European 1.184.
+    s = re.sub(r"(?<=\d),(?=\d{3}(?!\d))", "", s)
     cm2_m = re.search(
         r"(-?\d+(?:[.,]\d+)?)\s*(?:cm\s*\^?\s*[²2]|sq\.?\s*cm)", s, re.IGNORECASE
     )
