@@ -167,8 +167,30 @@ _LABEL_MAP: dict[
 
 
 def _model_from_handle(handle: str) -> str:
-    """Uppercase the URL handle and turn '_' into ' '. Best-effort readable id."""
-    return handle.replace("_", " ").upper().strip() or handle
+    """Turn '_' into ' ' and apply case normalization. The URL handle is
+    lowercase; naively upper-casing it (`cannabis_rex_10` → `CANNABIS REX 10`)
+    reads as shouty UI. Title-case pure-letter tokens (`CANNABIS`→`Cannabis`,
+    `REX`→`Rex`) but keep mixed alphanumeric codes uppercase (`CB3010N`,
+    `820H`, `GA10`) since those are model codes, not words."""
+    s = handle.replace("_", " ").strip()
+    if not s:
+        return handle
+    return re.sub(r"[A-Za-z0-9]+", lambda m: _normalize_token(m.group(0)), s)
+
+
+def _normalize_token(t: str) -> str:
+    has_alpha = any(c.isalpha() for c in t)
+    has_digit = any(c.isdigit() for c in t)
+    if has_alpha and has_digit:
+        return t.upper()
+    if has_alpha:
+        # Short pure-letter tokens are almost always abbreviations in Eminence's
+        # catalog (GA = Guitar Amp, MK = mark, DV = Dave V., JS = Jerry Sumner,
+        # DELTA PRO has `PRO` which we DO title-case). Keep ≤2-letter words upper.
+        if len(t) <= 2:
+            return t.upper()
+        return t.capitalize()
+    return t
 
 
 # Fallback for pages without a `table#em-detail`: extract spec fields from the

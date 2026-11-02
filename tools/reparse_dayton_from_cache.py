@@ -27,6 +27,7 @@ from driver_base.interface import RawArtifact, SeedContext
 from driver_base.merge import assign_canonical_ids, merge_fragments_by_id
 from driver_base.model import DriverKind
 from driver_base.orchestrator import rehydrate_drivers
+from driver_base.overrides import apply_overrides
 from driver_base.power import derive_missing_power
 from driver_base.sanity import sanity_check_fragment
 from driver_base.schema import read_prior_drivers_json, write_drivers_json
@@ -143,6 +144,14 @@ def main() -> int:
         fragments, now_iso=NOW_ISO, prior_scraped_at_by_id=prior_scraped_at_by_id
     )
     drivers, _rejected = enforce_consistency(drivers)
+    # Apply hand-patched overrides to the freshly-parsed drivers (matches
+    # orchestrator/CLI semantics — overrides run against reparsed records only).
+    ov_stats = apply_overrides(list(drivers))
+    if ov_stats.applied_fields:
+        print(
+            f"applied overrides: {ov_stats.applied_fields} field(s) "
+            f"across {ov_stats.applied_drivers} driver(s)"
+        )
     rehydrated_dayton = rehydrate_drivers(unparsed_records, now_iso=None)
     print(
         f"merged dayton drivers: {len(drivers)} reparsed + "

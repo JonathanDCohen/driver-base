@@ -49,7 +49,7 @@ def test_parse_kilomax_pro_18a(scraper: EminenceScraper) -> None:
     f = res.fragments[0]
 
     assert f.manufacturer == "Eminence"
-    assert f.model == "KILOMAX PRO 18A"
+    assert f.model == "Kilomax Pro 18A"
     assert f.driver_kind == DriverKind.LF_WOOFER
 
     # T/S (recon-verified baseline)
@@ -88,3 +88,21 @@ def test_parse_kilomax_pro_18a(scraper: EminenceScraper) -> None:
     assert f.net_weight_kg == pytest.approx(12.43)  # "27.4 lbs, 12.43 kg"
 
     assert f.spec_source["fs_hz"] == SpecSource.HTML_TABLE
+
+
+@pytest.mark.parametrize(
+    "handle,expected",
+    [
+        ("kilomax_pro_18a", "Kilomax Pro 18A"),
+        ("cannabis_rex_10", "Cannabis Rex 10"),
+        ("legend_bp102_4", "Legend BP102 4"),
+        ("820h", "820H"),
+        ("cannabass_cb3010n_8", "Cannabass CB3010N 8"),
+        ("ga_sc59", "GA SC59"),
+        ("governor-mk-2", "Governor-MK-2"),
+    ],
+)
+def test_model_handle_case_normalization(handle: str, expected: str) -> None:
+    from driver_base.scrapers.eminence import _model_from_handle
+
+    assert _model_from_handle(handle) == expected

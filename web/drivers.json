@@ -1,12 +1,35 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-01T23:47:37+00:00",
+  "generated_at": "2026-11-02T21:39:46+00:00",
   "generator": {
     "name": "driver-base",
     "version": "0.1.0",
     "git_sha": null
   },
   "per_scraper_status": {
+    "eminence": {
+      "status": "ok",
+      "last_run_at": "2026-11-02T21:37:16+00:00",
+      "last_success_at": "2026-11-02T21:37:16+00:00",
+      "consecutive_failures": 0,
+      "records_this_run": 116,
+      "records_prior_run": 116,
+      "fetch_stats": {
+        "requested": 141,
+        "cache_hits": 0,
+        "network_fetches": 141,
+        "transient_errors": 0,
+        "permanent_errors": 0,
+        "playwright_incidents": 0
+      },
+      "parse_stats": {
+        "fragments_parsed": 140,
+        "fragments_after_merge": 116,
+        "records_rejected": 24,
+        "warn_flags_total": 27
+      },
+      "warn_flags": []
+    },
     "bcspeakers": {
       "status": "ok",
       "last_run_at": "2026-10-18T00:50:31+00:00",
@@ -124,29 +147,6 @@
       },
       "warn_flags": []
     },
-    "eminence": {
-      "status": "ok",
-      "last_run_at": "2026-10-18T00:50:31+00:00",
-      "last_success_at": "2026-10-18T00:50:31+00:00",
-      "consecutive_failures": 0,
-      "records_this_run": 116,
-      "records_prior_run": 116,
-      "fetch_stats": {
-        "requested": 141,
-        "cache_hits": 0,
-        "network_fetches": 141,
-        "transient_errors": 0,
-        "permanent_errors": 0,
-        "playwright_incidents": 0
-      },
-      "parse_stats": {
-        "fragments_parsed": 140,
-        "fragments_after_merge": 116,
-        "records_rejected": 24,
-        "warn_flags_total": 27
-      },
-      "warn_flags": []
-    },
     "faital": {
       "status": "ok",
       "last_run_at": "2026-10-18T00:50:31+00:00",
@@ -217,27 +217,29 @@
       "warn_flags": []
     },
     "monacor": {
-      "status": "ok",
-      "last_run_at": "2026-10-18T00:50:31+00:00",
+      "status": "preserved",
+      "last_run_at": "2026-11-02T21:31:27+00:00",
       "last_success_at": "2026-10-18T00:50:31+00:00",
-      "consecutive_failures": 0,
-      "records_this_run": 220,
+      "consecutive_failures": 1,
+      "records_this_run": 0,
       "records_prior_run": 220,
       "fetch_stats": {
-        "requested": 251,
+        "requested": 9,
         "cache_hits": 0,
-        "network_fetches": 251,
+        "network_fetches": 9,
         "transient_errors": 0,
         "permanent_errors": 0,
         "playwright_incidents": 0
       },
       "parse_stats": {
-        "fragments_parsed": 221,
-        "fragments_after_merge": 220,
-        "records_rejected": 1,
-        "warn_flags_total": 259
+        "fragments_parsed": 0,
+        "fragments_after_merge": 0,
+        "records_rejected": 0,
+        "warn_flags_total": 0
       },
-      "warn_flags": []
+      "warn_flags": [],
+      "reason": "zero_records_this_run",
+      "rejection_sidecar": "data/rejections/monacor.json"
     },
     "peerless": {
       "status": "ok",
@@ -311,8 +313,8 @@
   },
   "scraper_run_stats": {
     "total_scrapers": 13,
-    "ok": 12,
-    "preserved": 1,
+    "ok": 11,
+    "preserved": 2,
     "blocked": 0,
     "total_records": 2212
   },
@@ -119267,7 +119269,7 @@
       "model": "SS18-22",
       "spec_source": {
         "net_weight_kg": "html_table",
-        "nominal_size_mm": "html_table",
+        "nominal_size_mm": "override",
         "power_aes_watts": "html_table",
         "power_peak_watts": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -119343,7 +119345,7 @@
       "sensitivity_db_2_83v_1m": 90.8,
       "msrp_currency": null,
       "msrp_amount": null,
-      "nominal_size_mm": 381.0,
+      "nominal_size_mm": 457.2,
       "throat_diameter_mm": null,
       "diaphragm_material": null,
       "diaphragm_shape": null,
@@ -119365,7 +119367,9 @@
       "coax_hf_freq_high_hz": null,
       "coax_hf_voice_coil_diameter_mm": null,
       "coax_hf_re_ohm": null,
-      "override_notes": {}
+      "override_notes": {
+        "nominal_size_mm": "Dayton's spec table lists 15\""
+      }
     },
     {
       "manufacturer": "Dayton Audio",
@@ -127848,9 +127852,9 @@
       "source_urls": [
         "https://eminence.com/products/820h"
       ],
-      "fetched_at": "2026-10-18T00:54:34+00:00",
+      "fetched_at": "2026-11-02T21:37:55+00:00",
       "scraped_at": "2026-08-22T21:57:11+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -127919,7 +127923,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__cannabass_cb3015n_8__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "CANNABASS-CB3015N-8",
+      "model": "Cannabass-CB3015N-8",
       "spec_source": {
         "power_aes_watts": "inferred",
         "nominal_size_mm": "inferred",
@@ -127932,9 +127936,9 @@
       "source_urls": [
         "https://eminence.com/products/cannabass-cb3015n-8"
       ],
-      "fetched_at": "2026-10-18T00:56:24+00:00",
+      "fetched_at": "2026-11-02T21:39:33+00:00",
       "scraped_at": "2026-08-22T21:58:50+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -128003,7 +128007,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__cannabis_rex_10__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "CANNABIS REX 10",
+      "model": "Cannabis Rex 10",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "nominal_size_mm": "inferred",
@@ -128016,9 +128020,9 @@
       "source_urls": [
         "https://eminence.com/products/cannabis_rex_10"
       ],
-      "fetched_at": "2026-10-18T00:55:54+00:00",
+      "fetched_at": "2026-11-02T21:39:09+00:00",
       "scraped_at": "2026-08-22T21:58:25+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -128100,9 +128104,9 @@
       "source_urls": [
         "https://eminence.com/products/cb3010n_8"
       ],
-      "fetched_at": "2026-10-18T00:56:22+00:00",
+      "fetched_at": "2026-11-02T21:39:31+00:00",
       "scraped_at": "2026-08-22T21:58:48+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -128171,7 +128175,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__double_t_15__4ohm",
       "driver_kind": "guitar_bass",
-      "model": "DOUBLE T 15",
+      "model": "Double T 15",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "voice_coil_diameter_mm": "inferred",
@@ -128184,9 +128188,9 @@
       "source_urls": [
         "https://eminence.com/products/double_t_15"
       ],
-      "fetched_at": "2026-10-18T00:55:59+00:00",
+      "fetched_at": "2026-11-02T21:39:14+00:00",
       "scraped_at": "2026-08-22T21:58:30+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -128255,7 +128259,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__dv_77_12_mick_thomson_signature_speaker__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "DV-77-12-MICK-THOMSON-SIGNATURE-SPEAKER",
+      "model": "DV-77-12-Mick-Thomson-Signature-Speaker",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "impedance_nominal_ohm": "inferred"
@@ -128263,9 +128267,9 @@
       "source_urls": [
         "https://eminence.com/products/dv-77-12-mick-thomson-signature-speaker"
       ],
-      "fetched_at": "2026-10-18T00:56:09+00:00",
+      "fetched_at": "2026-11-02T21:39:24+00:00",
       "scraped_at": "2026-08-22T21:58:41+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -128334,7 +128338,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__dv_77_16_12_mick_thomson_signature_speaker_16_ohm__16ohm",
       "driver_kind": "guitar_bass",
-      "model": "DV-77-16-12-MICK-THOMSON-SIGNATURE-SPEAKER-16-OHM",
+      "model": "DV-77-16-12-Mick-Thomson-Signature-Speaker-16-Ohm",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "nominal_size_mm": "inferred",
@@ -128346,9 +128350,9 @@
       "source_urls": [
         "https://eminence.com/products/dv-77-16-12-mick-thomson-signature-speaker-16-ohm"
       ],
-      "fetched_at": "2026-10-18T00:56:20+00:00",
+      "fetched_at": "2026-11-02T21:39:29+00:00",
       "scraped_at": "2026-08-22T21:58:46+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -128430,9 +128434,9 @@
       "source_urls": [
         "https://eminence.com/products/ga_sc59"
       ],
-      "fetched_at": "2026-10-18T00:56:00+00:00",
+      "fetched_at": "2026-11-02T21:39:15+00:00",
       "scraped_at": "2026-08-22T21:58:31+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -128514,9 +128518,9 @@
       "source_urls": [
         "https://eminence.com/products/ga_sc64"
       ],
-      "fetched_at": "2026-10-18T00:54:04+00:00",
+      "fetched_at": "2026-11-02T21:37:32+00:00",
       "scraped_at": "2026-08-22T21:56:48+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -128585,7 +128589,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__ga_sc_x_12_signature_guitar_speaker_neodymium__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "GA-SC-X-12-SIGNATURE-GUITAR-SPEAKER-NEODYMIUM",
+      "model": "GA-SC-X-12-Signature-Guitar-Speaker-Neodymium",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "voice_coil_diameter_mm": "inferred",
@@ -128598,9 +128602,9 @@
       "source_urls": [
         "https://eminence.com/products/ga-sc-x-12-signature-guitar-speaker-neodymium"
       ],
-      "fetched_at": "2026-10-18T00:56:28+00:00",
+      "fetched_at": "2026-11-02T21:39:37+00:00",
       "scraped_at": "2026-08-22T21:58:54+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -128682,9 +128686,9 @@
       "source_urls": [
         "https://eminence.com/products/ga10_sc59"
       ],
-      "fetched_at": "2026-10-18T00:56:01+00:00",
+      "fetched_at": "2026-11-02T21:39:16+00:00",
       "scraped_at": "2026-08-22T21:58:32+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -128766,9 +128770,9 @@
       "source_urls": [
         "https://eminence.com/products/ga10_sc64"
       ],
-      "fetched_at": "2026-10-18T00:54:05+00:00",
+      "fetched_at": "2026-11-02T21:37:33+00:00",
       "scraped_at": "2026-08-22T21:56:49+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -128837,7 +128841,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__ga10_sc64_10_guitar_speaker_16_ohm__16ohm",
       "driver_kind": "guitar_bass",
-      "model": "GA10-SC64-10-GUITAR-SPEAKER-16-OHM",
+      "model": "GA10-SC64-10-Guitar-Speaker-16-Ohm",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "impedance_nominal_ohm": "inferred",
@@ -128846,9 +128850,9 @@
       "source_urls": [
         "https://eminence.com/products/ga10-sc64-10-guitar-speaker-16-ohm"
       ],
-      "fetched_at": "2026-10-18T00:56:20+00:00",
+      "fetched_at": "2026-11-02T21:39:28+00:00",
       "scraped_at": "2026-08-22T21:58:45+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -128917,7 +128921,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__ga10_sc69_10_guitar_speaker_8_ohm__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "GA10-SC69-10-GUITAR-SPEAKER-8-OHM",
+      "model": "GA10-SC69-10-Guitar-Speaker-8-Ohm",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "nominal_size_mm": "inferred",
@@ -128930,9 +128934,9 @@
       "source_urls": [
         "https://eminence.com/products/ga10-sc69-10-guitar-speaker-8-ohm"
       ],
-      "fetched_at": "2026-10-18T00:56:26+00:00",
+      "fetched_at": "2026-11-02T21:39:35+00:00",
       "scraped_at": "2026-08-22T21:58:52+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -129001,14 +129005,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__governor_mk_2__governor_mk_2",
       "driver_kind": "guitar_bass",
-      "model": "GOVERNOR-MK-2",
+      "model": "Governor-MK-2",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/governor-mk-2"
       ],
-      "fetched_at": "2026-10-18T00:53:52+00:00",
+      "fetched_at": "2026-11-02T21:37:20+00:00",
       "scraped_at": "2026-08-22T21:56:36+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -129077,7 +129081,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__guit_fiddle__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "GUIT FIDDLE",
+      "model": "Guit Fiddle",
       "spec_source": {
         "power_aes_watts": "inferred",
         "nominal_size_mm": "inferred",
@@ -129090,9 +129094,9 @@
       "source_urls": [
         "https://eminence.com/products/guit_fiddle"
       ],
-      "fetched_at": "2026-10-18T00:54:20+00:00",
+      "fetched_at": "2026-11-02T21:37:40+00:00",
       "scraped_at": "2026-08-22T21:56:56+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -129174,9 +129178,9 @@
       "source_urls": [
         "https://eminence.com/products/js_1250"
       ],
-      "fetched_at": "2026-10-18T00:55:12+00:00",
+      "fetched_at": "2026-11-02T21:38:33+00:00",
       "scraped_at": "2026-08-22T21:57:48+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -129245,7 +129249,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__karnivore_by_kristian_kohle__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "KARNIVORE-BY-KRISTIAN-KOHLE",
+      "model": "Karnivore-BY-Kristian-Kohle",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "impedance_nominal_ohm": "inferred"
@@ -129253,9 +129257,9 @@
       "source_urls": [
         "https://eminence.com/products/karnivore-by-kristian-kohle"
       ],
-      "fetched_at": "2026-10-18T00:54:07+00:00",
+      "fetched_at": "2026-11-02T21:37:35+00:00",
       "scraped_at": "2026-08-22T21:56:51+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -129324,7 +129328,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__karnivore_by_kristian_kohle_16o_copy__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "KARNIVORE-BY-KRISTIAN-KOHLE-16O-COPY",
+      "model": "Karnivore-BY-Kristian-Kohle-16O-Copy",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "impedance_nominal_ohm": "inferred"
@@ -129332,9 +129336,9 @@
       "source_urls": [
         "https://eminence.com/products/karnivore-by-kristian-kohle-16o-copy"
       ],
-      "fetched_at": "2026-10-18T00:54:07+00:00",
+      "fetched_at": "2026-11-02T21:37:34+00:00",
       "scraped_at": "2026-08-22T21:56:50+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -129403,7 +129407,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__legend_1058__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "LEGEND 1058",
+      "model": "Legend 1058",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "nominal_size_mm": "inferred",
@@ -129416,9 +129420,9 @@
       "source_urls": [
         "https://eminence.com/products/legend_1058"
       ],
-      "fetched_at": "2026-10-18T00:54:31+00:00",
+      "fetched_at": "2026-11-02T21:37:52+00:00",
       "scraped_at": "2026-08-22T21:57:08+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -129487,7 +129491,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__legend_1258__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "LEGEND 1258",
+      "model": "Legend 1258",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "nominal_size_mm": "inferred",
@@ -129500,9 +129504,9 @@
       "source_urls": [
         "https://eminence.com/products/legend_1258"
       ],
-      "fetched_at": "2026-10-18T00:54:30+00:00",
+      "fetched_at": "2026-11-02T21:37:51+00:00",
       "scraped_at": "2026-08-22T21:57:07+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -129571,7 +129575,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__legend_1275__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "LEGEND 1275",
+      "model": "Legend 1275",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "nominal_size_mm": "inferred",
@@ -129584,9 +129588,9 @@
       "source_urls": [
         "https://eminence.com/products/legend_1275"
       ],
-      "fetched_at": "2026-10-18T00:54:29+00:00",
+      "fetched_at": "2026-11-02T21:37:50+00:00",
       "scraped_at": "2026-08-22T21:57:06+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -129655,7 +129659,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__legend_1518__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "LEGEND 1518",
+      "model": "Legend 1518",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "power_aes_watts": "inferred",
@@ -129668,9 +129672,9 @@
       "source_urls": [
         "https://eminence.com/products/legend_1518"
       ],
-      "fetched_at": "2026-10-18T00:54:28+00:00",
+      "fetched_at": "2026-11-02T21:37:49+00:00",
       "scraped_at": "2026-08-22T21:57:05+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -129739,7 +129743,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__legend_b810__32ohm",
       "driver_kind": "guitar_bass",
-      "model": "LEGEND B810",
+      "model": "Legend B810",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "voice_coil_diameter_mm": "inferred",
@@ -129752,9 +129756,9 @@
       "source_urls": [
         "https://eminence.com/products/legend_b810"
       ],
-      "fetched_at": "2026-10-18T00:55:26+00:00",
+      "fetched_at": "2026-11-02T21:38:47+00:00",
       "scraped_at": "2026-08-22T21:58:02+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "impedance_unusual:32.0"
@@ -129825,7 +129829,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__legend_bp102__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "LEGEND BP102",
+      "model": "Legend BP102",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "voice_coil_diameter_mm": "inferred",
@@ -129838,9 +129842,9 @@
       "source_urls": [
         "https://eminence.com/products/legend_bp102"
       ],
-      "fetched_at": "2026-10-18T00:55:34+00:00",
+      "fetched_at": "2026-11-02T21:38:49+00:00",
       "scraped_at": "2026-09-13T01:00:08+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -129909,7 +129913,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__legend_bp102_4__4ohm",
       "driver_kind": "guitar_bass",
-      "model": "LEGEND BP102 4",
+      "model": "Legend BP102 4",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "voice_coil_diameter_mm": "inferred",
@@ -129922,9 +129926,9 @@
       "source_urls": [
         "https://eminence.com/products/legend_bp102_4"
       ],
-      "fetched_at": "2026-10-18T00:55:34+00:00",
+      "fetched_at": "2026-11-02T21:38:48+00:00",
       "scraped_at": "2026-09-13T01:00:07+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -129993,7 +129997,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__legend_bp122__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "LEGEND BP122",
+      "model": "Legend BP122",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "voice_coil_diameter_mm": "inferred",
@@ -130006,9 +130010,9 @@
       "source_urls": [
         "https://eminence.com/products/legend_bp122"
       ],
-      "fetched_at": "2026-10-18T00:55:36+00:00",
+      "fetched_at": "2026-11-02T21:38:51+00:00",
       "scraped_at": "2026-08-22T21:58:06+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -130077,7 +130081,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__legend_bp1525__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "LEGEND BP1525",
+      "model": "Legend BP1525",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "voice_coil_diameter_mm": "inferred",
@@ -130090,9 +130094,9 @@
       "source_urls": [
         "https://eminence.com/products/legend_bp1525"
       ],
-      "fetched_at": "2026-10-18T00:55:36+00:00",
+      "fetched_at": "2026-11-02T21:38:50+00:00",
       "scraped_at": "2026-08-22T21:58:05+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -130161,7 +130165,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__legend_ca154__4ohm",
       "driver_kind": "guitar_bass",
-      "model": "LEGEND CA154",
+      "model": "Legend CA154",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "voice_coil_diameter_mm": "inferred",
@@ -130174,9 +130178,9 @@
       "source_urls": [
         "https://eminence.com/products/legend_ca154"
       ],
-      "fetched_at": "2026-10-18T00:55:37+00:00",
+      "fetched_at": "2026-11-02T21:38:52+00:00",
       "scraped_at": "2026-09-13T01:00:11+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -130245,7 +130249,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__legend_em12__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "LEGEND EM12",
+      "model": "Legend EM12",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "voice_coil_diameter_mm": "inferred",
@@ -130258,9 +130262,9 @@
       "source_urls": [
         "https://eminence.com/products/legend_em12"
       ],
-      "fetched_at": "2026-10-18T00:54:27+00:00",
+      "fetched_at": "2026-11-02T21:37:48+00:00",
       "scraped_at": "2026-08-22T21:57:04+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -130329,7 +130333,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__legend_gb128__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "LEGEND GB128",
+      "model": "Legend GB128",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "nominal_size_mm": "inferred",
@@ -130342,9 +130346,9 @@
       "source_urls": [
         "https://eminence.com/products/legend_gb128"
       ],
-      "fetched_at": "2026-10-18T00:54:26+00:00",
+      "fetched_at": "2026-11-02T21:37:47+00:00",
       "scraped_at": "2026-08-22T21:57:03+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -130413,7 +130417,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__lil_buddy__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "LIL BUDDY",
+      "model": "Lil Buddy",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "nominal_size_mm": "inferred",
@@ -130426,9 +130430,9 @@
       "source_urls": [
         "https://eminence.com/products/lil_buddy"
       ],
-      "fetched_at": "2026-10-18T00:54:25+00:00",
+      "fetched_at": "2026-11-02T21:37:46+00:00",
       "scraped_at": "2026-08-22T21:57:02+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -130497,7 +130501,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__man_o_war__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "MAN O WAR",
+      "model": "Man O War",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "nominal_size_mm": "inferred",
@@ -130510,9 +130514,9 @@
       "source_urls": [
         "https://eminence.com/products/man_o_war"
       ],
-      "fetched_at": "2026-10-18T00:54:24+00:00",
+      "fetched_at": "2026-11-02T21:37:45+00:00",
       "scraped_at": "2026-08-22T21:57:01+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -130581,7 +130585,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__ragin_cajun__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "RAGIN CAJUN",
+      "model": "Ragin Cajun",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "nominal_size_mm": "inferred",
@@ -130594,9 +130598,9 @@
       "source_urls": [
         "https://eminence.com/products/ragin_cajun"
       ],
-      "fetched_at": "2026-10-18T00:55:47+00:00",
+      "fetched_at": "2026-11-02T21:39:02+00:00",
       "scraped_at": "2026-08-22T21:58:18+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -130665,7 +130669,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__red_white_and_blues__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "RED- WHITE AND BLUES",
+      "model": "Red- White And Blues",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "nominal_size_mm": "inferred",
@@ -130678,9 +130682,9 @@
       "source_urls": [
         "https://eminence.com/products/red-_white_and_blues"
       ],
-      "fetched_at": "2026-10-18T00:55:48+00:00",
+      "fetched_at": "2026-11-02T21:39:03+00:00",
       "scraped_at": "2026-08-22T21:58:19+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -130749,7 +130753,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__swamp_thang_16__16ohm",
       "driver_kind": "guitar_bass",
-      "model": "SWAMP THANG 16",
+      "model": "Swamp Thang 16",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "power_aes_watts": "inferred",
@@ -130762,9 +130766,9 @@
       "source_urls": [
         "https://eminence.com/products/swamp_thang_16"
       ],
-      "fetched_at": "2026-10-18T00:55:52+00:00",
+      "fetched_at": "2026-11-02T21:39:07+00:00",
       "scraped_at": "2026-08-22T21:58:23+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -130833,7 +130837,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__swamp_thang_8__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "SWAMP THANG 8",
+      "model": "Swamp Thang 8",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "power_aes_watts": "inferred",
@@ -130846,9 +130850,9 @@
       "source_urls": [
         "https://eminence.com/products/swamp_thang_8"
       ],
-      "fetched_at": "2026-10-18T00:55:50+00:00",
+      "fetched_at": "2026-11-02T21:39:05+00:00",
       "scraped_at": "2026-09-13T01:00:29+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -130917,14 +130921,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__tcf_golden_50_12_signature_series_lead_rhythm_guitar_speaker_50_w__tcf_golden_50_12_signature_series_lead_rhythm_guitar_speaker_50_w",
       "driver_kind": "guitar_bass",
-      "model": "TCF-GOLDEN-50-12-SIGNATURE-SERIES-LEAD-RHYTHM-GUITAR-SPEAKER-50-W",
+      "model": "Tcf-Golden-50-12-Signature-Series-Lead-Rhythm-Guitar-Speaker-50-W",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/tcf-golden-50-12-signature-series-lead-rhythm-guitar-speaker-50-w"
       ],
-      "fetched_at": "2026-10-18T00:53:50+00:00",
+      "fetched_at": "2026-11-02T21:37:18+00:00",
       "scraped_at": "2026-10-18T00:53:50+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -130993,7 +130997,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__texas_heat__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "TEXAS HEAT",
+      "model": "Texas Heat",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "power_aes_watts": "inferred",
@@ -131006,9 +131010,9 @@
       "source_urls": [
         "https://eminence.com/products/texas_heat"
       ],
-      "fetched_at": "2026-10-18T00:54:23+00:00",
+      "fetched_at": "2026-11-02T21:37:44+00:00",
       "scraped_at": "2026-08-22T21:57:00+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -131077,7 +131081,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__texas_heat_16__16ohm",
       "driver_kind": "guitar_bass",
-      "model": "TEXAS HEAT 16",
+      "model": "Texas Heat 16",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "power_aes_watts": "inferred",
@@ -131090,9 +131094,9 @@
       "source_urls": [
         "https://eminence.com/products/texas_heat_16"
       ],
-      "fetched_at": "2026-10-18T00:55:53+00:00",
+      "fetched_at": "2026-11-02T21:39:08+00:00",
       "scraped_at": "2026-08-22T21:58:24+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -131161,7 +131165,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__texas_heat_4__4ohm",
       "driver_kind": "guitar_bass",
-      "model": "TEXAS HEAT 4",
+      "model": "Texas Heat 4",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "power_aes_watts": "inferred",
@@ -131174,9 +131178,9 @@
       "source_urls": [
         "https://eminence.com/products/texas_heat_4"
       ],
-      "fetched_at": "2026-10-18T00:54:22+00:00",
+      "fetched_at": "2026-11-02T21:37:43+00:00",
       "scraped_at": "2026-08-22T21:56:59+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -131245,7 +131249,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__the_copperhead__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "THE COPPERHEAD",
+      "model": "The Copperhead",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "nominal_size_mm": "inferred",
@@ -131258,9 +131262,9 @@
       "source_urls": [
         "https://eminence.com/products/the_copperhead"
       ],
-      "fetched_at": "2026-10-18T00:54:21+00:00",
+      "fetched_at": "2026-11-02T21:37:42+00:00",
       "scraped_at": "2026-08-22T21:56:58+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -131329,7 +131333,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__the_tonker__8ohm",
       "driver_kind": "guitar_bass",
-      "model": "THE TONKER",
+      "model": "The Tonker",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "power_aes_watts": "inferred",
@@ -131342,9 +131346,9 @@
       "source_urls": [
         "https://eminence.com/products/the_tonker"
       ],
-      "fetched_at": "2026-10-18T00:54:20+00:00",
+      "fetched_at": "2026-11-02T21:37:41+00:00",
       "scraped_at": "2026-08-22T21:56:57+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -131413,7 +131417,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__asd_1001__8ohm",
       "driver_kind": "hf_compression",
-      "model": "ASD 1001",
+      "model": "Asd 1001",
       "spec_source": {
         "throat_diameter_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -131436,9 +131440,9 @@
       "source_urls": [
         "https://eminence.com/products/asd_1001"
       ],
-      "fetched_at": "2026-10-18T00:55:56+00:00",
+      "fetched_at": "2026-11-02T21:39:11+00:00",
       "scraped_at": "2026-08-22T21:58:27+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:fs_hz=0.59"
@@ -131509,7 +131513,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__asd_1001b__8ohm",
       "driver_kind": "hf_compression",
-      "model": "ASD 1001B",
+      "model": "Asd 1001B",
       "spec_source": {
         "throat_diameter_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -131532,9 +131536,9 @@
       "source_urls": [
         "https://eminence.com/products/asd_1001b"
       ],
-      "fetched_at": "2026-10-18T00:54:52+00:00",
+      "fetched_at": "2026-11-02T21:38:13+00:00",
       "scraped_at": "2026-08-22T21:57:28+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:fs_hz=0.59"
@@ -131605,14 +131609,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__asd_1001dia__asd_1001dia",
       "driver_kind": "hf_compression",
-      "model": "ASD 1001DIA",
+      "model": "Asd 1001DIA",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/asd_1001dia"
       ],
-      "fetched_at": "2026-10-18T00:54:54+00:00",
+      "fetched_at": "2026-11-02T21:38:15+00:00",
       "scraped_at": "2026-08-22T21:57:30+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -131686,9 +131690,9 @@
       "source_urls": [
         "https://eminence.com/products/b2s_a"
       ],
-      "fetched_at": "2026-10-18T00:54:53+00:00",
+      "fetched_at": "2026-11-02T21:38:14+00:00",
       "scraped_at": "2026-08-22T21:57:29+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -131780,9 +131784,9 @@
       "source_urls": [
         "https://eminence.com/products/f110m_8"
       ],
-      "fetched_at": "2026-10-18T00:55:58+00:00",
+      "fetched_at": "2026-11-02T21:39:13+00:00",
       "scraped_at": "2026-08-22T21:58:29+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:fs_hz=1.2"
@@ -131853,16 +131857,16 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__md_2001_16_dia__16ohm",
       "driver_kind": "hf_compression",
-      "model": "MD 2001 16 DIA",
+      "model": "MD 2001 16 Dia",
       "spec_source": {
         "impedance_nominal_ohm": "inferred"
       },
       "source_urls": [
         "https://eminence.com/products/md_2001_16_dia"
       ],
-      "fetched_at": "2026-10-18T00:56:07+00:00",
+      "fetched_at": "2026-11-02T21:39:22+00:00",
       "scraped_at": "2026-08-22T21:58:38+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -131931,7 +131935,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__n210t_16_1_throat_size_hf_device_neodymium__16ohm",
       "driver_kind": "hf_compression",
-      "model": "N210T-16-1-THROAT-SIZE-HF-DEVICE-NEODYMIUM",
+      "model": "N210T-16-1-Throat-Size-HF-Device-Neodymium",
       "spec_source": {
         "throat_diameter_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -131955,9 +131959,9 @@
       "source_urls": [
         "https://eminence.com/products/n210t-16-1-throat-size-hf-device-neodymium"
       ],
-      "fetched_at": "2026-10-18T00:56:27+00:00",
+      "fetched_at": "2026-11-02T21:39:36+00:00",
       "scraped_at": "2026-08-22T21:58:53+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 599.0,
@@ -132050,9 +132054,9 @@
       "source_urls": [
         "https://eminence.com/products/n210t-8"
       ],
-      "fetched_at": "2026-10-18T00:56:25+00:00",
+      "fetched_at": "2026-11-02T21:39:34+00:00",
       "scraped_at": "2026-08-22T21:58:51+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 599.0,
@@ -132144,9 +132148,9 @@
       "source_urls": [
         "https://eminence.com/products/n314t_16"
       ],
-      "fetched_at": "2026-10-18T00:56:12+00:00",
+      "fetched_at": "2026-11-02T21:39:27+00:00",
       "scraped_at": "2026-08-22T21:58:44+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:fs_hz=0.729"
@@ -132222,9 +132226,9 @@
       "source_urls": [
         "https://eminence.com/products/n314t_16dia"
       ],
-      "fetched_at": "2026-10-18T00:55:38+00:00",
+      "fetched_at": "2026-11-02T21:38:53+00:00",
       "scraped_at": "2026-08-22T21:58:09+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -132298,9 +132302,9 @@
       "source_urls": [
         "https://eminence.com/products/n314t_8dia"
       ],
-      "fetched_at": "2026-10-18T00:55:39+00:00",
+      "fetched_at": "2026-11-02T21:38:54+00:00",
       "scraped_at": "2026-08-22T21:58:10+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -132374,9 +132378,9 @@
       "source_urls": [
         "https://eminence.com/products/n320t_8dia"
       ],
-      "fetched_at": "2026-10-18T00:55:40+00:00",
+      "fetched_at": "2026-11-02T21:38:55+00:00",
       "scraped_at": "2026-08-22T21:58:11+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -132445,7 +132449,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__nsd_2005s_16__16ohm",
       "driver_kind": "hf_compression",
-      "model": "NSD 2005S 16",
+      "model": "Nsd 2005S 16",
       "spec_source": {
         "throat_diameter_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -132467,9 +132471,9 @@
       "source_urls": [
         "https://eminence.com/products/nsd_2005s_16"
       ],
-      "fetched_at": "2026-10-18T00:55:41+00:00",
+      "fetched_at": "2026-11-02T21:38:56+00:00",
       "scraped_at": "2026-08-22T21:58:12+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:fs_hz=0.578"
@@ -132540,16 +132544,16 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__psd_2002_16dia__16ohm",
       "driver_kind": "hf_compression",
-      "model": "PSD 2002 16DIA",
+      "model": "Psd 2002 16DIA",
       "spec_source": {
         "impedance_nominal_ohm": "inferred"
       },
       "source_urls": [
         "https://eminence.com/products/psd_2002_16dia"
       ],
-      "fetched_at": "2026-10-18T00:55:43+00:00",
+      "fetched_at": "2026-11-02T21:38:58+00:00",
       "scraped_at": "2026-08-22T21:58:14+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -132618,16 +132622,16 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__psd_2002_8dia__8ohm",
       "driver_kind": "hf_compression",
-      "model": "PSD 2002 8DIA",
+      "model": "Psd 2002 8DIA",
       "spec_source": {
         "impedance_nominal_ohm": "inferred"
       },
       "source_urls": [
         "https://eminence.com/products/psd_2002_8dia"
       ],
-      "fetched_at": "2026-10-18T00:55:45+00:00",
+      "fetched_at": "2026-11-02T21:39:00+00:00",
       "scraped_at": "2026-08-22T21:58:16+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -132696,14 +132700,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__psd_3014_16__psd_3014_16",
       "driver_kind": "hf_compression",
-      "model": "PSD 3014 16",
+      "model": "Psd 3014 16",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/psd_3014_16"
       ],
-      "fetched_at": "2026-10-18T00:55:44+00:00",
+      "fetched_at": "2026-11-02T21:38:59+00:00",
       "scraped_at": "2026-08-22T21:58:15+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -132772,14 +132776,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__psd_3014_16dia__psd_3014_16dia",
       "driver_kind": "hf_compression",
-      "model": "PSD 3014 16DIA",
+      "model": "Psd 3014 16DIA",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/psd_3014_16dia"
       ],
-      "fetched_at": "2026-10-18T00:55:46+00:00",
+      "fetched_at": "2026-11-02T21:39:01+00:00",
       "scraped_at": "2026-08-22T21:58:17+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -132848,7 +132852,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__alpha_10a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "ALPHA 10A",
+      "model": "Alpha 10A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -132884,9 +132888,9 @@
       "source_urls": [
         "https://eminence.com/products/alpha_10a"
       ],
-      "fetched_at": "2026-10-18T00:54:39+00:00",
+      "fetched_at": "2026-11-02T21:38:00+00:00",
       "scraped_at": "2026-08-22T21:57:15+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 50.0,
@@ -132955,7 +132959,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__alpha_5_8__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "ALPHA 5 8",
+      "model": "Alpha 5 8",
       "spec_source": {
         "voice_coil_diameter_mm": "inferred",
         "power_aes_watts": "inferred",
@@ -132968,9 +132972,9 @@
       "source_urls": [
         "https://eminence.com/products/alpha_5_8"
       ],
-      "fetched_at": "2026-10-18T00:53:51+00:00",
+      "fetched_at": "2026-11-02T21:37:19+00:00",
       "scraped_at": "2026-09-27T01:00:58+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -133041,7 +133045,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__alpha_8a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "ALPHA 8A",
+      "model": "Alpha 8A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -133077,9 +133081,9 @@
       "source_urls": [
         "https://eminence.com/products/alpha_8a"
       ],
-      "fetched_at": "2026-10-18T00:54:43+00:00",
+      "fetched_at": "2026-11-02T21:38:04+00:00",
       "scraped_at": "2026-08-22T21:57:19+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 73.0,
@@ -133148,7 +133152,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__beta_10a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "BETA 10A",
+      "model": "Beta 10A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -133184,9 +133188,9 @@
       "source_urls": [
         "https://eminence.com/products/beta_10a"
       ],
-      "fetched_at": "2026-10-18T00:54:33+00:00",
+      "fetched_at": "2026-11-02T21:37:54+00:00",
       "scraped_at": "2026-08-22T21:57:10+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 53.0,
@@ -133255,7 +133259,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__beta_12a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "BETA 12A",
+      "model": "Beta 12A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -133291,9 +133295,9 @@
       "source_urls": [
         "https://eminence.com/products/beta_12a"
       ],
-      "fetched_at": "2026-10-18T00:54:56+00:00",
+      "fetched_at": "2026-11-02T21:38:17+00:00",
       "scraped_at": "2026-08-22T21:57:32+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 47.0,
@@ -133362,7 +133366,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__beta_12cx__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "BETA 12CX",
+      "model": "Beta 12CX",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -133398,9 +133402,9 @@
       "source_urls": [
         "https://eminence.com/products/beta_12cx"
       ],
-      "fetched_at": "2026-10-18T00:54:57+00:00",
+      "fetched_at": "2026-11-02T21:38:18+00:00",
       "scraped_at": "2026-08-22T21:57:33+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 47.0,
@@ -133469,7 +133473,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__beta_15a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "BETA 15A",
+      "model": "Beta 15A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -133505,9 +133509,9 @@
       "source_urls": [
         "https://eminence.com/products/beta_15a"
       ],
-      "fetched_at": "2026-10-18T00:54:59+00:00",
+      "fetched_at": "2026-11-02T21:38:20+00:00",
       "scraped_at": "2026-08-22T21:57:35+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 35.0,
@@ -133576,7 +133580,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__beta_8a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "BETA 8A",
+      "model": "Beta 8A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -133612,9 +133616,9 @@
       "source_urls": [
         "https://eminence.com/products/beta_8a"
       ],
-      "fetched_at": "2026-10-18T00:55:00+00:00",
+      "fetched_at": "2026-11-02T21:38:21+00:00",
       "scraped_at": "2026-08-22T21:57:36+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 65.0,
@@ -133683,7 +133687,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__beta_8cx__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "BETA 8CX",
+      "model": "Beta 8CX",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -133719,9 +133723,9 @@
       "source_urls": [
         "https://eminence.com/products/beta_8cx"
       ],
-      "fetched_at": "2026-10-18T00:55:02+00:00",
+      "fetched_at": "2026-11-02T21:38:23+00:00",
       "scraped_at": "2026-08-22T21:57:38+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 62.0,
@@ -133790,7 +133794,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__beta_10b__16ohm",
       "driver_kind": "lf_woofer",
-      "model": "BETA-10B",
+      "model": "Beta-10B",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -133826,9 +133830,9 @@
       "source_urls": [
         "https://eminence.com/products/beta-10b"
       ],
-      "fetched_at": "2026-10-18T00:56:21+00:00",
+      "fetched_at": "2026-11-02T21:39:30+00:00",
       "scraped_at": "2026-08-22T21:58:47+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 51.6,
@@ -133897,14 +133901,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__cdf1_17amy8_1_inch_hf_driver__cdf1_17amy8_1_inch_hf_driver",
       "driver_kind": "lf_woofer",
-      "model": "CDF1-17AMY8-1-INCH-HF-DRIVER",
+      "model": "CDF1-17AMY8-1-Inch-HF-Driver",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/cdf1-17amy8-1-inch-hf-driver"
       ],
-      "fetched_at": "2026-10-18T00:53:55+00:00",
+      "fetched_at": "2026-11-02T21:37:23+00:00",
       "scraped_at": "2026-08-22T21:56:39+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -133975,14 +133979,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__cdf1_17apm8_1_inch_hf_driver__cdf1_17apm8_1_inch_hf_driver",
       "driver_kind": "lf_woofer",
-      "model": "CDF1-17APM8-1-INCH-HF-DRIVER",
+      "model": "CDF1-17APM8-1-Inch-HF-Driver",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/cdf1-17apm8-1-inch-hf-driver"
       ],
-      "fetched_at": "2026-10-18T00:53:54+00:00",
+      "fetched_at": "2026-11-02T21:37:22+00:00",
       "scraped_at": "2026-08-22T21:56:38+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -134053,7 +134057,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__delta_10b__16ohm",
       "driver_kind": "lf_woofer",
-      "model": "DELTA 10B",
+      "model": "Delta 10B",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -134089,9 +134093,9 @@
       "source_urls": [
         "https://eminence.com/products/delta_10b"
       ],
-      "fetched_at": "2026-10-18T00:56:08+00:00",
+      "fetched_at": "2026-11-02T21:39:23+00:00",
       "scraped_at": "2026-08-22T21:58:40+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 65.0,
@@ -134160,7 +134164,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__delta_12a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "DELTA 12A",
+      "model": "Delta 12A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -134196,9 +134200,9 @@
       "source_urls": [
         "https://eminence.com/products/delta_12a"
       ],
-      "fetched_at": "2026-10-18T00:55:04+00:00",
+      "fetched_at": "2026-11-02T21:38:25+00:00",
       "scraped_at": "2026-08-22T21:57:40+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 55.0,
@@ -134267,7 +134271,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__delta_12b__16ohm",
       "driver_kind": "lf_woofer",
-      "model": "DELTA 12B",
+      "model": "Delta 12B",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -134303,9 +134307,9 @@
       "source_urls": [
         "https://eminence.com/products/delta_12b"
       ],
-      "fetched_at": "2026-10-18T00:55:55+00:00",
+      "fetched_at": "2026-11-02T21:39:10+00:00",
       "scraped_at": "2026-08-22T21:58:26+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 58.0,
@@ -134374,7 +134378,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__delta_12lfa__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "DELTA 12LFA",
+      "model": "Delta 12LFA",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -134410,9 +134414,9 @@
       "source_urls": [
         "https://eminence.com/products/delta_12lfa"
       ],
-      "fetched_at": "2026-10-18T00:55:03+00:00",
+      "fetched_at": "2026-11-02T21:38:24+00:00",
       "scraped_at": "2026-08-22T21:57:39+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 51.0,
@@ -134481,7 +134485,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__delta_12lfc__4ohm",
       "driver_kind": "lf_woofer",
-      "model": "DELTA 12LFC",
+      "model": "Delta 12LFC",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -134517,9 +134521,9 @@
       "source_urls": [
         "https://eminence.com/products/delta_12lfc"
       ],
-      "fetched_at": "2026-10-18T00:55:06+00:00",
+      "fetched_at": "2026-11-02T21:38:27+00:00",
       "scraped_at": "2026-08-22T21:57:42+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 52.0,
@@ -134588,7 +134592,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__delta_15a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "DELTA 15A",
+      "model": "Delta 15A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -134624,9 +134628,9 @@
       "source_urls": [
         "https://eminence.com/products/delta_15a"
       ],
-      "fetched_at": "2026-10-18T00:55:05+00:00",
+      "fetched_at": "2026-11-02T21:38:26+00:00",
       "scraped_at": "2026-08-22T21:57:41+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 40.0,
@@ -134695,7 +134699,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__delta_15b__16ohm",
       "driver_kind": "lf_woofer",
-      "model": "DELTA 15B",
+      "model": "Delta 15B",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -134731,9 +134735,9 @@
       "source_urls": [
         "https://eminence.com/products/delta_15b"
       ],
-      "fetched_at": "2026-10-18T00:55:57+00:00",
+      "fetched_at": "2026-11-02T21:39:12+00:00",
       "scraped_at": "2026-08-22T21:58:28+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "xmech_xmax_ratio_high:11.1/1.6"
@@ -134804,7 +134808,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__delta_15lf_4__4ohm",
       "driver_kind": "lf_woofer",
-      "model": "DELTA 15LF 4",
+      "model": "Delta 15LF 4",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -134840,9 +134844,9 @@
       "source_urls": [
         "https://eminence.com/products/delta_15lf_4"
       ],
-      "fetched_at": "2026-10-18T00:54:09+00:00",
+      "fetched_at": "2026-11-02T21:37:37+00:00",
       "scraped_at": "2026-08-22T21:56:53+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 40.0,
@@ -134911,7 +134915,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__delta_pro_15a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "DELTA PRO 15A",
+      "model": "Delta Pro 15A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -134947,9 +134951,9 @@
       "source_urls": [
         "https://eminence.com/products/delta_pro_15a"
       ],
-      "fetched_at": "2026-10-18T00:55:07+00:00",
+      "fetched_at": "2026-11-02T21:38:28+00:00",
       "scraped_at": "2026-08-22T21:57:43+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 42.0,
@@ -135018,7 +135022,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__deltalite_ii_2510__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "DELTALITE II 2510",
+      "model": "Deltalite II 2510",
       "spec_source": {
         "nominal_size_mm": "inferred",
         "voice_coil_diameter_mm": "inferred",
@@ -135031,9 +135035,9 @@
       "source_urls": [
         "https://eminence.com/products/deltalite_ii_2510"
       ],
-      "fetched_at": "2026-10-18T00:56:11+00:00",
+      "fetched_at": "2026-11-02T21:39:26+00:00",
       "scraped_at": "2026-08-22T21:58:43+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -135104,14 +135108,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__fs10_20a8_10_ceramic_woofer__fs10_20a8_10_ceramic_woofer",
       "driver_kind": "lf_woofer",
-      "model": "FS10-20A8-10-CERAMIC-WOOFER",
+      "model": "FS10-20A8-10-Ceramic-Woofer",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/fs10-20a8-10-ceramic-woofer"
       ],
-      "fetched_at": "2026-10-18T00:53:57+00:00",
+      "fetched_at": "2026-11-02T21:37:25+00:00",
       "scraped_at": "2026-08-22T21:56:44+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -135182,14 +135186,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__fs10_25a8_10_ceramic_woofer__fs10_25a8_10_ceramic_woofer",
       "driver_kind": "lf_woofer",
-      "model": "FS10-25A8-10-CERAMIC-WOOFER",
+      "model": "FS10-25A8-10-Ceramic-Woofer",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/fs10-25a8-10-ceramic-woofer"
       ],
-      "fetched_at": "2026-10-18T00:54:00+00:00",
+      "fetched_at": "2026-11-02T21:37:28+00:00",
       "scraped_at": "2026-09-13T00:58:42+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -135260,14 +135264,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__fs12_25a8_12_ceramic_woofer__fs12_25a8_12_ceramic_woofer",
       "driver_kind": "lf_woofer",
-      "model": "FS12-25A8-12-CERAMIC-WOOFER",
+      "model": "FS12-25A8-12-Ceramic-Woofer",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/fs12-25a8-12-ceramic-woofer"
       ],
-      "fetched_at": "2026-10-18T00:54:00+00:00",
+      "fetched_at": "2026-11-02T21:37:27+00:00",
       "scraped_at": "2026-08-22T21:56:43+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -135338,14 +135342,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__fs12_25a8_12_high_output_ceramic_woofer__fs12_25a8_12_high_output_ceramic_woofer",
       "driver_kind": "lf_woofer",
-      "model": "FS12-25A8-12-HIGH-OUTPUT-CERAMIC-WOOFER",
+      "model": "FS12-25A8-12-High-Output-Ceramic-Woofer",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/fs12-25a8-12-high-output-ceramic-woofer"
       ],
-      "fetched_at": "2026-10-18T00:53:56+00:00",
+      "fetched_at": "2026-11-02T21:37:24+00:00",
       "scraped_at": "2026-08-22T21:56:40+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -135416,14 +135420,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__fs15_30a8_15_ceramic_woofer__fs15_30a8_15_ceramic_woofer",
       "driver_kind": "lf_woofer",
-      "model": "FS15-30A8-15-CERAMIC-WOOFER",
+      "model": "FS15-30A8-15-Ceramic-Woofer",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/fs15-30a8-15-ceramic-woofer"
       ],
-      "fetched_at": "2026-10-18T00:53:58+00:00",
+      "fetched_at": "2026-11-02T21:37:26+00:00",
       "scraped_at": "2026-08-22T21:56:42+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -135494,14 +135498,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__fs5_15a8_5_ceramic_woofer__fs5_15a8_5_ceramic_woofer",
       "driver_kind": "lf_woofer",
-      "model": "FS5-15A8-5-CERAMIC-WOOFER",
+      "model": "FS5-15A8-5-Ceramic-Woofer",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/fs5-15a8-5-ceramic-woofer"
       ],
-      "fetched_at": "2026-10-18T00:54:03+00:00",
+      "fetched_at": "2026-11-02T21:37:31+00:00",
       "scraped_at": "2026-08-22T21:56:47+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -135572,14 +135576,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__fs6_15a8_6_ceramic_woofer__fs6_15a8_6_ceramic_woofer",
       "driver_kind": "lf_woofer",
-      "model": "FS6-15A8-6-CERAMIC-WOOFER",
+      "model": "FS6-15A8-6-Ceramic-Woofer",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/fs6-15a8-6-ceramic-woofer"
       ],
-      "fetched_at": "2026-10-18T00:54:03+00:00",
+      "fetched_at": "2026-11-02T21:37:30+00:00",
       "scraped_at": "2026-08-22T21:56:46+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -135650,14 +135654,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__fs6_15a8_6_ceramic_woofer_copy__fs6_15a8_6_ceramic_woofer_copy",
       "driver_kind": "lf_woofer",
-      "model": "FS6-15A8-6-CERAMIC-WOOFER-COPY",
+      "model": "FS6-15A8-6-Ceramic-Woofer-Copy",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/fs6-15a8-6-ceramic-woofer-copy"
       ],
-      "fetched_at": "2026-10-18T00:54:02+00:00",
+      "fetched_at": "2026-11-02T21:37:29+00:00",
       "scraped_at": "2026-08-22T21:56:45+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -135728,7 +135732,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__kappa_12a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "KAPPA 12A",
+      "model": "Kappa 12A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -135764,9 +135768,9 @@
       "source_urls": [
         "https://eminence.com/products/kappa_12a"
       ],
-      "fetched_at": "2026-10-18T00:55:11+00:00",
+      "fetched_at": "2026-11-02T21:38:32+00:00",
       "scraped_at": "2026-08-22T21:57:47+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 45.0,
@@ -135835,7 +135839,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__kappa_15a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "KAPPA 15A",
+      "model": "Kappa 15A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -135871,9 +135875,9 @@
       "source_urls": [
         "https://eminence.com/products/kappa_15a"
       ],
-      "fetched_at": "2026-10-18T00:55:14+00:00",
+      "fetched_at": "2026-11-02T21:38:35+00:00",
       "scraped_at": "2026-08-22T21:57:50+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 33.0,
@@ -135942,7 +135946,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__kappa_15c__4ohm",
       "driver_kind": "lf_woofer",
-      "model": "KAPPA 15C",
+      "model": "Kappa 15C",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -135978,9 +135982,9 @@
       "source_urls": [
         "https://eminence.com/products/kappa_15c"
       ],
-      "fetched_at": "2026-10-18T00:56:02+00:00",
+      "fetched_at": "2026-11-02T21:39:17+00:00",
       "scraped_at": "2026-08-22T21:58:33+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 31.0,
@@ -136049,7 +136053,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__kappa_pro_10a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "KAPPA PRO 10A",
+      "model": "Kappa Pro 10A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -136085,9 +136089,9 @@
       "source_urls": [
         "https://eminence.com/products/kappa_pro_10a"
       ],
-      "fetched_at": "2026-10-18T00:55:16+00:00",
+      "fetched_at": "2026-11-02T21:38:37+00:00",
       "scraped_at": "2026-08-22T21:57:52+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 46.0,
@@ -136156,7 +136160,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__kappa_pro_10lf__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "KAPPA PRO 10LF",
+      "model": "Kappa Pro 10LF",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -136192,9 +136196,9 @@
       "source_urls": [
         "https://eminence.com/products/kappa_pro_10lf"
       ],
-      "fetched_at": "2026-10-18T00:55:15+00:00",
+      "fetched_at": "2026-11-02T21:38:36+00:00",
       "scraped_at": "2026-08-22T21:57:51+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 39.0,
@@ -136263,7 +136267,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__kappa_pro_12a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "KAPPA PRO 12A",
+      "model": "Kappa Pro 12A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -136299,9 +136303,9 @@
       "source_urls": [
         "https://eminence.com/products/kappa_pro_12a"
       ],
-      "fetched_at": "2026-10-18T00:55:17+00:00",
+      "fetched_at": "2026-11-02T21:38:38+00:00",
       "scraped_at": "2026-08-22T21:57:53+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 37.0,
@@ -136370,7 +136374,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__kappa_pro_15a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "KAPPA PRO 15A",
+      "model": "Kappa Pro 15A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -136406,9 +136410,9 @@
       "source_urls": [
         "https://eminence.com/products/kappa_pro_15a"
       ],
-      "fetched_at": "2026-10-18T00:54:32+00:00",
+      "fetched_at": "2026-11-02T21:37:53+00:00",
       "scraped_at": "2026-08-22T21:57:09+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 47.0,
@@ -136477,7 +136481,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__kappa_pro_15lf2__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "KAPPA PRO 15LF2",
+      "model": "Kappa Pro 15LF2",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -136513,9 +136517,9 @@
       "source_urls": [
         "https://eminence.com/products/kappa_pro_15lf2"
       ],
-      "fetched_at": "2026-10-18T00:55:19+00:00",
+      "fetched_at": "2026-11-02T21:38:40+00:00",
       "scraped_at": "2026-08-22T21:57:55+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 35.0,
@@ -136584,7 +136588,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__kappalite_3012ho__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "KAPPALITE 3012HO",
+      "model": "Kappalite 3012HO",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -136620,9 +136624,9 @@
       "source_urls": [
         "https://eminence.com/products/kappalite_3012ho"
       ],
-      "fetched_at": "2026-10-18T00:55:18+00:00",
+      "fetched_at": "2026-11-02T21:38:39+00:00",
       "scraped_at": "2026-08-22T21:57:54+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 52.0,
@@ -136691,7 +136695,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__kilomax_pro_18a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "KILOMAX PRO 18A",
+      "model": "Kilomax Pro 18A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -136727,9 +136731,9 @@
       "source_urls": [
         "https://eminence.com/products/kilomax_pro_18a"
       ],
-      "fetched_at": "2026-10-18T00:55:21+00:00",
+      "fetched_at": "2026-11-02T21:38:42+00:00",
       "scraped_at": "2026-08-22T21:57:57+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 32.0,
@@ -136803,9 +136807,9 @@
       "source_urls": [
         "https://eminence.com/products/l12-40a"
       ],
-      "fetched_at": "2026-10-18T00:54:37+00:00",
+      "fetched_at": "2026-11-02T21:37:58+00:00",
       "scraped_at": "2026-08-22T21:57:14+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -136881,9 +136885,9 @@
       "source_urls": [
         "https://eminence.com/products/l12-60n"
       ],
-      "fetched_at": "2026-10-18T00:54:36+00:00",
+      "fetched_at": "2026-11-02T21:37:57+00:00",
       "scraped_at": "2026-08-22T21:57:13+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -136959,9 +136963,9 @@
       "source_urls": [
         "https://eminence.com/products/l12-70c"
       ],
-      "fetched_at": "2026-10-18T00:54:35+00:00",
+      "fetched_at": "2026-11-02T21:37:56+00:00",
       "scraped_at": "2026-08-22T21:57:12+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -137032,7 +137036,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__la6_cbmr__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "LA6 CBMR",
+      "model": "LA6 Cbmr",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -137067,9 +137071,9 @@
       "source_urls": [
         "https://eminence.com/products/la6_cbmr"
       ],
-      "fetched_at": "2026-10-18T00:55:24+00:00",
+      "fetched_at": "2026-11-02T21:38:45+00:00",
       "scraped_at": "2026-08-22T21:58:00+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "fs_hz_high_for_lf_woofer:460.0"
@@ -137140,14 +137144,14 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__muse_1292_12_lead_rhythm_guitar_speaker_60w__muse_1292_12_lead_rhythm_guitar_speaker_60w",
       "driver_kind": "lf_woofer",
-      "model": "MUSE-1292-12-LEAD-RHYTHM-GUITAR-SPEAKER-60W",
+      "model": "Muse-1292-12-Lead-Rhythm-Guitar-Speaker-60W",
       "spec_source": {},
       "source_urls": [
         "https://eminence.com/products/muse-1292-12-lead-rhythm-guitar-speaker-60w"
       ],
-      "fetched_at": "2026-10-18T00:53:53+00:00",
+      "fetched_at": "2026-11-02T21:37:21+00:00",
       "scraped_at": "2026-08-22T21:56:37+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -137218,7 +137222,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__nsw6021_124_21_speaker__1ohm",
       "driver_kind": "lf_woofer",
-      "model": "NSW6021-124-21-SPEAKER",
+      "model": "NSW6021-124-21-Speaker",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -137253,9 +137257,9 @@
       "source_urls": [
         "https://eminence.com/products/nsw6021-124-21-speaker"
       ],
-      "fetched_at": "2026-10-18T00:56:23+00:00",
+      "fetched_at": "2026-11-02T21:39:32+00:00",
       "scraped_at": "2026-08-22T21:58:49+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "impedance_unusual:1.0"
@@ -137326,7 +137330,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__omega_pro_12_2kw8__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "OMEGA PRO 12 2KW8",
+      "model": "Omega Pro 12 2KW8",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -137362,9 +137366,9 @@
       "source_urls": [
         "https://eminence.com/products/omega_pro_12_2kw8"
       ],
-      "fetched_at": "2026-10-18T00:54:09+00:00",
+      "fetched_at": "2026-11-02T21:37:36+00:00",
       "scraped_at": "2026-08-22T21:56:52+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 48.14,
@@ -137433,7 +137437,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__omega_pro_15a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "OMEGA PRO 15A",
+      "model": "Omega Pro 15A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -137469,9 +137473,9 @@
       "source_urls": [
         "https://eminence.com/products/omega_pro_15a"
       ],
-      "fetched_at": "2026-10-18T00:55:42+00:00",
+      "fetched_at": "2026-11-02T21:38:57+00:00",
       "scraped_at": "2026-08-22T21:58:13+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 33.0,
@@ -137540,7 +137544,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__sigma_pro_18a__8ohm",
       "driver_kind": "lf_woofer",
-      "model": "SIGMA PRO 18A",
+      "model": "Sigma Pro 18A",
       "spec_source": {
         "nominal_size_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -137576,9 +137580,9 @@
       "source_urls": [
         "https://eminence.com/products/sigma_pro_18a"
       ],
-      "fetched_at": "2026-10-18T00:55:51+00:00",
+      "fetched_at": "2026-11-02T21:39:06+00:00",
       "scraped_at": "2026-08-22T21:58:22+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 28.0,
@@ -137652,9 +137656,9 @@
       "source_urls": [
         "https://eminence.com/products/vk1010-20-8o"
       ],
-      "fetched_at": "2026-10-18T00:54:38+00:00",
+      "fetched_at": "2026-11-02T21:37:59+00:00",
       "scraped_at": "2026-09-13T00:59:13+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -137725,7 +137729,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__apt_150__8ohm",
       "driver_kind": "tweeter",
-      "model": "APT 150",
+      "model": "Apt 150",
       "spec_source": {
         "throat_diameter_mm": "html_table",
         "power_aes_watts": "html_table",
@@ -137744,9 +137748,9 @@
       "source_urls": [
         "https://eminence.com/products/apt_150"
       ],
-      "fetched_at": "2026-10-18T00:54:44+00:00",
+      "fetched_at": "2026-11-02T21:38:05+00:00",
       "scraped_at": "2026-08-22T21:57:20+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 2700.0,
@@ -137815,7 +137819,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__apt_200__8ohm",
       "driver_kind": "tweeter",
-      "model": "APT 200",
+      "model": "Apt 200",
       "spec_source": {
         "throat_diameter_mm": "html_table",
         "power_aes_watts": "html_table",
@@ -137834,9 +137838,9 @@
       "source_urls": [
         "https://eminence.com/products/apt_200"
       ],
-      "fetched_at": "2026-10-18T00:54:46+00:00",
+      "fetched_at": "2026-11-02T21:38:07+00:00",
       "scraped_at": "2026-08-22T21:57:22+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 2600.0,
@@ -137905,7 +137909,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__apt_50__8ohm",
       "driver_kind": "tweeter",
-      "model": "APT 50",
+      "model": "Apt 50",
       "spec_source": {
         "throat_diameter_mm": "html_table",
         "impedance_nominal_ohm": "html_table",
@@ -137928,9 +137932,9 @@
       "source_urls": [
         "https://eminence.com/products/apt_50"
       ],
-      "fetched_at": "2026-10-18T00:54:49+00:00",
+      "fetched_at": "2026-11-02T21:38:10+00:00",
       "scraped_at": "2026-08-22T21:57:25+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:fs_hz=2.1"
@@ -138001,7 +138005,7 @@
       "manufacturer": "Eminence",
       "canonical_id": "eminence__apt_80__8ohm",
       "driver_kind": "tweeter",
-      "model": "APT 80",
+      "model": "Apt 80",
       "spec_source": {
         "throat_diameter_mm": "html_table",
         "power_aes_watts": "html_table",
@@ -138020,9 +138024,9 @@
       "source_urls": [
         "https://eminence.com/products/apt_80"
       ],
-      "fetched_at": "2026-10-18T00:54:48+00:00",
+      "fetched_at": "2026-11-02T21:38:09+00:00",
       "scraped_at": "2026-08-22T21:57:24+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1500.0,
@@ -138110,9 +138114,9 @@
       "source_urls": [
         "https://eminence.com/products/bgh25_8"
       ],
-      "fetched_at": "2026-10-18T00:55:01+00:00",
+      "fetched_at": "2026-11-02T21:38:22+00:00",
       "scraped_at": "2026-08-22T21:57:37+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1300.0,
@@ -138198,9 +138202,9 @@
       "source_urls": [
         "https://eminence.com/products/sd28"
       ],
-      "fetched_at": "2026-10-18T00:55:49+00:00",
+      "fetched_at": "2026-11-02T21:39:04+00:00",
       "scraped_at": "2026-08-22T21:58:20+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:37:16+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1500.0,
@@ -167827,7 +167831,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:28+00:00",
       "scraped_at": "2026-09-06T01:02:57+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 123.3,
@@ -167935,7 +167939,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:29+00:00",
       "scraped_at": "2026-09-06T01:02:59+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__ftx0617__8ohm"
@@ -168045,7 +168049,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:29+00:00",
       "scraped_at": "2026-09-06T01:03:00+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 78.8,
@@ -168153,7 +168157,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:31+00:00",
       "scraped_at": "2026-09-06T01:03:01+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 78.8,
@@ -168261,7 +168265,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:31+00:00",
       "scraped_at": "2026-09-06T01:03:03+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 47.3,
@@ -168369,7 +168373,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:33+00:00",
       "scraped_at": "2026-09-06T01:03:03+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 42.5,
@@ -168475,7 +168479,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:33+00:00",
       "scraped_at": "2026-09-06T01:03:03+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 80.0,
@@ -168581,7 +168585,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:35+00:00",
       "scraped_at": "2026-09-06T01:03:05+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 60.0,
@@ -168686,7 +168690,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:35+00:00",
       "scraped_at": "2026-09-06T01:03:05+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -168796,7 +168800,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:37+00:00",
       "scraped_at": "2026-09-06T01:03:07+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 74.0,
@@ -168904,7 +168908,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:37+00:00",
       "scraped_at": "2026-09-06T01:03:08+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 97.0,
@@ -169010,7 +169014,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:15+00:00",
       "scraped_at": "2026-09-06T01:03:59+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__an2075__8ohm"
@@ -169118,7 +169122,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:27+00:00",
       "scraped_at": "2026-09-06T01:03:59+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__an2075__8ohm"
@@ -169226,7 +169230,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:15+00:00",
       "scraped_at": "2026-09-06T01:03:10+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__an2775__8ohm"
@@ -169334,7 +169338,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:17+00:00",
       "scraped_at": "2026-09-06T01:04:00+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__an3510__8ohm"
@@ -169442,7 +169446,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:28+00:00",
       "scraped_at": "2026-09-06T01:04:00+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__an3510__8ohm"
@@ -169551,7 +169555,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:14+00:00",
       "scraped_at": "2026-09-06T01:02:44+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 116.6,
@@ -169658,7 +169662,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:14+00:00",
       "scraped_at": "2026-09-06T01:02:45+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__cf0820bmb__8ohm"
@@ -169767,7 +169771,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:15+00:00",
       "scraped_at": "2026-09-06T01:02:45+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 202.0,
@@ -169874,7 +169878,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:16+00:00",
       "scraped_at": "2026-09-06T01:02:47+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__cf1025c__8ohm"
@@ -169983,7 +169987,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:17+00:00",
       "scraped_at": "2026-09-06T01:02:47+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__ftr08_2011d__8ohm"
@@ -170092,7 +170096,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:18+00:00",
       "scraped_at": "2026-09-06T01:02:48+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__ftr12_3070c__8ohm"
@@ -170201,7 +170205,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:21+00:00",
       "scraped_at": "2026-09-06T01:02:50+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 55.6,
@@ -170308,7 +170312,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:22+00:00",
       "scraped_at": "2026-09-06T01:02:51+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 62.3,
@@ -170413,7 +170417,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:50+00:00",
       "scraped_at": "2026-09-06T01:03:21+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__msh_115__8ohm"
@@ -170519,7 +170523,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:52+00:00",
       "scraped_at": "2026-09-06T01:03:25+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__msh_115hq__8ohm"
@@ -170626,7 +170630,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:52+00:00",
       "scraped_at": "2026-09-06T01:03:26+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__msh_116__4ohm"
@@ -170717,7 +170721,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:18+00:00",
       "scraped_at": "2026-09-06T01:03:50+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -170826,7 +170830,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:22+00:00",
       "scraped_at": "2026-09-06T01:02:52+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -170933,7 +170937,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:23+00:00",
       "scraped_at": "2026-09-06T01:02:53+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -171024,7 +171028,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:19+00:00",
       "scraped_at": "2026-09-06T01:03:51+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -171118,7 +171122,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:29+00:00",
       "scraped_at": "2026-09-06T01:04:01+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -171226,7 +171230,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:53+00:00",
       "scraped_at": "2026-09-06T01:03:26+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -171318,7 +171322,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:24+00:00",
       "scraped_at": "2026-09-06T01:02:54+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -171410,7 +171414,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:54+00:00",
       "scraped_at": "2026-09-06T01:04:38+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -171519,7 +171523,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:20+00:00",
       "scraped_at": "2026-09-06T01:03:52+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -171626,7 +171630,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:55+00:00",
       "scraped_at": "2026-09-06T01:03:28+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -171718,7 +171722,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:21+00:00",
       "scraped_at": "2026-09-06T01:03:53+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -171806,7 +171810,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:30+00:00",
       "scraped_at": "2026-09-06T01:04:02+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:net_weight_kg=0.045",
@@ -171916,7 +171920,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:51+00:00",
       "scraped_at": "2026-09-06T01:05:26+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__sp_308cx__8ohm"
@@ -172024,7 +172028,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:52+00:00",
       "scraped_at": "2026-09-06T01:05:27+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__sp_310cx__2ohm"
@@ -172111,7 +172115,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:31+00:00",
       "scraped_at": "2026-09-06T01:04:03+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:depth_mm=8.0",
@@ -172204,7 +172208,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:31+00:00",
       "scraped_at": "2026-09-06T01:04:04+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -172311,7 +172315,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:56+00:00",
       "scraped_at": "2026-09-06T01:03:29+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -172418,7 +172422,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:53+00:00",
       "scraped_at": "2026-09-06T01:04:49+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -172526,7 +172530,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:57+00:00",
       "scraped_at": "2026-09-06T01:03:30+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -172633,7 +172637,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:58+00:00",
       "scraped_at": "2026-09-06T01:03:31+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -172724,7 +172728,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:22+00:00",
       "scraped_at": "2026-09-06T01:03:54+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -172816,7 +172820,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:23+00:00",
       "scraped_at": "2026-09-06T01:03:55+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -172908,7 +172912,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:32+00:00",
       "scraped_at": "2026-09-06T01:05:36+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -173001,7 +173005,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:34+00:00",
       "scraped_at": "2026-09-06T01:05:38+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -173110,7 +173114,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:58+00:00",
       "scraped_at": "2026-09-06T01:04:29+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -173218,7 +173222,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:59+00:00",
       "scraped_at": "2026-09-06T01:04:30+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -173309,7 +173313,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:24+00:00",
       "scraped_at": "2026-09-06T01:03:56+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -173400,7 +173404,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:25+00:00",
       "scraped_at": "2026-09-06T01:05:41+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -173492,7 +173496,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:34+00:00",
       "scraped_at": "2026-09-06T01:05:40+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -173584,7 +173588,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:36+00:00",
       "scraped_at": "2026-09-06T01:05:41+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -173677,7 +173681,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:26+00:00",
       "scraped_at": "2026-09-06T01:03:58+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -173785,7 +173789,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:00+00:00",
       "scraped_at": "2026-09-06T01:04:31+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -173892,7 +173896,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:59+00:00",
       "scraped_at": "2026-09-06T01:03:32+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -173999,7 +174003,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:00+00:00",
       "scraped_at": "2026-09-06T01:03:33+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -174106,7 +174110,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:02+00:00",
       "scraped_at": "2026-09-06T01:03:34+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -174213,7 +174217,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:19+00:00",
       "scraped_at": "2026-09-06T01:04:50+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -174320,7 +174324,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:20+00:00",
       "scraped_at": "2026-09-06T01:04:51+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -174427,7 +174431,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:21+00:00",
       "scraped_at": "2026-09-06T01:04:52+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -174534,7 +174538,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:22+00:00",
       "scraped_at": "2026-09-06T01:04:53+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -174641,7 +174645,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:23+00:00",
       "scraped_at": "2026-09-06T01:04:54+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -174748,7 +174752,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:38+00:00",
       "scraped_at": "2026-09-06T01:05:10+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -174855,7 +174859,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:24+00:00",
       "scraped_at": "2026-09-06T01:04:55+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -174962,7 +174966,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:25+00:00",
       "scraped_at": "2026-09-06T01:04:56+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -175069,7 +175073,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:26+00:00",
       "scraped_at": "2026-09-06T01:04:57+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -175176,7 +175180,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:27+00:00",
       "scraped_at": "2026-09-06T01:04:58+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -175283,7 +175287,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:39+00:00",
       "scraped_at": "2026-09-06T01:05:11+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -175390,7 +175394,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:28+00:00",
       "scraped_at": "2026-09-06T01:04:59+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -175497,7 +175501,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:40+00:00",
       "scraped_at": "2026-09-06T01:05:12+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -175604,7 +175608,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:36+00:00",
       "scraped_at": "2026-09-06T01:04:09+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -175711,7 +175715,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:41+00:00",
       "scraped_at": "2026-09-06T01:06:17+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -175819,7 +175823,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:38+00:00",
       "scraped_at": "2026-09-06T01:04:10+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -175926,7 +175930,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:42+00:00",
       "scraped_at": "2026-09-06T01:06:18+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -176034,7 +176038,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:43+00:00",
       "scraped_at": "2026-09-06T01:05:15+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -176141,7 +176145,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:44+00:00",
       "scraped_at": "2026-09-06T01:05:16+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -176248,7 +176252,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:45+00:00",
       "scraped_at": "2026-09-06T01:05:20+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -176357,7 +176361,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:01+00:00",
       "scraped_at": "2026-09-06T01:04:32+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 128.1,
@@ -176453,7 +176457,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:02+00:00",
       "scraped_at": "2026-09-06T01:04:33+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -176562,7 +176566,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:03+00:00",
       "scraped_at": "2026-09-06T01:04:34+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 104.7,
@@ -176658,7 +176662,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:04+00:00",
       "scraped_at": "2026-09-06T01:04:35+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -176767,7 +176771,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:05+00:00",
       "scraped_at": "2026-09-06T01:04:36+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 94.0,
@@ -176863,7 +176867,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:06+00:00",
       "scraped_at": "2026-09-06T01:04:37+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -176972,7 +176976,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:58+00:00",
       "scraped_at": "2026-09-06T01:05:32+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 55.8,
@@ -177079,7 +177083,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:59+00:00",
       "scraped_at": "2026-09-06T01:05:33+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 60.3,
@@ -177170,7 +177174,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:25+00:00",
       "scraped_at": "2026-09-06T01:02:56+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -177261,7 +177265,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:27+00:00",
       "scraped_at": "2026-09-06T01:02:56+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": null,
@@ -177367,7 +177371,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:39+00:00",
       "scraped_at": "2026-09-06T01:03:09+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "fs_hz_high_for_lf_woofer:153.4"
@@ -177475,7 +177479,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:39+00:00",
       "scraped_at": "2026-09-06T01:03:10+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "fs_hz_high_for_lf_woofer:123.3",
@@ -177584,7 +177588,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:41+00:00",
       "scraped_at": "2026-09-06T01:03:11+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "fs_hz_high_for_lf_woofer:113.4"
@@ -177673,7 +177677,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:41+00:00",
       "scraped_at": "2026-09-06T01:03:11+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "missing_ts_for_expected_kind"
@@ -177782,7 +177786,7 @@
       ],
       "fetched_at": "2026-10-18T00:56:57+00:00",
       "scraped_at": "2026-09-06T01:02:32+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 50.5,
@@ -177889,7 +177893,7 @@
       ],
       "fetched_at": "2026-10-18T00:56:58+00:00",
       "scraped_at": "2026-09-06T01:02:32+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 54.8,
@@ -177996,7 +178000,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:01+00:00",
       "scraped_at": "2026-09-06T01:02:33+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 40.8,
@@ -178103,7 +178107,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:03+00:00",
       "scraped_at": "2026-09-06T01:02:34+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 37.0,
@@ -178210,7 +178214,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:02+00:00",
       "scraped_at": "2026-09-06T01:02:35+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 37.0,
@@ -178317,7 +178321,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:03+00:00",
       "scraped_at": "2026-09-06T01:02:37+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 34.5,
@@ -178424,7 +178428,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:04+00:00",
       "scraped_at": "2026-09-06T01:02:37+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 86.1,
@@ -178531,7 +178535,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:05+00:00",
       "scraped_at": "2026-09-06T01:02:39+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 65.1,
@@ -178638,7 +178642,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:06+00:00",
       "scraped_at": "2026-09-06T01:02:39+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 28.9,
@@ -178745,7 +178749,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:07+00:00",
       "scraped_at": "2026-09-06T01:02:40+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 41.4,
@@ -178852,7 +178856,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:08+00:00",
       "scraped_at": "2026-09-06T01:02:41+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 39.2,
@@ -178960,7 +178964,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:13+00:00",
       "scraped_at": "2026-09-06T01:02:43+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 100.0,
@@ -179068,7 +179072,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:38+00:00",
       "scraped_at": "2026-09-06T01:04:11+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__ftx0820__8ohm"
@@ -179178,7 +179182,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:40+00:00",
       "scraped_at": "2026-09-06T01:04:12+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__ftx1025__8ohm"
@@ -179288,7 +179292,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:41+00:00",
       "scraped_at": "2026-09-06T01:04:13+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__ftx1225__8ohm"
@@ -179398,7 +179402,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:42+00:00",
       "scraped_at": "2026-09-06T01:04:14+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__ftx1530__8ohm"
@@ -179507,7 +179511,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:43+00:00",
       "scraped_at": "2026-09-06T01:04:15+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__k12h_100tc__8ohm"
@@ -179616,7 +179620,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:44+00:00",
       "scraped_at": "2026-09-06T01:04:16+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__k12h_200tc__8ohm"
@@ -179723,7 +179727,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:42+00:00",
       "scraped_at": "2026-09-06T01:03:13+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 85.0,
@@ -179827,7 +179831,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:44+00:00",
       "scraped_at": "2026-09-06T01:03:14+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 89.0,
@@ -179932,7 +179936,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:45+00:00",
       "scraped_at": "2026-09-06T01:03:15+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 95.0,
@@ -180039,7 +180043,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:45+00:00",
       "scraped_at": "2026-09-06T01:04:17+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 34.8,
@@ -180053,10 +180057,10 @@
       "bl_tm": 24.38,
       "re_ohm": 5.1,
       "le_mh": 1.61,
-      "sd_cm2": 1.21,
+      "sd_cm2": 1210.0,
       "eta_zero_pct": null,
       "ebp_hz": 80.7,
-      "vd_liters": 0.0012,
+      "vd_liters": 1.1616,
       "xmax_mm": 9.6,
       "xmech_mm": null,
       "voice_coil_diameter_mm": 100.0,
@@ -180129,7 +180133,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:45+00:00",
       "scraped_at": "2026-09-06T01:03:16+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:net_weight_kg=0.035",
@@ -180221,7 +180225,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:46+00:00",
       "scraped_at": "2026-09-06T01:03:17+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -180329,7 +180333,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:46+00:00",
       "scraped_at": "2026-09-06T01:04:18+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -180436,7 +180440,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:47+00:00",
       "scraped_at": "2026-09-06T01:03:18+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -180543,7 +180547,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:47+00:00",
       "scraped_at": "2026-09-06T01:04:19+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -180650,7 +180654,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:48+00:00",
       "scraped_at": "2026-09-06T01:04:20+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -180758,7 +180762,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:49+00:00",
       "scraped_at": "2026-09-06T01:04:21+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -180850,7 +180854,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:48+00:00",
       "scraped_at": "2026-09-06T01:03:19+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -180958,7 +180962,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:50+00:00",
       "scraped_at": "2026-09-06T01:04:22+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -181065,7 +181069,7 @@
       ],
       "fetched_at": "2026-10-18T00:57:50+00:00",
       "scraped_at": "2026-09-06T01:03:20+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -181156,7 +181160,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:07+00:00",
       "scraped_at": "2026-09-06T01:04:38+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -181265,7 +181269,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:08+00:00",
       "scraped_at": "2026-09-06T01:04:39+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -181373,7 +181377,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:09+00:00",
       "scraped_at": "2026-09-06T01:04:40+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -181481,7 +181485,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:10+00:00",
       "scraped_at": "2026-09-06T01:04:41+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -181588,7 +181592,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:46+00:00",
       "scraped_at": "2026-09-06T01:05:21+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -181681,7 +181685,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:11+00:00",
       "scraped_at": "2026-09-06T01:04:42+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -181790,7 +181794,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:12+00:00",
       "scraped_at": "2026-09-06T01:04:43+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -181897,7 +181901,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:47+00:00",
       "scraped_at": "2026-09-06T01:05:21+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -182006,7 +182010,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:13+00:00",
       "scraped_at": "2026-09-06T01:04:44+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -182114,7 +182118,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:48+00:00",
       "scraped_at": "2026-09-06T01:05:22+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -182222,7 +182226,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:14+00:00",
       "scraped_at": "2026-09-06T01:04:45+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -182329,7 +182333,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:15+00:00",
       "scraped_at": "2026-09-06T01:04:46+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -182436,7 +182440,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:49+00:00",
       "scraped_at": "2026-09-06T01:05:23+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -182544,7 +182548,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:16+00:00",
       "scraped_at": "2026-09-06T01:04:47+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -182651,7 +182655,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:50+00:00",
       "scraped_at": "2026-09-06T01:05:24+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -182759,7 +182763,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:17+00:00",
       "scraped_at": "2026-09-06T01:04:48+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -182866,7 +182870,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:51+00:00",
       "scraped_at": "2026-09-06T01:05:25+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -182974,7 +182978,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:52+00:00",
       "scraped_at": "2026-09-06T01:05:26+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__sp_308cx__8ohm"
@@ -183082,7 +183086,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:53+00:00",
       "scraped_at": "2026-09-06T01:05:27+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__sp_310cx__2ohm"
@@ -183189,7 +183193,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:54+00:00",
       "scraped_at": "2026-09-06T01:05:28+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -183297,7 +183301,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:55+00:00",
       "scraped_at": "2026-09-06T01:05:29+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -183404,7 +183408,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:18+00:00",
       "scraped_at": "2026-09-06T01:04:49+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -183512,7 +183516,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:00+00:00",
       "scraped_at": "2026-09-06T01:05:34+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -183621,7 +183625,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:01+00:00",
       "scraped_at": "2026-09-06T01:05:35+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -183714,7 +183718,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:02+00:00",
       "scraped_at": "2026-09-06T01:05:36+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -183807,7 +183811,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:03+00:00",
       "scraped_at": "2026-09-06T01:05:38+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -183916,7 +183920,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:04+00:00",
       "scraped_at": "2026-09-06T01:05:39+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -184023,7 +184027,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:05+00:00",
       "scraped_at": "2026-09-06T01:05:39+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -184113,7 +184117,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:06+00:00",
       "scraped_at": "2026-09-06T01:05:40+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -184205,7 +184209,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:07+00:00",
       "scraped_at": "2026-09-06T01:05:41+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -184314,7 +184318,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:56+00:00",
       "scraped_at": "2026-09-06T01:05:30+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -184422,7 +184426,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:57+00:00",
       "scraped_at": "2026-09-06T01:05:31+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -184514,7 +184518,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:08+00:00",
       "scraped_at": "2026-09-06T01:05:42+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -184622,7 +184626,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:09+00:00",
       "scraped_at": "2026-09-06T01:05:43+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -184729,7 +184733,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:10+00:00",
       "scraped_at": "2026-09-06T01:05:44+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -184837,7 +184841,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:11+00:00",
       "scraped_at": "2026-09-06T01:05:45+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -184945,7 +184949,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:24+00:00",
       "scraped_at": "2026-09-06T01:05:58+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -185053,7 +185057,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:25+00:00",
       "scraped_at": "2026-09-06T01:05:59+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -185161,7 +185165,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:26+00:00",
       "scraped_at": "2026-09-06T01:06:00+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -185269,7 +185273,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:27+00:00",
       "scraped_at": "2026-09-06T01:06:01+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -185377,7 +185381,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:28+00:00",
       "scraped_at": "2026-09-06T01:06:02+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -185485,7 +185489,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:29+00:00",
       "scraped_at": "2026-09-06T01:06:03+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -185592,7 +185596,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:30+00:00",
       "scraped_at": "2026-09-06T01:06:04+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -185700,7 +185704,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:31+00:00",
       "scraped_at": "2026-09-06T01:06:06+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -185809,7 +185813,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:32+00:00",
       "scraped_at": "2026-09-06T01:06:07+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -185917,7 +185921,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:33+00:00",
       "scraped_at": "2026-09-06T01:06:08+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -186024,7 +186028,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:34+00:00",
       "scraped_at": "2026-09-06T01:06:09+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -186131,7 +186135,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:35+00:00",
       "scraped_at": "2026-09-06T01:06:10+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -186239,7 +186243,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:36+00:00",
       "scraped_at": "2026-09-06T01:06:11+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -186347,7 +186351,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:37+00:00",
       "scraped_at": "2026-09-06T01:06:12+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -186455,7 +186459,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:38+00:00",
       "scraped_at": "2026-09-06T01:06:13+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -186563,7 +186567,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:39+00:00",
       "scraped_at": "2026-09-06T01:06:14+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -186671,7 +186675,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:40+00:00",
       "scraped_at": "2026-09-06T01:06:15+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0"
@@ -186778,7 +186782,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:41+00:00",
       "scraped_at": "2026-09-06T01:06:16+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -186886,7 +186890,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:43+00:00",
       "scraped_at": "2026-09-06T01:06:17+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -186995,7 +186999,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:43+00:00",
       "scraped_at": "2026-09-06T01:06:18+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -187104,7 +187108,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:44+00:00",
       "scraped_at": "2026-09-06T01:06:19+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -187212,7 +187216,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:45+00:00",
       "scraped_at": "2026-09-06T01:06:20+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -187321,7 +187325,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:46+00:00",
       "scraped_at": "2026-09-06T01:06:21+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:freq_low_hz=3.0",
@@ -187432,7 +187436,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:12+00:00",
       "scraped_at": "2026-09-06T01:05:46+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__tf0818__8ohm"
@@ -187541,7 +187545,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:13+00:00",
       "scraped_at": "2026-09-06T01:05:47+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 69.4,
@@ -187648,7 +187652,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:14+00:00",
       "scraped_at": "2026-09-06T01:05:48+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__tf1220__8ohm"
@@ -187757,7 +187761,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:15+00:00",
       "scraped_at": "2026-09-06T01:05:49+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 55.6,
@@ -187864,7 +187868,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:16+00:00",
       "scraped_at": "2026-09-06T01:05:50+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 52.6,
@@ -187971,7 +187975,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:17+00:00",
       "scraped_at": "2026-09-06T01:05:51+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__tf1230s__8ohm"
@@ -188079,7 +188083,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:18+00:00",
       "scraped_at": "2026-09-06T01:05:52+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:le_mh=0.0"
@@ -188188,7 +188192,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:19+00:00",
       "scraped_at": "2026-09-06T01:05:53+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 47.5,
@@ -188295,7 +188299,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:20+00:00",
       "scraped_at": "2026-09-06T01:05:54+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 47.5,
@@ -188402,7 +188406,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:21+00:00",
       "scraped_at": "2026-09-06T01:05:55+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 42.0,
@@ -188510,7 +188514,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:22+00:00",
       "scraped_at": "2026-09-06T01:05:56+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__tfx0515__8ohm"
@@ -188620,7 +188624,7 @@
       ],
       "fetched_at": "2026-10-18T01:00:23+00:00",
       "scraped_at": "2026-09-06T01:05:57+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__tfx0615__8ohm"
@@ -188713,7 +188717,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:02+00:00",
       "scraped_at": "2026-09-06T01:03:35+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__airmt_130__8ohm"
@@ -188806,7 +188810,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:03+00:00",
       "scraped_at": "2026-09-06T01:03:36+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "duplicate_canonical_id_collision:monacor__airmt_85__4ohm"
@@ -188899,7 +188903,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:04+00:00",
       "scraped_at": "2026-09-06T01:03:37+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1500.0,
@@ -188990,7 +188994,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:06+00:00",
       "scraped_at": "2026-09-06T01:03:38+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1200.0,
@@ -189081,7 +189085,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:06+00:00",
       "scraped_at": "2026-09-06T01:03:39+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1200.0,
@@ -189172,7 +189176,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:07+00:00",
       "scraped_at": "2026-09-06T01:03:40+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1500.0,
@@ -189263,7 +189267,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:08+00:00",
       "scraped_at": "2026-09-06T01:03:41+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1600.0,
@@ -189354,7 +189358,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:09+00:00",
       "scraped_at": "2026-09-06T01:03:42+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1300.0,
@@ -189445,7 +189449,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:10+00:00",
       "scraped_at": "2026-09-06T01:03:43+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1200.0,
@@ -189536,7 +189540,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:12+00:00",
       "scraped_at": "2026-09-06T01:03:44+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 750.0,
@@ -189627,7 +189631,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:12+00:00",
       "scraped_at": "2026-09-06T01:03:45+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1500.0,
@@ -189718,7 +189722,7 @@
       ],
       "fetched_at": "2026-10-18T00:58:14+00:00",
       "scraped_at": "2026-09-06T01:03:46+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1200.0,
@@ -189809,7 +189813,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:29+00:00",
       "scraped_at": "2026-09-06T01:05:00+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1200.0,
@@ -189899,7 +189903,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:30+00:00",
       "scraped_at": "2026-09-06T01:05:01+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 2000.0,
@@ -189989,7 +189993,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:31+00:00",
       "scraped_at": "2026-09-06T01:05:02+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 2500.0,
@@ -190079,7 +190083,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:32+00:00",
       "scraped_at": "2026-09-06T01:05:03+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 2200.0,
@@ -190169,7 +190173,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:33+00:00",
       "scraped_at": "2026-09-06T01:05:04+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 1600.0,
@@ -190259,7 +190263,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:34+00:00",
       "scraped_at": "2026-09-06T01:05:05+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "impedance_unusual:7.0"
@@ -190351,7 +190355,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:35+00:00",
       "scraped_at": "2026-09-06T01:05:06+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [
         "range_reject:net_weight_kg=0.035",
@@ -190443,7 +190447,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:36+00:00",
       "scraped_at": "2026-09-06T01:05:07+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 4500.0,
@@ -190532,7 +190536,7 @@
       ],
       "fetched_at": "2026-10-18T00:59:37+00:00",
       "scraped_at": "2026-09-06T01:05:08+00:00",
-      "last_scraped_at": "2026-10-18T00:50:31+00:00",
+      "last_scraped_at": "2026-11-02T21:31:27+00:00",
       "status": "active",
       "warn_flags": [],
       "fs_hz": 3500.0,
