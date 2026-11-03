@@ -80,6 +80,15 @@
             <i class="material-icons" aria-hidden="true">dark_mode</i>
           </label>
         </div>
+        <button
+          type="button"
+          class="nav-icon-btn export-btn-header"
+          @click="openExportDatabase()"
+          title="Export Database"
+          aria-label="Export Database"
+        >
+          <i class="material-icons" aria-hidden="true">file_download</i>
+        </button>
       </div>
       <div class="nav-actions">
         <a
@@ -422,7 +431,7 @@
                     </template>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody @click="onRowExportClick($event)">
                   <template x-for="(d, i) in visibleRows" :key="d.canonical_id">
                     <tr
                       :class="hoverIdx === i ? 'row-hover' : ''"
@@ -535,7 +544,138 @@
       </div>
     </div>
 
+    <!-- Export modal — Alpine-driven, not Materialize-initialized. -->
+    <div
+      class="export-modal-backdrop"
+      x-show="exportModal.open"
+      x-cloak
+      x-transition.opacity
+      @click.self="closeExportModal()"
+      @keydown.escape.window="closeExportModal()"
+    >
+      <div class="export-modal" role="dialog" aria-modal="true">
+        <h5
+          x-text="exportModal.mode === 'driver'
+                  ? `Export driver — ${exportModal.driver?.manufacturer || ''} ${exportModal.driver?.model || ''}`
+                  : 'Export database'"
+        ></h5>
+
+        <div x-show="!exportModal.result">
+          <fieldset class="export-radio-group">
+            <legend>Format</legend>
+            <label
+              ><input
+                type="radio"
+                class="with-gap"
+                name="exportFormat"
+                value="winisd"
+                x-model="exportModal.format"
+              /><span>WinISD (.wdr)</span></label
+            >
+            <label
+              ><input
+                type="radio"
+                class="with-gap"
+                name="exportFormat"
+                value="ffs"
+                x-model="exportModal.format"
+              /><span>FFS (.ffsdrv)</span></label
+            >
+          </fieldset>
+
+          <fieldset
+            class="export-radio-group"
+            x-show="exportModal.mode === 'database'"
+          >
+            <legend>Scope</legend>
+            <label
+              ><input
+                type="radio"
+                class="with-gap"
+                name="exportScope"
+                value="view"
+                x-model="exportModal.scope" /><span
+                x-text="`Current view (${sortedFiltered.length})`"
+              ></span
+            ></label>
+            <label
+              ><input
+                type="radio"
+                class="with-gap"
+                name="exportScope"
+                value="full"
+                x-model="exportModal.scope" /><span
+                x-text="`Full database (${drivers.length})`"
+              ></span
+            ></label>
+          </fieldset>
+
+          <div class="export-modal-actions">
+            <button
+              type="button"
+              class="btn-flat teal-text"
+              @click="closeExportModal()"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn waves-effect teal"
+              @click="confirmExport()"
+            >
+              Export
+            </button>
+          </div>
+        </div>
+
+        <div x-show="exportModal.result">
+          <p x-show="exportModal.result?.nothingToExport" class="grey-text">
+            Nothing to export in the current view.
+          </p>
+          <p x-show="!exportModal.result?.nothingToExport">
+            Exported
+            <strong x-text="exportModal.result?.written"></strong>
+            driver(s).
+          </p>
+          <template x-if="exportModal.result?.skipped?.length">
+            <div class="export-skipped">
+              <p>
+                Skipped
+                <strong x-text="exportModal.result.skipped.length"></strong>
+                driver(s) with missing fields:
+              </p>
+              <ul>
+                <template
+                  x-for="s in exportModal.result.skipped"
+                  :key="s.canonical_id"
+                >
+                  <li>
+                    <span x-text="`${s.manufacturer} ${s.model}`"></span>
+                    <span
+                      class="grey-text"
+                      x-text="`(missing: ${s.missing.join(', ')})`"
+                    ></span>
+                  </li>
+                </template>
+              </ul>
+            </div>
+          </template>
+          <div class="export-modal-actions">
+            <button
+              type="button"
+              class="btn-flat teal-text"
+              @click="closeExportModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
+    <script src="export.js"></script>
     <script src="app.js"></script>
     <script
       defer

@@ -540,6 +540,16 @@ function app() {
     // `top`/`left` are viewport-relative px; the popover uses position:fixed.
     specPopover: { open: false, text: "", top: 0, left: 0 },
 
+    // Export modal — opened by per-row download icon or header icon.
+    exportModal: {
+      open: false,
+      mode: "driver", // "driver" | "database"
+      driver: null,
+      format: "winisd", // "winisd" | "ffs"
+      scope: "view", // "view" | "full"
+      result: null, // null until confirmExport runs
+    },
+
     async init() {
       const state = parseURLState();
       Object.assign(this.filters, state.filters);
@@ -989,9 +999,23 @@ function app() {
       const v = d[col.key];
       if (v == null || v === "") return '<span class="null">–</span>';
       // Manufacturer + model link to the source page and never carry a sigil.
-      if (col.key === "manufacturer" || col.key === "model") {
+      if (col.key === "manufacturer") {
         const u = d.source_urls && d.source_urls[0];
         return u ? `<a href="${u}" target="_blank" rel="noopener">${v}</a>` : v;
+      }
+      if (col.key === "model") {
+        const u = d.source_urls && d.source_urls[0];
+        const link = u
+          ? `<a href="${u}" target="_blank" rel="noopener">${v}</a>`
+          : v;
+        // Hover-reveal export icon. Visibility handled by CSS via tr.row-hover
+        // and tr:hover (fallback for fast cursors). Delegated click handler
+        // is attached on the fixed-table tbody.
+        const icon =
+          `<button type="button" class="row-export-btn" data-cid="${d.canonical_id}"` +
+          ` title="Export Driver" aria-label="Export Driver">` +
+          `<i class="material-icons" aria-hidden="true">file_download</i></button>`;
+        return `${link}${icon}`;
       }
       // All other columns share a common tail: format the value, then append
       // the spec-source dagger (if any) uniformly. Prior versions returned
@@ -1059,6 +1083,78 @@ function app() {
     },
     closeSpecPopover() {
       this.specPopover.open = false;
+    },
+
+    // Export modal — opened from per-row icon or header icon.
+    openExportDriver(driver) {
+      this.exportModal = {
+        open: true,
+        mode: "driver",
+        driver,
+        format: "winisd",
+        scope: "view",
+        result: null,
+      };
+    },
+    openExportDatabase() {
+      this.exportModal = {
+        open: true,
+        mode: "database",
+        driver: null,
+        format: "winisd",
+        scope: "view",
+        result: null,
+      };
+    },
+    closeExportModal() {
+      this.exportModal.open = false;
+    },
+    confirmExport() {
+      const DX = window.DriverExport;
+      if (this.exportModal.mode === "driver") {
+        const d = this.exportModal.driver;
+        const r = DX.downloadDriver(d, this.exportModal.format);
+        this.exportModal.result = r.ok
+          ? { written: 1, skipped: [], nothingToExport: false }
+          : {
+              written: 0,
+              skipped: [
+                {
+                  canonical_id: d.canonical_id,
+                  manufacturer: d.manufacturer,
+                  model: d.model,
+                  missing: r.missing,
+                },
+              ],
+              nothingToExport: false,
+            };
+      } else {
+        const rows =
+          this.exportModal.scope === "full"
+            ? this.drivers
+            : this.sortedFiltered;
+        const r = DX.downloadDatabase(rows, this.exportModal.format, {
+          scope: this.exportModal.scope,
+          generatedAt: this.generatedAt,
+        });
+        this.exportModal.result = {
+          written: r.written,
+          skipped: r.skipped,
+          nothingToExport: r.written === 0 && r.skipped.length === 0,
+        };
+      }
+    },
+
+    // Delegated click handler on the fixed-table tbody. Dispatches on the
+    // per-row export icon; a click anywhere else in the row is a no-op.
+    onRowExportClick(event) {
+      const btn = event.target.closest(".row-export-btn");
+      if (!btn) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const cid = btn.dataset.cid;
+      const driver = this.drivers.find((d) => d.canonical_id === cid);
+      if (driver) this.openExportDriver(driver);
     },
 
     updateUrl() {

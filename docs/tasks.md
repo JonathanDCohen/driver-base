@@ -2,6 +2,60 @@
 
 ---
 
+## Monacor duplicate canonical_ids
+
+**Added:** 2026-11-02 (surfaced during export-feature verification)
+
+`web/drivers.json` has 13 Monacor records with canonical_ids ending in
+`__dup_<model>_<Z>` that are byte-identical to another record's canonical_id,
+so the "dupe" suffix doesn't actually disambiguate. In the bulk export, this
+causes 6 FFS-viable rows to overwrite each other in the entries map
+(1554 viable per audit → 1548 written). The export dedup logic by filename
+works correctly; the bug is upstream in the Monacor scraper's canonical_id
+assignment. Example: `monacor__an2075__8ohm__dup_an2075_8` appears twice.
+
+Fix location: whatever Monacor scraper step assigns `__dup_` suffixes —
+the suffix needs to be unique per occurrence (e.g. include a sequence
+counter or a source-fragment hash).
+
+---
+
+## Close export-viability gaps on in-scope drivers
+
+**Added:** 2026-11-02 (during export-feature build)
+
+The in-browser exporter skips drivers that lack the minimum fields for the
+chosen format, with a user-visible warning. Scan of `web/drivers.json`
+(2026-11-02, 2212 drivers total) summarized below; **per-driver worklist
+grouped by manufacturer in [`docs/export-viability.md`](export-viability.md)**.
+
+- **FFS** (needs `fs_hz`, `qms`, `re_ohm`, `bl_tm`, `mms_g`, `sd_cm2`):
+  1554 OK / 658 missing. Breakdown: `hf_compression` 352 (data-source
+  reality — HF compression drivers don't publish full T/S anywhere, out of
+  scope for closure), `guitar_bass` 92, `tweeter` 85, `lf_woofer` 49,
+  `fullrange` 44, `passive` 35 (schema mismatch — no T/S applies).
+- **WinISD** (needs `fs_hz`, `qts`): 1580 OK / 632 missing. Distribution
+  mirrors FFS; `qts` missing on 616 rows is the biggest single gap.
+- **Realistic ceiling** once HF compression (352) and passive (35) are
+  excluded: ~1825/2212 for FFS. The addressable gap is ~270 drivers, most
+  of them on the LF/midbass side where T/S is normally published.
+- **Top manufacturers to work down** (FFS): Dayton 106, B&C 99,
+  Celestion 98, 18Sound 84, Eminence 83, Beyma 58, Monacor 56.
+- Most-missing field (FFS): `mms_g` (622), `sd_cm2` (593), `qms` (588),
+  `bl_tm` (572), `fs_hz` (505), `re_ohm` (449).
+
+Re-run the audit after each scraper fix:
+```
+python3 - <<'EOF'
+# see tools/ or regenerate from the one-shot in commit history
+EOF
+```
+(If this gets run repeatedly, promote the one-shot in
+`docs/export-viability.md`'s generation to a proper
+`tools/audit_export_viability.py`.)
+
+---
+
 ## Framework gaps surfaced by SB Acoustics / Monacor / Peerless
 
 **Added:** 2026-09-01 (during SB/Monacor/Peerless scraper landing)

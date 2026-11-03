@@ -813,3 +813,96 @@ html[data-theme="dark"] .table-split::-webkit-scrollbar-corner {
     max-height: none;
   }
 }
+
+/* Per-row export icon — hover-revealed, right-aligned in the Model cell.
+ * The tr:hover fallback alongside tr.row-hover covers the fast-cursor
+ * race between Alpine's hoverIdx state transition and the click. */
+td[data-key="model"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.row-export-btn {
+  background: transparent;
+  border: 0;
+  padding: 0 4px;
+  cursor: pointer;
+  color: var(--text-muted);
+  opacity: 0;
+  flex-shrink: 0;
+  transition:
+    opacity 0.1s,
+    color 0.15s;
+}
+.row-export-btn .material-icons {
+  font-size: 18px;
+}
+tr.row-hover .row-export-btn,
+tr:hover .row-export-btn {
+  opacity: 1;
+}
+.row-export-btn:hover {
+  color: var(--link);
+}
+
+/* Export modal — Alpine-controlled, surface styling mirrors .picker-popover. */
+.export-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.export-modal {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px 24px;
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  box-shadow: 0 4px 16px var(--shadow-popover);
+}
+.export-modal h5 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.export-radio-group {
+  border: none;
+  padding: 0;
+  margin: 12px 0;
+}
+.export-radio-group legend {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+.export-radio-group label {
+  display: block;
+  margin: 6px 0;
+}
+.export-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+.export-skipped {
+  margin-top: 12px;
+}
+.export-skipped ul {
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.export-skipped li {
+  margin: 2px 0;
+}
