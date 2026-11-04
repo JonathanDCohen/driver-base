@@ -13,7 +13,7 @@
   --surface-hover: #dde3e6;
   --border: #cfd8dc;
   --text: #263238;
-  --text-muted: #616161;
+  --text-muted: #616161b5;
   --text-faint: #b0bec5;
   --link: #00695c;
   --shadow: rgba(0, 0, 0, 0.08);
@@ -33,7 +33,7 @@ html[data-theme="dark"] {
   --surface-hover: #303842;
   --border: #37414a;
   --text: #eceff1;
-  --text-muted: #90a4ae;
+  --text-muted: #90a4aeb5;
   --text-faint: #607d8b;
   --link: #4db6ac;
   --shadow: rgba(0, 0, 0, 0.4);

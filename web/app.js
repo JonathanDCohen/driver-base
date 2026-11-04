@@ -1008,6 +1008,11 @@ function app() {
         const link = u
           ? `<a href="${u}" target="_blank" rel="noopener">${v}</a>`
           : v;
+        const z = d.impedance_nominal_ohm;
+        const zTag =
+          typeof z === "number" && Number.isFinite(z)
+            ? ` <span style="color: var(--text-muted)">${Number(z)}Ω</span>`
+            : "";
         // Hover-reveal export icon. Visibility handled by CSS via tr.row-hover
         // and tr:hover (fallback for fast cursors). Delegated click handler
         // is attached on the fixed-table tbody.
@@ -1015,7 +1020,7 @@ function app() {
           `<button type="button" class="row-export-btn" data-cid="${d.canonical_id}"` +
           ` title="Export Driver" aria-label="Export Driver">` +
           `<i class="material-icons" aria-hidden="true">file_download</i></button>`;
-        return `${link}${icon}`;
+        return `${link}${zTag}${icon}`;
       }
       // All other columns share a common tail: format the value, then append
       // the spec-source dagger (if any) uniformly. Prior versions returned
