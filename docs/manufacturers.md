@@ -23,10 +23,11 @@ The selectors below are the ones the validator's script actually used. Substitut
 | SB Acoustics | sbacoustics.com | `product-sitemap.xml` (231 URLs) | static HTML | unadorned `<ul>` of `<li>label value</li>` | ~200 (18 kits + 13 passive radiators excluded) | Sensitivity is `2.83V/1m`; `Linear coil travel` reported peak-to-peak → xmax halved & tagged DERIVED; coax pages ship two spec `<ul>`s (LF + HF); nominal size derived from URL slug |
 | Monacor | monacor.com | 9 category pages under `/products/components/speaker-technology/` with `?page=N` (silent wrap) | static HTML | `<tr class="spec">` with `td.spec-name` + `td.spec-value` | ~240 (Celestion-branded resells excluded) | Trailing hyphen on every category slug is required; `Force factor (BxL)` variant; `Peak music power output (MAX)` = peak; sensitivity 1W/1m; `dep. on horn` → null |
 | Peerless | products.peerless-audio.com | JSON API `/api/drivers?page=N` (paginated) | JSON API `/api/driver/{id}` | JSON-native (no HTML/PDF) | ~94 (109 total minus Preliminary/Prototype/out-of-scope types) | First pure-JSON scraper — no HTML; `PowerLF/PowerUF` are Hz not W (trap); publishes both `SensZ` (measured at TestVolt/1m) and `SensRe` (1W/1m Re-corrected) |
+| Ciare | ciare.com | 1 category page (full catalog embedded as inline JSON) | per-product detail page (Remix route `/products/:preview?/:category/:inches/:ohms/:code`) | `variants[].params.<key>.computedValue` + `variants[].lfSpecs/hfSpecs/shippingMounting` | ~160 (148 products × up to 2 variants) | Catalog view publishes only a stripped subset — the detail page is the T/S source of truth; sensitivity measured at 2.83V (labelled misleadingly as 1W/1m in page header) |
 
-**Deferred:** La Voce (site unreachable — see `memory/la-voce-parked.md` and the "Deferred" section below).
+**Deferred:** La Voce (SiteGround PoW captcha gates non-browser clients — see `memory/la-voce-parked.md` and the "Deferred" section below). A Playwright-based LaVoce scraper lives on the `lavoce-playwright-fallback` branch.
 
-**Total v1 records estimate:** ~2,200 across the 12 in-scope manufacturers (each impedance variant is a separate record per the ID scheme).
+**Total v1 records estimate:** ~2,360 across the 13 in-scope manufacturers (each impedance variant is a separate record per the ID scheme).
 
 ---
 
@@ -780,25 +781,71 @@ Records typed `Headphone` or `Micro` are silently dropped. No `GUITAR_BASS` type
 
 ---
 
+## Ciare (`ciare`)
+
+**Homepage:** https://ciare.com (Italy; custom CMS with Algolia + Remix SPA shell). `robots.txt` not published; `sitemap.xml` self-redirects to `/en`. Products are organized under `/en/products/{category}/` (five categories: `lf-driver`, `hf-driver`, `tweeter`, `coaxial`, `fullrange-driver`).
+
+**Enumeration.** Every category listing page ships the FULL catalog embedded as inline JSON; the SPA filters client-side by `category._id`. One fetch of ANY category URL gives us every product's name, inches, and first-variant impedance — enough to build per-product detail URLs matching the SPA's Remix route `/products/:preview?/:category/:inches/:ohms/:code`.
+
+**Why per-product detail fetches.** The catalog view publishes only a stripped subset of each product (impedance, continuous power, sensitivity, VC diameter, nominal size). The detail-page JSON carries `variants[].params` with the full Thiele–Small block (Fs, Qts, Qes, Qms, Vas, Sd, Mms, Bl, Le, Xmax, η₀, EBP) and `variants[].shippingMounting` with physical/mounting dimensions. Fetching 148 detail pages (one per model) for the T/S data is well worth the ~2.5 min wall time.
+
+**Sample product page:** https://ciare.com/en/products/lf-driver/18/4/NDH18-4S (18″ pro LF, dual-impedance 8Ω/4Ω).
+
+**Extraction.** Walk every `"name":"<MODEL>","archived":...` marker in the detail page HTML via balanced-brace scan, find the one matching the URL's trailing path segment, iterate its `variants[]` array. Each variant has `lfSpecs`, `hfSpecs`, `generalSpecs`, `params`, `shippingMounting`, `design` dicts; each individual spec is `{computedValue, label, notes, units, value, values}` — parse `computedValue` with the shared unit parsers (`parse_impedance("8 Ω") → 8.0`, `parse_sd_cm2("1164 cm² (180.42 in²)") → 1164.0`, `parse_liters("239 dm³ (8.44 ft³)") → 239.0`).
+
+**Spec coverage (2026-11-05 scrape, 148 products / ~160 variants):** 158 of 160 drivers carry Fs/Qts/Vas (the two outliers are consumer-only models); every record carries impedance, AES+program power, sensitivity, voice-coil diameter, nominal size, magnet type.
+
+**Sample data (`NDH18-4S`, 18″ pro LF, 8Ω variant):**
+- Fs 31 Hz, Qts 0.32, Qes 0.33, Qms 9.8, Vas 239 L, Sd 1164 cm², Mms 212 g, Bl 27.7 Tm, Le 1.9 mH, Re 6.1 Ω, η₀ 2.1 %, EBP 94 Hz, Xmax 11.5 mm.
+- Nominal 8Ω, AES 1000W, Program 2000W, Sensitivity 96.5 dB (2.83V/1m), VC 100mm.
+- Mounting: Overall 388mm, Cutout 354mm, Depth 208mm, Weight 8kg.
+
+**Field mapping (Ciare → Driver):**
+- `variants[i].nominalImpedance` (variant-level) → `impedance_nominal_ohm`.
+- `lfSpecs.nominalPowerHandling` → `power_aes_watts`; `lfSpecs.continuousPowerHandling` → `power_program_watts`. Ciare's own tooltip says "Program Power is defined as 3 dB greater than the Nominal rating" — so nominal IS the AES and continuous IS the program (2× AES per convention).
+- `lfSpecs.sensitivity` → `sensitivity_db_2_83v_1m`. The in-page tooltip says "measured ... when connected to 2,83V sine wave test signal" despite the misleading "1W/1m" heading. Framework derives the 1W/1m slot for us.
+- `lfSpecs.frequencyRange` parses via shared `parse_range`. Ciare occasionally ships `"700 Hz - 700 Hz"` zero-bandwidth placeholders; `_apply_section` drops the range (setting both endpoints to null) rather than emit a 0-bandwidth record that fails the consistency gate.
+- `params.*` → canonical T/S fields via `_PARAMS_MAP` (fs, re, qes, qms, qts, vas, sd, etaZero, xmax, xvar, mms, bl, le, cms, ebp).
+- `shippingMounting.overallDiameter` → `overall_diameter_mm`; `baffleCutoutDiameter` → `mounting_diameter_mm`; `depth` → `depth_mm`; `netWeight` → `net_weight_kg`.
+- Top-level `inches` → `nominal_size_mm` via `* 25.4` (always populated; `lfSpecs.nominalDiameter` on the detail page overrides when present).
+- Top-level `neodymium` boolean → `magnet_type` (NEODYMIUM/CERAMIC). Ciare rarely publishes a per-product `magnetMaterial` string.
+- Construction strings: `windingMaterial`, `formerMaterial`, `diaphragmMaterial` (HF/tweeter only).
+
+**DriverKind mapping (from `category._id`):**
+```
+lf-driver          → LF_WOOFER
+hf-driver          → HF_COMPRESSION
+tweeter            → TWEETER
+coaxial            → COAX
+fullrange-driver   → FULLRANGE
+```
+
+**Coax layout:** CX102 and similar 2-way drivers populate BOTH `lfSpecs` and `hfSpecs`. LF section fills generic fields; HF section fills `coax_hf_*` counterparts. `hfSpecs.diaphragmMaterial` additionally feeds the top-level `diaphragm_material` field (same pattern as SB Acoustics — the HF section IS the compression driver and there's no LF competitor for the diaphragm slot). HF sensitivity is dropped rather than slotted into `coax_hf_sensitivity_db_1w_1m` because Ciare measures at 2.83V and no 2.83V coax_hf slot exists.
+
+**Quirks:**
+- Detail pages embed ~3–4 copies of each related product's "wrappedProduct" shape. The parser matches ONLY the one whose `name` equals the URL's trailing path segment; related/connected products are discarded (they'd duplicate across detail pages).
+- `doubledNominalImpedance` on variants is a dual-voice-coil indicator (impedance is the parallel-wired value, half the series value). No direct Driver field — not surfaced in output today.
+- `archived` boolean on variants: skipped at parse (small subset; not in the main catalog).
+- Detail URLs use the FIRST variant's impedance in the path (`/lf-driver/18/4/NDH18-4S`); the SPA loads all variants from the same detail JSON regardless of which impedance is in the URL.
+
+**Recon count:** 148 products × up to 2 variants ≈ 160 fragments (2026-11-05 live). `expected_min_records = 100`.
+
+---
+
 ## Deferred
 
 ### La Voce (`lavoce`)
 
-**Status:** parked pending network fix. See `memory/la-voce-parked.md`.
+**Status:** parked pending browser-based captcha fallback. A full scraper, parse tests, and captured product fixtures live on the `lavoce-playwright-fallback` branch — the extraction pipeline against `div.lv--product-section-specifications` is validated end-to-end, and the sitemap enumerates 276 English products.
 
-**Blocker:** `lavocespeakers.com` (35.207.151.200) is unreachable from:
-- macOS (`nc` → EBADF errno=9; `curl` → ECONNREFUSED; `httpx` → EBADF)
-- Anthropic workflow subagent sandbox (same errors as above)
+**Blocker:** `lavocespeakers.com` is SiteGround-hosted and gates non-browser clients with a PoW captcha. Once an IP crosses some request threshold, every subsequent response is `HTTP 202` with header `sg-captcha: challenge` and body `<meta http-equiv="refresh" content="0;/.well-known/sgcaptcha/...">`; the challenge is a SHA-1 proof-of-work that a browser solves in JS to acquire a session cookie. httpx-only scraping can't solve the PoW.
 
-Both `lavocespeakers.com` and `www.lavoceitaliana.com` fail identically. Whether this is a temporary outage, a macOS-specific socket-layer quirk with this specific IP, or a persistent geoblock is undetermined as of 2026-08-22.
+`fetch.py` now classifies HTTP 202 as transient (never cache-written), so captcha garbage never poisons the cache even when the gate fires mid-run.
 
-**Recon completed against Wayback Machine snapshot** (`web.archive.org/web/20241004083609/lavocespeakers.com/single-product/?id=113`):
-- Specs live in `div.each_column_specifications` triples: `div.left_column_spec` (label) + `div.units_specifications` (unit) + `div.value_specifications` (value). 38 spec fields captured.
-- Model in `div.title_p` (not `h1`/`h2`/`h3`).
-- Product URL pattern: `https://lavocespeakers.com/single-product/?id={NNN}` with IDs 1-229.
-- Catalog ~177 products (based on unique statuscode:200 CDX records).
-
-**When to resume.** Test reachability with `nc -zv -w 5 lavocespeakers.com 443` and `curl -sSI https://lavocespeakers.com/`. If reachable, port the Wayback-validated schema straight into a `LaVoceScraper` subclass — the extraction (`div.each_column_specifications` triples, model in `div.title_p`) is already verified.
+**When to resume.** Merge `lavoce-playwright-fallback` after adding a Playwright-based fetcher that can solve SG's PoW. The scraper itself is complete — only the fetch layer needs the fallback. Verify the gate is still active with:
+```
+curl -sSI https://lavocespeakers.com/products-sitemap.xml  # look for 'HTTP/2 202' + 'sg-captcha: challenge'
+```
 
 ---
 

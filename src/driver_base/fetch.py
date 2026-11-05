@@ -28,7 +28,11 @@ from driver_base.interface import FetchError, RawArtifact, SeedRef
 from driver_base.rate_limiter import HostRateLimiter
 
 DEFAULT_USER_AGENT = "driver-base/0.1 (+contact: jon@joncohen.dev)"
-_TRANSIENT_STATUSES = frozenset({408, 425, 429, 500, 502, 503, 504})
+# HTTP 202 Accepted on a GET is semantically "come back later" — SiteGround
+# serves it alongside `sg-captcha: challenge` when it fingers a client for a
+# PoW captcha (seen on lavocespeakers.com). Treat as transient so the garbage
+# body (meta-refresh to `/.well-known/sgcaptcha/`) never poisons the cache.
+_TRANSIENT_STATUSES = frozenset({202, 408, 425, 429, 500, 502, 503, 504})
 _PERMANENT_STATUSES = frozenset({400, 401, 403, 404, 405, 406, 410, 451})
 _BACKOFF_SCHEDULE = (1.0, 3.0, 9.0)  # seconds; length = max retry attempts
 
@@ -113,7 +117,9 @@ class HttpxFetcher:
 
             status = resp.status_code
 
-            if 200 <= status < 300:
+            # Narrow success to real content codes. 202 falls through into the
+            # transient classifier above (see `_TRANSIENT_STATUSES`).
+            if 200 <= status < 300 and status != 202:
                 body = resp.content
                 artifact = RawArtifact(
                     url=str(resp.request.url),
