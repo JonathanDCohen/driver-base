@@ -1,5 +1,13 @@
 # Manufacturer scraping strategy (v1)
 
+<!--
+  2026-11-05: LaVoce and Ciare added as the 13th and 14th scrapers. LaVoce
+  schema was re-reconned against the live site (the Wayback schema in the
+  original "Deferred" section is obsolete — LaVoce redesigned to WordPress
+  slug URLs since). Ciare's recon discovered that every category page ships
+  the full catalog as inline JSON, so one fetch suffices for the whole brand.
+-->
+
 ## How this was arrived at
 
 Every claim below (URL patterns, extraction selectors, T/S values, catalog counts) came out of an empirical validation loop, not manufacturer marketing pages. Sonnet agents produced an initial recon per manufacturer (WebFetch a starting URL, propose an extraction strategy, capture sample T/S values from one product), then a second agent per manufacturer wrote and ran a throwaway Python script via `uv run --with httpx --with beautifulsoup4 --with lxml` that fetched the same page and applied the proposed extraction, comparing the extracted values to the recon's claims. If any numerical value disagreed by more than ±5 % OR the extraction returned an empty dict, the loop iterated with a refinement prompt. **9 of 10 manufacturers converged on iteration 1 with 0.00 % delta on sampled T/S values.** Faital Pro and La Voce each needed 2 iterations. Full workflow output lives at `/private/tmp/claude-501/-Users-jonathancohen-src-driver-base/f8a49839-7228-4a1a-8498-660f9a6beff4/tasks/w072etvbx.output` (regeneratable if pruned).
@@ -23,10 +31,10 @@ The selectors below are the ones the validator's script actually used. Substitut
 | SB Acoustics | sbacoustics.com | `product-sitemap.xml` (231 URLs) | static HTML | unadorned `<ul>` of `<li>label value</li>` | ~200 (18 kits + 13 passive radiators excluded) | Sensitivity is `2.83V/1m`; `Linear coil travel` reported peak-to-peak → xmax halved & tagged DERIVED; coax pages ship two spec `<ul>`s (LF + HF); nominal size derived from URL slug |
 | Monacor | monacor.com | 9 category pages under `/products/components/speaker-technology/` with `?page=N` (silent wrap) | static HTML | `<tr class="spec">` with `td.spec-name` + `td.spec-value` | ~240 (Celestion-branded resells excluded) | Trailing hyphen on every category slug is required; `Force factor (BxL)` variant; `Peak music power output (MAX)` = peak; sensitivity 1W/1m; `dep. on horn` → null |
 | Peerless | products.peerless-audio.com | JSON API `/api/drivers?page=N` (paginated) | JSON API `/api/driver/{id}` | JSON-native (no HTML/PDF) | ~94 (109 total minus Preliminary/Prototype/out-of-scope types) | First pure-JSON scraper — no HTML; `PowerLF/PowerUF` are Hz not W (trap); publishes both `SensZ` (measured at TestVolt/1m) and `SensRe` (1W/1m Re-corrected) |
+| LaVoce | lavocespeakers.com | `products-sitemap.xml` (276 English product URLs) | static HTML | `div.lv--product-section-specifications` → `div.row` pairs (label `col-6` + value `span.lv--fw-bold`) | ~276 | SiteGround `sg-captcha` 202 on non-browser clients (fetch layer treats 202 transient so cache stays clean); 2-way coax freq range writes `70 ÷ 22kHz` where left is Hz and right is kHz |
+| Ciare | ciare.com | 1 category page (full catalog embedded as inline JSON) | same URL (cache-served) | `variants[].lfSpecs/hfSpecs.<spec>.computedValue` string | ~160 (148 products × up to 2 variants) | Every category page returns the same blob; no T/S parameters on any product; sensitivity measured at 2.83V (labelled misleadingly as 1W/1m in page header) |
 
-**Deferred:** La Voce (site unreachable — see `memory/la-voce-parked.md` and the "Deferred" section below).
-
-**Total v1 records estimate:** ~2,200 across the 12 in-scope manufacturers (each impedance variant is a separate record per the ID scheme).
+**Total v1 records estimate:** ~2,600 across the 14 in-scope manufacturers (each impedance variant is a separate record per the ID scheme). LaVoce output depends on getting past the SG captcha gate.
 
 ---
 
@@ -780,25 +788,113 @@ Records typed `Headphone` or `Micro` are silently dropped. No `GUITAR_BASS` type
 
 ---
 
+## LaVoce (`lavoce`)
+
+**Homepage:** https://lavocespeakers.com (Italy; WordPress + custom theme, SiteGround-hosted). `robots.txt` is open (`Disallow:`). All-in-One SEO publishes a canonical product sitemap at `/products-sitemap.xml`.
+
+**Enumeration.** Parse `products-sitemap.xml`; filter to English-locale product URLs (`^https://lavocespeakers.com/product/[^/]+/$`). Non-English locales (`/zh/产品/*`) are listed alongside and are dropped at enumeration. **276 product URLs** (2026-11-05 capture). The Wayback-era `/single-product/?id=NNN` numeric scheme is gone; the site now uses WordPress slug paths.
+
+**Sample product page:** https://lavocespeakers.com/product/icf061-00/ (ICF061.00, weather-resistant coaxial).
+
+**Extraction.** Specs live in `div.lv--product-section-specifications`. Each spec is a Bootstrap grid `div.row` with two `div.col-6` children — the first is the label, the second holds `span.lv--fw-bold` with the value, followed by zero or more `span.lv--product-unit` unit spans. Section headers are `h3.text-uppercase` ("General Specifications", "Small Signal Parameters"); both sections use the same row shape so one selector captures everything.
+
+**Sample data (`WSN122.50-16`, 12″ neodymium LF transducer, 16Ω):**
+- Fs 53 Hz, Qts 0.4, Qes 0.45, Qms 3.88, Vas 65.84 l, Sd 531 cm², Xmax 4.6 mm, Xmech 8.7 mm, Mms 54.7 g, BxL 23.03 N/A, Le 1.4 mH @ 1 kHz, Re 13.1 Ω, EBP 118 Hz, η₀ 2.09 %, Cms 0.165 mm/N
+- Vd 1.6 l, Recommended Enclosure 39.6 l, Recommended Tuning 55 Hz
+- Nominal 16Ω / Min 14.2Ω, AES 250W, Program 500W, Sensitivity 96.5 dB, Range 50–3000 Hz
+- VC 65mm neodymium, Copper winding, Glass Fiber former, Polycotton surround
+
+**Field mapping (LaVoce → Driver):**
+- `AES Power Rating` → `power_aes_watts`
+- `Program Power` → `power_program_watts` (LaVoce's Program is 2× AES per AES convention)
+- `Sensitivity` → `sensitivity_db_1w_1m` (unlabelled numeric; tooltip reads "measured with Klippel DA LPM module" — European pro-audio default is 1W/1m).
+- `Frequency Range` uses `÷` as the separator. Most ranges are same-unit (e.g. `500÷18000Hz`), but 2-way coax entries write `70 ÷ 22kHz` where **the left endpoint is in Hz and the right in kHz**. `scrapers/lavoce.py::_parse_frequency_range` detects the kHz tail and swaps units when the same-unit interpretation would yield `low > high`.
+- `Force Factor` / `Force Factor (BxL)` → `bl_tm` (values in `N/A` = N per Ampere = T·m).
+- `Driver Displacement Volume` → `vd_liters` (scraped directly; framework `derived.py` fills if missing).
+- `Recommended Enclosure` → `recommended_enclosure_volume_liters`.
+- `Xmax` / `Xmech` → `xmax_mm` / `xmech_mm` stored **as-reported** (both one-way on LaVoce — empirical: Xmech/Xmax clusters at ~2× across the LF catalog, which is only physical if both are one-way). The consistency gate `xmech ≥ 1.9*xmax` will REJECT any legit-looking record; see `_XMECH_ONE_WAY_MANUFACTURERS` in `consistency.py` if this needs bypassing like Faital.
+- Construction strings: `Coil Material` → `winding_material`, `Former Material` → `former_material`, `Surround Material` → `surround_material`. `Magnet Material` normalizes to `MagnetType` via `magnets.py`.
+- `Gap Height`, `Voice Coil Winding Height`, `Magnet Dimensions OD X ID X H`, `Chassis Material`, `Cone Material`, `Recommended Tuning` have no schema slot and are dropped.
+
+**DriverKind classification.** LaVoce product URLs carry no category hint (`/product/{slug}/` is flat). Each product page's `<script type="application/ld+json">` ships a `BreadcrumbList` whose penultimate item is the collection name — e.g. `"Pro Audio" → "Weather Resistant Coaxials" → "ICF061.00"`. Match substrings (longer-wins order) against `_COLLECTION_TO_KIND`:
+```
+weather resistant coaxials      → COAX
+coaxials / coaxial              → COAX
+hf compression drivers          → HF_COMPRESSION
+compression drivers             → HF_COMPRESSION
+lf transducers                  → LF_WOOFER
+low frequency transducers       → LF_WOOFER
+bass speakers                   → LF_WOOFER
+lead guitar speakers            → GUITAR_BASS
+guitar speakers                 → GUITAR_BASS
+small size fullranges           → FULLRANGE
+soft dome tweeters              → TWEETER
+dome tweeters / tweeters        → TWEETER
+horns                           → HORN
+```
+
+**Quirks:**
+- **SiteGround `sg-captcha: challenge` on HTTP 202.** LaVoce's host fingers non-browser clients for a PoW captcha after some number of requests from the same IP — returns `HTTP 202` with a meta-refresh body to `/.well-known/sgcaptcha/`. The challenge is a SHA-1 PoW that the shared httpx fetcher can't solve. `fetch.py` now treats status 202 as transient (never cached) so garbage doesn't poison the cache; a captcha-gated run exhausts retries and the scraper preserves prior. Workarounds if this becomes blocking: slower cadence per-host, Playwright pool with real UA, or egress through a non-fingered IP.
+- Values are concatenated in one text run (`"165mm(6.5in)"`). The shared unit parsers handle this shape — don't be tempted to split on the trailing `span.lv--product-unit` siblings.
+- H1 contains the publishable model string with periods and dashes preserved (`WSN122.50-16`, `DF20.30T-16`, `ICF061.00`). `<title>` has a `- LAVOCE` suffix the scraper strips.
+
+**Recon count:** 276 English products in sitemap (2026-11-05). `expected_min_records = 150` (conservative pending first successful live run past SG captcha).
+
+---
+
+## Ciare (`ciare`)
+
+**Homepage:** https://ciare.com (Italy; custom CMS with Algolia + Next-style SPA shell). `robots.txt` not published; `sitemap.xml` self-redirects to `/en`. Products are organized under `/en/products/{category}/` (five categories: `lf-driver`, `hf-driver`, `tweeter`, `coaxial`, `fullrange-driver`).
+
+**Enumeration.** Every category listing page ships with the **FULL catalog** embedded as inline JSON on the server-rendered HTML; the SPA's job is to filter client-side by `category._id`. One fetch of ANY category URL yields all ~148 products (29 tweeters + 3 HF drivers + 97 LF drivers + 8 fullrange + 11 coax as of 2026-11-05).
+
+Pipeline shape: `discover_seeds` returns one category URL. `enumerate` yields that same URL as the sole product URL (cache-served on the second fetch — one real network hit per run). `parse_artifact` mines every product object from the inline JSON blob and emits one `DriverFragment` per (product × variant).
+
+**Sample product page:** https://ciare.com/en/products/lf-driver/HW210 (8″ consumer LF).
+
+**Extraction.** Walk every `"name":"<MODEL>","archived":...` occurrence in the HTML, capture the enclosing JSON object via balanced-brace scan. Each product carries `variants[]` where each variant has `lfSpecs`, `hfSpecs`, `generalSpecs`, `shippingMounting`, `design` dicts. Each individual spec is `{computedValue, label, notes, units, value, values}` — parse `computedValue` with the shared unit parsers (`parse_impedance("8 Ω") → 8.0`, `parse_power("450 W") → 450.0`).
+
+**Spec coverage (empirical across 148 products):**
+- Always present: impedance (variant-level), continuous power handling, sensitivity, voice-coil diameter, basket material, inches (nominal size).
+- Usually present: frequency range (119/148), winding material (35/148 LF), former material (122/148 LF).
+- **Never published on any Ciare product: T/S parameters** (Fs/Qts/Vas/Sd/Mms/Bl/Le/Re/Xmax). `missing_ts_for_expected_kind` WARN fires on every LF_WOOFER/FULLRANGE/COAX record but the gate keeps the record.
+
+**Sample data (`CSW7015EVO`, 15″ SPL subwoofer, 2Ω dual-VC):**
+- Nominal 2Ω, Continuous 3000W, Sensitivity 92.6 dB (2.83V/1m), Range 25–200 Hz, VC 75mm aluminum flat-wound on aluminum former, basket Aluminum, inches=15 → 381mm size.
+
+**Field mapping (Ciare → Driver):**
+- Variant-level `nominalImpedance` → `impedance_nominal_ohm` (authoritative, even when `lfSpecs.nominalImpedance` is populated).
+- `lfSpecs.continuousPowerHandling` → `power_aes_watts`. Ciare's notes read "Program Power is defined as 3 dB greater than the Nominal rating" — their published "Continuous" IS the AES-equivalent nominal rating. Framework's `derive_missing_power` then fills `power_program_watts` = 2× AES.
+- `lfSpecs.sensitivity` → `sensitivity_db_2_83v_1m`. The in-page tooltip says "measured ... when connected to 2,83V sine wave test signal" despite the misleading "1W/1m" heading in the note's first line. For 4Ω drivers (CMI160) this is 3 dB higher than the 1W/1m value the framework derives via `derive_missing_sensitivity`.
+- `lfSpecs.frequencyRange` parses via shared `parse_range`. Ciare occasionally ships `"700 Hz - 700 Hz"` zero-bandwidth placeholders; the scraper drops the range (setting both endpoints to null) rather than emit a 0-bandwidth record that would fail the consistency gate.
+- `lfSpecs.voiceCoilDiameter` → `voice_coil_diameter_mm` (parse metric from `"50 mm (2 in)"`).
+- Top-level `inches` → `nominal_size_mm` (always populated: `inches * 25.4`).
+- Top-level `neodymium` boolean → `magnet_type` (`True` → NEODYMIUM, `False` → CERAMIC). No per-product `magnetMaterial` string is published.
+- Construction strings: `windingMaterial`, `formerMaterial`, `diaphragmMaterial` (HF/tweeter only).
+
+**DriverKind mapping (from `category._id`):**
+```
+lf-driver          → LF_WOOFER
+hf-driver          → HF_COMPRESSION
+tweeter            → TWEETER
+coaxial            → COAX
+fullrange-driver   → FULLRANGE
+```
+
+**Coax layout:** CX102 and related 2-way drivers populate BOTH `lfSpecs` and `hfSpecs`. LF section fills generic fields; HF section fills `coax_hf_*` counterparts. `hfSpecs.diaphragmMaterial` additionally feeds the top-level `diaphragm_material` field (same pattern as SB Acoustics — the HF section IS the compression driver and there's no LF competitor for the diaphragm slot). HF sensitivity is dropped rather than slotted into `coax_hf_sensitivity_db_1w_1m` because Ciare measures at 2.83V and no 2.83V coax_hf slot exists.
+
+**Quirks:**
+- Every category page returns the same 1.8MB HTML blob. One network fetch covers the entire catalog; the enumerate→parse flow re-uses the cached body for the "product fetch" round.
+- `doubledNominalImpedance` on variants: a dual-voice-coil indicator (impedance is the parallel-wired value, half the series value). No direct Driver field — not surfaced in output today.
+- `archived` boolean on variants: skipped at parse (small subset; not in the main catalog).
+
+**Recon count:** 148 products × up to 2 variants ≈ 160 fragments (2026-11-05 live). `expected_min_records = 100`.
+
+---
+
 ## Deferred
 
-### La Voce (`lavoce`)
-
-**Status:** parked pending network fix. See `memory/la-voce-parked.md`.
-
-**Blocker:** `lavocespeakers.com` (35.207.151.200) is unreachable from:
-- macOS (`nc` → EBADF errno=9; `curl` → ECONNREFUSED; `httpx` → EBADF)
-- Anthropic workflow subagent sandbox (same errors as above)
-
-Both `lavocespeakers.com` and `www.lavoceitaliana.com` fail identically. Whether this is a temporary outage, a macOS-specific socket-layer quirk with this specific IP, or a persistent geoblock is undetermined as of 2026-08-22.
-
-**Recon completed against Wayback Machine snapshot** (`web.archive.org/web/20241004083609/lavocespeakers.com/single-product/?id=113`):
-- Specs live in `div.each_column_specifications` triples: `div.left_column_spec` (label) + `div.units_specifications` (unit) + `div.value_specifications` (value). 38 spec fields captured.
-- Model in `div.title_p` (not `h1`/`h2`/`h3`).
-- Product URL pattern: `https://lavocespeakers.com/single-product/?id={NNN}` with IDs 1-229.
-- Catalog ~177 products (based on unique statuscode:200 CDX records).
-
-**When to resume.** Test reachability with `nc -zv -w 5 lavocespeakers.com 443` and `curl -sSI https://lavocespeakers.com/`. If reachable, port the Wayback-validated schema straight into a `LaVoceScraper` subclass — the extraction (`div.each_column_specifications` triples, model in `div.title_p`) is already verified.
+_(none as of 2026-11-05 — LaVoce landed above)_
 
 ---
 

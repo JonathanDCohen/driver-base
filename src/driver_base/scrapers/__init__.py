@@ -25,12 +25,14 @@ def instantiate_all() -> list[Scraper]:
     from driver_base.scrapers import bcspeakers  # noqa: F401
     from driver_base.scrapers import beyma  # noqa: F401
     from driver_base.scrapers import celestion  # noqa: F401
+    from driver_base.scrapers import ciare  # noqa: F401
     from driver_base.scrapers import dayton  # noqa: F401
     from driver_base.scrapers import eighteensound  # noqa: F401
     from driver_base.scrapers import eminence  # noqa: F401
     from driver_base.scrapers import faital  # noqa: F401
     from driver_base.scrapers import hoqs  # noqa: F401
     from driver_base.scrapers import jensen  # noqa: F401
+    from driver_base.scrapers import lavoce  # noqa: F401
     from driver_base.scrapers import monacor  # noqa: F401
     from driver_base.scrapers import peerless  # noqa: F401
     from driver_base.scrapers import rcf  # noqa: F401

@@ -29,7 +29,9 @@ class RejectedDriver:
 # (both are then in the same units, and Xdamage typically sits 1.5–2× Xmax — well
 # under 1.9). Skip the gate for these manufacturers. This is an ASSUMPTION we're
 # tracking — see docs/tasks.md "surface per-manufacturer assumptions".
-_XMECH_ONE_WAY_MANUFACTURERS: frozenset[str] = frozenset({"Faital Pro", "Peerless"})
+_XMECH_ONE_WAY_MANUFACTURERS: frozenset[str] = frozenset(
+    {"Faital Pro", "Peerless", "LaVoce"}
+)
 
 
 _MIN_BANDWIDTH_HZ: dict[DriverKind, float] = {
