@@ -56,7 +56,7 @@ EOF
 
 ---
 
-## Framework gaps surfaced by SB Acoustics / Monacor / Peerless
+## Framework gaps surfaced by SB Acoustics / Monacor / Peerless / SB Audience
 
 **Added:** 2026-09-01 (during SB/Monacor/Peerless scraper landing)
 
@@ -68,7 +68,8 @@ a downstream feature does.
   it on every driver. Currently ignored. Would compose with `magnet_type` and
   `flux_density_t` for motor-strength approximations.
 - **`voice_coil_winding_height_mm`, `magnetic_gap_height_mm`** — SB Acoustics
-  publishes both; useful for excursion/BL derating math (Xmax = (VC winding −
+  and SB Audience (`Winding Depth` / `Magnetic Gap Depth`, parsed but not
+  stored) publish both; useful for excursion/BL derating math (Xmax = (VC winding −
   gap) / 2). Would enable one more consistency check.
 - **`ean` / `gtin`** — Monacor publishes 13-digit GTINs on every product.
   Useful for retailer cross-linking in v2 (Parts Express carries some Monacor
@@ -77,6 +78,14 @@ a downstream feature does.
   exists, but SB Acoustics coax HF sections publish at 2.83V/1m. Currently
   left null to avoid mis-slotting. Add `coax_hf_sensitivity_db_2_83v_1m`
   or a per-manufacturer conversion pass if this data becomes load-bearing.
+- **Coax HF program power slot** — SB Audience coax sheets publish an HF
+  `Maximum Power Handling` defined as AES + 3 dB (program-class). The only
+  HF power slots are AES / long-term / peak, so it's dropped rather than
+  mis-slotted into `coax_hf_power_peak_watts`. (Added 2026-11-06.)
+- **Shared PDF table primitives** — SB Audience is the first PDF scraper; its
+  glyph→word→row→label-anchored-cell extraction (pypdfium2) lives in
+  `scrapers/sbaudience.py`. Promote it to the `parsers/pdf.py` that
+  `framework.md` sketches when a second PDF scraper lands. (Added 2026-11-06.)
 - **`SpecSource.JSON_API` provenance for API-only data** — Peerless is the
   first scraper whose entire spec set comes from a JSON body (not HTML). The
   enum already covers it; `manufacturers.md` documents the pattern; but the

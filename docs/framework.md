@@ -137,6 +137,9 @@ class SeedContext:
     parent_model: Optional[str] = None
     parent_impedance_ohm: Optional[float] = None
     parent_driver_kind: Optional[DriverKind] = None
+    # Human-facing page the followup came from; used as the fragment's source_url
+    # when the specs live in a linked document (SB Audience datasheet PDFs)
+    parent_source_url: Optional[str] = None
 
 @dataclass(frozen=True)
 class SeedRef:
@@ -783,6 +786,7 @@ Fixtures are real bytes captured via `tools/capture_fixtures.py --scraper NAME`.
 3. Write `tests/test_parse_{name}.py` with at least one fixture per `DriverKind` the scraper handles.
 4. Add the manufacturer's entry to `docs/manufacturers.md`.
 5. `uv run pytest tests/test_parse_{name}.py -v` — must pass before merge.
+6. Regenerate `web/drivers.json` and verify the new records against fresh reads of the live site with the `verify-scrape` project skill (`.claude/skills/verify-scrape/`, comparer `tools/verify_scrape.py`).
 
 CI runs `uv run pytest tests/ --ignore=tests/integration` on every PR. Integration tests under `tests/integration/` are marked `@pytest.mark.slow` and only run nightly.
 

@@ -36,5 +36,6 @@ def instantiate_all() -> list[Scraper]:
     from driver_base.scrapers import peerless  # noqa: F401
     from driver_base.scrapers import rcf  # noqa: F401
     from driver_base.scrapers import sbacoustics  # noqa: F401
+    from driver_base.scrapers import sbaudience  # noqa: F401
 
     return [cls() for cls in SCRAPERS.values()]

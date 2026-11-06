@@ -378,11 +378,18 @@ async def _run_parse_phase(
         _tally_fetches(f_arts, fetch_stats)
         new_pending: list[SeedRef] = []
         for r in f_arts:
+            # Recorded like first-round drops: for two-phase scrapers (SB
+            # Audience: product page → datasheet PDF) the followup IS the
+            # spec fetch, and a silent skip just shrinks the record count.
             if not isinstance(r, RawArtifact):
+                dropped_dbg.append({"url": r.url, "reason": r.reason, "kind": r.kind})
                 continue
             try:
                 res = scraper.parse_artifact(r, f_ctx_map.get(r.url, SeedContext()))
-            except Exception:
+            except Exception as e:
+                dropped_dbg.append(
+                    {"url": r.url, "reason": f"parse_exception:{type(e).__name__}:{e}"}
+                )
                 continue
             fragments.extend(res.fragments)
             new_pending.extend(res.followups)

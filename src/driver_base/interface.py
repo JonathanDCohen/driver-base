@@ -51,6 +51,10 @@ class SeedContext:
     parent_model: Optional[str] = None
     parent_impedance_ohm: Optional[float] = None
     parent_driver_kind: Optional[DriverKind] = None
+    # Human-facing page the followup was discovered on. Scrapers whose specs
+    # live in a linked document (SB Audience datasheet PDFs) set this so the
+    # fragment's source_url points at the product page, not a download link.
+    parent_source_url: Optional[str] = None
 
 
 @dataclass(frozen=True)

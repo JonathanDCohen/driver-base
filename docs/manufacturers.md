@@ -4,6 +4,8 @@
 
 Every claim below (URL patterns, extraction selectors, T/S values, catalog counts) came out of an empirical validation loop, not manufacturer marketing pages. Sonnet agents produced an initial recon per manufacturer (WebFetch a starting URL, propose an extraction strategy, capture sample T/S values from one product), then a second agent per manufacturer wrote and ran a throwaway Python script via `uv run --with httpx --with beautifulsoup4 --with lxml` that fetched the same page and applied the proposed extraction, comparing the extracted values to the recon's claims. If any numerical value disagreed by more than ±5 % OR the extraction returned an empty dict, the loop iterated with a refinement prompt. **9 of 10 manufacturers converged on iteration 1 with 0.00 % delta on sampled T/S values.** Faital Pro and La Voce each needed 2 iterations. Full workflow output lives at `/private/tmp/claude-501/-Users-jonathancohen-src-driver-base/f8a49839-7228-4a1a-8498-660f9a6beff4/tasks/w072etvbx.output` (regeneratable if pruned).
 
+**Re-verifying against the live site:** use the `verify-scrape` project skill (`.claude/skills/verify-scrape/SKILL.md`). Blind transcribers read the live pages, and `tools/verify_scrape.py` diffs them against `web/drivers.json`.
+
 The selectors below are the ones the validator's script actually used. Substituting them into `parse_artifact()` should Just Work; if you find a selector that doesn't, the recon should be considered stale.
 
 ## Coverage summary
@@ -23,11 +25,12 @@ The selectors below are the ones the validator's script actually used. Substitut
 | SB Acoustics | sbacoustics.com | `product-sitemap.xml` (231 URLs) | static HTML | unadorned `<ul>` of `<li>label value</li>` | ~200 (18 kits + 13 passive radiators excluded) | Sensitivity is `2.83V/1m`; `Linear coil travel` reported peak-to-peak → xmax halved & tagged DERIVED; coax pages ship two spec `<ul>`s (LF + HF); nominal size derived from URL slug |
 | Monacor | monacor.com | 9 category pages under `/products/components/speaker-technology/` with `?page=N` (silent wrap) | static HTML | `<tr class="spec">` with `td.spec-name` + `td.spec-value` | ~240 (Celestion-branded resells excluded) | Trailing hyphen on every category slug is required; `Force factor (BxL)` variant; `Peak music power output (MAX)` = peak; sensitivity 1W/1m; `dep. on horn` → null |
 | Peerless | products.peerless-audio.com | JSON API `/api/drivers?page=N` (paginated) | JSON API `/api/driver/{id}` | JSON-native (no HTML/PDF) | ~94 (109 total minus Preliminary/Prototype/out-of-scope types) | First pure-JSON scraper — no HTML; `PowerLF/PowerUF` are Hz not W (trap); publishes both `SensZ` (measured at TestVolt/1m) and `SensRe` (1W/1m Re-corrected) |
+| SB Audience | sbaudience.com | Superfish nav on `/index.php/products/` (64 product URLs, 6 categories; `horns` skipped) | product HTML has **no** specs → followup fetch of the linked datasheet PDF | one-page text PDF, label-anchored table cells via pypdfium2 glyph geometry | 60 | First PDF scraper. Sensitivity slotted by label (`1W/1m` vs `2.83V/1m`); `Maximum Power` (3 dB over AES) → program; `Xdamage` (p-p) → xmech; `source_url` is the product page, not the PDF |
 | Ciare | ciare.com | 1 category page (full catalog embedded as inline JSON) | per-product detail page (Remix route `/products/:preview?/:category/:inches/:ohms/:code`) | `variants[].params.<key>.computedValue` + `variants[].lfSpecs/hfSpecs/shippingMounting` | ~160 (148 products × up to 2 variants) | Catalog view publishes only a stripped subset — the detail page is the T/S source of truth; sensitivity measured at 2.83V (labelled misleadingly as 1W/1m in page header) |
 
 **Deferred:** La Voce (SiteGround PoW captcha gates non-browser clients — see `memory/la-voce-parked.md` and the "Deferred" section below). A Playwright-based LaVoce scraper lives on the `lavoce-playwright-fallback` branch.
 
-**Total v1 records estimate:** ~2,360 across the 13 in-scope manufacturers (each impedance variant is a separate record per the ID scheme).
+**Total v1 records estimate:** ~2,430 across the 15 in-scope manufacturers (each impedance variant is a separate record per the ID scheme).
 
 ---
 
@@ -829,6 +832,63 @@ fullrange-driver   → FULLRANGE
 - Detail URLs use the FIRST variant's impedance in the path (`/lf-driver/18/4/NDH18-4S`); the SPA loads all variants from the same detail JSON regardless of which impedance is in the URL.
 
 **Recon count:** 148 products × up to 2 variants ≈ 160 fragments (2026-11-05 live). `expected_min_records = 100`.
+
+---
+
+## SB Audience (`sbaudience`)
+
+**Homepage:** https://www.sbaudience.com (SB Acoustics' pro-audio sister brand; Concrete5 CMS, unrelated to sbacoustics.com's WooCommerce markup). `robots.txt` disallows only CMS internals (`/blocks`, `/concrete`, `/tools`, …). No `Crawl-delay`.
+
+**Enumeration.** Do not use `sitemap.xml`: it's stale and lists 2014 sbacoustics.com URLs. Instead, every page's superfish nav lists every product as `/index.php/products/{category}/{slug}/`. Seed is `/index.php/products/`. Categories (2026-11-06): `woofers` 24, `subwoofers` 14, `compression-drivers` 15, `open-baffle-drivers` 4, `coaxials` 3, `horns` 4. Horns are skipped at enumerate time, since the pipeline drops HORN anyway. Unknown categories are skipped rather than guessed.
+
+**Two-phase extraction.** The product HTML page has **no spec text**, just a spec JPG and `<a href="/index.php/download_file/-/view/{id}/">Click to download Datasheet</a>`.
+1. `parse_artifact(product page)` emits one followup for the PDF. It picks the anchor whose text says "Datasheet", because two pages also carry an empty-text link to an older revision. The followup carries the H1 model plus the product-page URL in `SeedContext.parent_source_url`, so the record's `source_url` (and the UI's model link) points at the product page, not a file download.
+2. `parse_artifact(PDF)` parses the datasheet into one `DriverFragment`.
+
+**Sample:** https://www.sbaudience.com/index.php/products/subwoofers/rosso-15sw800/ (ROSSO-15SW800, 15″ sub).
+
+**PDF layout.** Title line = model; subtitle = `15” - Subwoofer - 1600W - 99dB`. Then side-by-side tables:
+- **Standard:** `Dimensions & Weight` | `Specs` | `Thiele Small Parameters`.
+- **Compression drivers:** no T/S block.
+- **Coax:** the Specs table has `LF Unit` / `HF Unit` value sub-columns.
+- **Four sheets** (bianco-18sw450, rosso-18sw650, rosso-18sw750, rosso-15w400) render the column headers as images.
+
+Because of those four, cells are **anchored on row labels**, not headers. A chunk that starts with a known label (longest-prefix, word-boundary match, footnote `(n)` stripped) opens a cell. The chunks after it on the row are its values.
+
+**Text-layer quirks:**
+- The PDFs embed literal space glyphs mid-token (`0.23 m m/N`, `1 2.1 Tm`, `B I`). The parser drops whitespace glyphs and re-splits words by geometry: loose char boxes, gap > 1pt = word break, gap > 6pt = new cell. Rows are grouped by glyph baseline (±4pt).
+- Some sheets set a value a few points above or below its label (`Cone Surround`, `Phase Plug Design`). An empty cell adopts the nearest unclaimed "orphan" chunk from the adjacent row, provided it lies inside the cell's column.
+- Graph-axis text below the tables can match short labels like `Bl`. The first value wins, since the tables come first.
+
+**Field mapping (SB Audience → Driver):**
+- `Overall Diameter` → `overall_diameter_mm`; `Baffle Cutout Diameter` → `mounting_diameter_mm`; `Mounting Depth` / `Depth` → `depth_mm`; `Net Weight` → `net_weight_kg`; `Nominal Throat Diameter` → `throat_diameter_mm`.
+- `Nominal` / `Minimum Impedance` → `impedance_nominal_ohm` / `impedance_min_ohm`. `Re` (T/S) or `RDC` (compression) → `re_ohm`.
+- **`AES Power Handling` → `power_aes_watts`; `Maximum Power Handling` → `power_program_watts`.** The footnote defines it as "3dB greater than nominal power", i.e. 2× AES, which is program-class, not peak. Same call as Ciare.
+- **`Sensitivity (1W/1m)` → `sensitivity_db_1w_1m`; `Sensitivity (2.83V/1m)` → `sensitivity_db_2_83v_1m`**, slotted by label. Every model is 8Ω, so the derived counterpart equals the published one.
+- `Frequency Range` → `freq_low/high_hz`; `Recommended Crossover Frequency` → `recommended_crossover_hz`; `Voice Coil Diameter` → `voice_coil_diameter_mm`.
+- `Winding` / `Former` / `Diaphragm Material`, `Phase Plug Design`, `Cone Surround` → the matching string fields. `Magnet` → `magnet_type` (`Ferrite, Neo` → OTHER).
+- T/S: `Fs`, `Qes`/`Qms`/`Qts`, `Vas`, `Sd`, `Mms`, `Bl` (rendered `BI`), `Le`, `Cms`, `Rms` (kg/s ≡ N·s/m), `Eta Zero`, `EBP` → the canonical fields.
+- **`Xmax`** is one-way per the sheet's own footnote, `((winding − gap)/2) + gap/3`, so it's stored as-is. **`Xdamage`** ("Maximum excursion (p-p) before permanent damage") → `xmech_mm`. Xdamage/Xmax is 2.2–4.7 across the catalog, so the consistency gate's p-p assumption holds.
+- `nominal_size_mm` comes from the subtitle inches (`PDF_TEXT`). For compression drivers that is the throat size, which matches the repo convention.
+
+**Coax (LF/HF columns).** LF → generic fields. HF:
+- `coax_hf_impedance_nominal_ohm`, `coax_hf_impedance_min_ohm`, `coax_hf_power_aes_watts`, `coax_hf_freq_low/high_hz`, `coax_hf_voice_coil_diameter_mm`.
+- The HF `Cone Surround` value is the dome (`Cone Surround (LF) / Dome (HF)` on 8CX250) → `diaphragm_material`.
+- **Dropped:** HF Maximum power (program-class; there's no coax HF program slot) and HF sensitivity (2.83V; no 2.83V coax HF slot).
+
+**DriverKind:** `woofers`, `subwoofers`, `open-baffle-drivers` → LF_WOOFER; `compression-drivers` → HF_COMPRESSION; `coaxials` → COAX. Any subtitle containing `Midrange` → FULLRANGE (NERO-5CCN125D, NERO-6MRN150D/151D sit under `woofers`).
+
+**Quirks:**
+- **NERO-5CCN125D** ships with a removable rear chamber. Its T/S block has `With Chamber` / `No Chamber` columns, and its sensitivity row reads `With / No Chamber 99/97 dB`. We take the as-shipped with-chamber values, which is also the sheet's headline 99 dB. The free-air figures (Fs 122 Hz, Vas 2.7 L) aren't stored.
+- Datasheet download ids change when SB Audience revises a sheet (`R.4 / 05.04.2024` revision stamps). The ids aren't used for identity: canonical_id comes from model + impedance.
+
+**Recon count (2026-11-06):** 64 products, 60 drivers after the horn skip. All 60 parse and survive consistency. `expected_min_records = 50`.
+
+**Verified 2026-11-06** (`verify-scrape`, full coverage): 4 blind transcribers read all 60 live datasheets as rendered pages, which is independent of the pypdfium2 text path. `tools/verify_scrape.py` ran 1,852 field comparisons with 0 mismatches. A mutated-record negative control failed as expected.
+
+**Latent risks (no current sheet triggers them):**
+- Coax Specs cells outside the LF/HF-mapped labels (winding/former material, flux, sensitivity) always take the first value as LF. A sheet with a blank LF cell would put its HF value there.
+- Some label-to-value displacements are 4.1 pt, just past `_ROW_TOL_PT = 4.0`. Both the same-row and orphan-adoption paths handle them today, but a layout tweak could flip which path applies.
 
 ---
 
